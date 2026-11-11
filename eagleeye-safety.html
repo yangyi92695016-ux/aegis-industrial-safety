@@ -215,6 +215,34 @@ canvas.chart{width:100%;height:180px;display:block}
 .toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(20px);background:var(--panel2);border:1px solid rgba(255,167,38,.5);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14.5px;letter-spacing:.05em;opacity:0;pointer-events:none;transition:.35s;z-index:500;box-shadow:0 12px 34px rgba(0,0,0,.5)}
 .toast.show{opacity:1;transform:translateX(-50%)}
 
+/* ============ v4：导览 / 告警铃 / 过渡 ============ */
+.c-top .bell-ui{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:6px 14px;cursor:pointer;transition:.25s}
+.c-top .bell-ui:hover{border-color:rgba(255,77,79,.5);color:var(--text)}
+.c-top .bell-ui b{color:#fff;background:var(--red);border-radius:50%;min-width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-variant-numeric:tabular-nums;padding:0 4px}
+.c-top .bell-ui b.zero{background:var(--dim2)}
+.tour-btn{font-size:14px;color:var(--hl);border:1px solid rgba(255,167,38,.5);background:rgba(255,167,38,.08);border-radius:20px;padding:6px 16px;transition:.25s;letter-spacing:.04em}
+.tour-btn:hover{background:rgba(255,167,38,.18)}
+.c-body{transition:opacity .22s ease,transform .22s ease}
+.c-body.swap{opacity:0;transform:translateY(10px)}
+@keyframes alarmPulse{0%,100%{box-shadow:0 40px 100px rgba(0,0,0,.55)}50%{box-shadow:0 40px 100px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,77,79,.9)}}
+body.alarming .console{animation:alarmPulse 1.6s ease infinite}
+.tour-hole{position:fixed;z-index:601;border-radius:14px;box-shadow:0 0 0 9999px rgba(3,5,9,.82),0 0 0 2px var(--hl);transition:all .45s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.tour-bubble{position:fixed;z-index:602;background:var(--panel2);border:1px solid rgba(255,167,38,.5);border-radius:16px;padding:20px 24px;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.6);transition:all .45s cubic-bezier(.22,1,.36,1)}
+.tour-bubble .tb-step{font-size:12px;letter-spacing:.2em;color:var(--hl)}
+.tour-bubble h3{font-size:19px;margin:6px 0 8px;letter-spacing:.04em}
+.tour-bubble p{font-size:14px;color:var(--dim);line-height:1.7}
+.tour-bubble .tb-btns{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
+.tour-bubble .tb-btns .btn{padding:9px 20px;font-size:14px}
+.tour-bubble .tb-skip{font-size:13px;color:var(--dim2);cursor:pointer}
+.tour-bubble .tb-skip:hover{color:var(--text)}
+.tour-dots{display:flex;gap:6px}
+.tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--dim2);transition:.3s}
+.tour-dots i.on{background:var(--hl);box-shadow:0 0 8px var(--hl)}
+.report-row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.08);font-size:14px;color:var(--dim)}
+.report-row i{font-style:normal;color:var(--text)}
+.report-tip{margin-top:12px;font-size:13px;color:var(--dim2);line-height:1.8}
+@media(max-width:640px){.tour-bubble{left:12px!important;right:12px;max-width:none}}
+
 /* ============ AI 能力卡片 ============ */
 .scenes{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .3s,border-color .3s}
@@ -395,7 +423,14 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       <div class="c-main">
         <div class="c-top">
           <div class="proj">🏗 高新区城市更新项目 · 二标段 <span class="st">● 系统运行中</span></div>
-          <div class="sys"><span>时间 <b id="sysClock">--:--:--</b></span><span>天气 <b>晴 26℃</b></span><span>在线设备 <b>142/148</b></span></div>
+          <div class="sys">
+            <span class="bell-ui" id="topBell" title="待处置告警">🔔<b id="bellCount">0</b></span>
+            <span>时间 <b id="sysClock">--:--:--</b></span>
+            <span>天气 <b>晴 26℃</b></span>
+            <span>在线设备 <b>142/148</b></span>
+            <button class="tour-btn" id="tourBtn">🎬 产品导览</button>
+            <button class="tour-btn" id="fsBtn" title="全屏">⛶</button>
+          </div>
         </div>
         <div class="c-body" id="cBody"><!-- 模块内容 --></div>
       </div>
@@ -643,7 +678,7 @@ MODULES.overview=function(){
   return `
   <div class="kpis">
     <div class="kpi" style="--kc:rgba(255,167,38,.12)"><div class="v" style="color:var(--hl)" id="kpiWorkers">1286</div><div class="l">在册劳务人员</div><div class="d">今日在场 <b style="color:var(--grn)">863</b></div></div>
-    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)" id="kpiAlarm">23</div><div class="l">今日告警</div><div class="d">高风险 <b style="color:var(--red)">4</b> · 已处置 <b style="color:var(--grn)">19</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)" id="kpiAlarm">23</div><div class="l">今日告警</div><div class="d">高风险 <b style="color:var(--red)" id="kpiHigh">4</b> · 已处置 <b style="color:var(--grn)" id="kpiDisposed">19</b></div></div>
     <div class="kpi" style="--kc:rgba(255,213,74,.12)"><div class="v" style="color:var(--yel)" id="kpiPending">3</div><div class="l">待处置隐患</div><div class="d">超 24h 未闭环 <b style="color:var(--red)">1</b></div></div>
     <div class="kpi" style="--kc:rgba(61,220,132,.12)"><div class="v" style="color:var(--grn)">96%</div><div class="l">设备在线率</div><div class="d">142 / 148 台在线</div></div>
   </div>
@@ -732,7 +767,7 @@ function renderBigCam(i){
 }
 
 /* ③ 告警中心 */
-const ALARMS=[
+let ALARMS=[
   {t:'09:12:34',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',lvT:'高风险',st:0},
   {t:'09:05:18',cam:'B-01 吊装区',type:'进入吊装警戒区',lv:'m',lvT:'警戒',st:0},
   {t:'08:47:02',cam:'A-02 3号楼',type:'高处作业未系安全带',lv:'h',lvT:'高风险',st:0},
@@ -743,6 +778,42 @@ const ALARMS=[
   {t:'06:44:51',cam:'E-01 环境站',type:'扬尘超标联动喷淋',lv:'l',lvT:'低',st:1}
 ];
 let alarmFilter='all';
+let tickN=0;
+
+/* ===== 持久化（刷新不丢，演示更可信） ===== */
+const LS_KEY='eagleeye_v4';
+let saved={};
+try{saved=JSON.parse(localStorage.getItem(LS_KEY)||'{}');}catch(e){saved={};}
+if(saved.alarmSt&&Array.isArray(saved.alarmSt))ALARMS.forEach((a,i)=>{if(saved.alarmSt[i]!=null)a.st=saved.alarmSt[i];});
+function persist(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({alarmSt:ALARMS.map(a=>a.st),hazards,aiOn,fenceOn}));}catch(e){}
+}
+
+/* ===== 全局告警联动总线 ===== */
+function raiseAlarm(cam,type,lv,lvT){
+  const d=new Date();
+  ALARMS.unshift({t:pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()),cam,type,lv,lvT,st:0});
+  if(ALARMS.length>12)ALARMS.pop();
+  document.body.classList.remove('alarming');
+  void document.body.offsetWidth;
+  document.body.classList.add('alarming');
+  clearTimeout(raiseAlarm._t);
+  raiseAlarm._t=setTimeout(()=>document.body.classList.remove('alarming'),2600);
+  toast('🚨 新告警：'+cam+' · '+type+' · 已推送安全员');
+  updateBell();updateKPIs();
+  if(curMod==='alarm')renderAlarmTable();
+  persist();
+}
+function updateBell(){
+  const b=$('#bellCount');
+  if(b){const n=ALARMS.filter(a=>!a.st).length;b.textContent=n;b.className=n?'':'zero';}
+}
+function updateKPIs(){
+  const kAlarm=$('#kpiAlarm');if(kAlarm)kAlarm.textContent=ALARMS.length;
+  const kHigh=$('#kpiHigh');if(kHigh)kHigh.textContent=ALARMS.filter(a=>a.lv==='h'&&!a.st).length;
+  const kDis=$('#kpiDisposed');if(kDis)kDis.textContent=ALARMS.filter(a=>a.st).length;
+  const pend=$('#kpiPending');if(pend)pend.textContent=hazards.filter(h=>h.st===0).length;
+}
 MODULES.alarm=function(){
   return `
   <div class="filter-row">
@@ -879,7 +950,7 @@ function envTick(){
   env.noise=Math.max(45,Math.min(95,env.noise+rnd(-3,3)));
   env.wind=Math.max(1,Math.min(11,env.wind+rnd(-.4,.4)));
   env.temp=Math.max(20,Math.min(36,env.temp+rnd(-.3,.3)));
-  if(!sprayOn&&env.pm25>75)sprayOn=true;
+  if(!sprayOn&&env.pm25>75){sprayOn=true;raiseAlarm('E-01 环境站','扬尘超标 · 喷淋已联动','l','低');}
   if(sprayOn&&env.pm25<45)sprayOn=false;
   /* 仅当模块可见时刷新 DOM */
   const gP=$('#gPm25');if(!gP)return;
@@ -897,6 +968,10 @@ let hazards=[
   {id:3,loc:'材料加工区',type:'配电箱未上锁',st:0,who:'刘洋'},
   {id:4,loc:'1#塔吊基础',type:'接地电阻偏高',st:2,who:'王芳'}
 ];
+/* 恢复本地保存的演示状态 */
+if(Array.isArray(saved.hazards)&&saved.hazards.length)hazards=saved.hazards;
+if(saved.aiOn)Object.assign(aiOn,saved.aiOn);
+if(saved.fenceOn!=null)fenceOn=saved.fenceOn;
 MODULES.hazard=function(){
   const c=hazards.filter(h=>h.st===0).length,p=hazards.filter(h=>h.st===1).length,d=hazards.filter(h=>h.st===2).length;
   return `
@@ -927,7 +1002,10 @@ MODULES.report=function(){
   <tbody><tr><td>2026-01</td><td>286</td><td>12</td><td style="color:var(--grn)">96.2%</td><td>x.x 分钟</td></tr>
   <tr><td>2026-02</td><td>241</td><td>9</td><td style="color:var(--grn)">97.5%</td><td>x.x 分钟</td></tr>
   <tr><td>2026-03</td><td>198</td><td>7</td><td style="color:var(--grn)">98.1%</td><td>x.x 分钟</td></tr></tbody></table>
-  <div style="margin-top:14px"><button class="btn btn-ghost" id="exportBtn" style="padding:10px 24px;font-size:14px">⬇ 导出报表（演示）</button></div>`)}
+  <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="exportBtn" style="padding:10px 24px;font-size:14px">⬇ 导出报表（演示）</button>
+    <button class="btn btn-primary" id="dailyBtn" style="padding:10px 24px;font-size:14px">🤖 生成今日 AI 巡检日报</button>
+  </div>`)}
   <p class="dash-note" style="margin-top:14px">★ 表格内标注 <b style="color:var(--hl)">x.x</b> 的数值需替换为真实数据，其余演示数据均为模拟</p>`;
 };
 
@@ -935,9 +1013,12 @@ MODULES.report=function(){
 let curMod='overview',consoleVisible=true;
 function showModule(m){
   curMod=m;
+  cBody.classList.add('swap');
   cBody.innerHTML=MODULES[m]();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>cBody.classList.remove('swap')));
   $$('#cNav button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   afterRender[m]&&afterRender[m]();
+  if(m==='overview'){updateBell();updateKPIs();}
   cBody.scrollTop=0;
 }
 const afterRender={
@@ -958,6 +1039,7 @@ const afterRender={
       aiOn[t]=!aiOn[t];
       ch.classList.toggle('on',aiOn[t]);
       $$('#cBody .dbox').forEach(b=>{if(b.dataset.t===t)b.classList.toggle('off',!aiOn[t]);});
+      persist();
     }));
     $('#bigAxis').addEventListener('input',()=>{
       const v=+$('#bigAxis').value;
@@ -975,6 +1057,7 @@ const afterRender={
       a.st=1;
       toast('✓ 告警已处置：'+a.type+' · 已通知复查');
       renderAlarmTable();
+      updateBell();updateKPIs();persist();
     });
     /* donut */
     const cv=$('#cvDonut'),ctx=cv.getContext('2d');
@@ -999,6 +1082,7 @@ const afterRender={
     $('#fenceBtn').addEventListener('click',()=>{
       fenceOn=!fenceOn;
       toast(fenceOn?'🛡 电子围栏已布防 · 越界将实时告警':'电子围栏已关闭');
+      persist();
       showModule('people');
     });
     $$('#sitemap .pdot').forEach(dot=>dot.addEventListener('click',e=>{
@@ -1042,6 +1126,7 @@ const afterRender={
       const h=hazards.find(x=>x.id===+btn.dataset.hz);
       if(btn.dataset.act==='1'){h.st=1;toast('🛠 隐患进入整改：'+h.type+' · 已指派责任人');}
       else{h.st=2;toast('✓ 复查通过 · 隐患已闭环归档');}
+      persist();updateKPIs();
       showModule('hazard');
     });
     $('#hzAdd').addEventListener('click',()=>{
@@ -1057,6 +1142,7 @@ const afterRender={
         hazards.unshift({id:hazards.length+1,loc,type:$('#mType').value,st:0,who:'我',desc});
         $('#modal').classList.remove('show');
         toast('已上报隐患 · 进入待整改');
+        persist();updateKPIs();
         showModule('hazard');
       });
     });
@@ -1079,6 +1165,26 @@ const afterRender={
     ctx.fillText(total+'%',cx0,cy0+2);
     ctx.fillStyle='#8B93A7';ctx.font='11px sans-serif';ctx.fillText('风险类型占比',cx0,cy0+20);
     $('#exportBtn').addEventListener('click',()=>toast('⬇ 报表导出中……（演示环境，请接入真实系统导出）'));
+    $('#dailyBtn').addEventListener('click',()=>{
+      const d=new Date();
+      const dateStr=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+      $('#modalCard').innerHTML=`<h3>🤖 今日 AI 巡检日报</h3>
+        <div style="margin-bottom:10px;font-size:13px;color:var(--dim)">${dateStr} · 高新区城市更新项目 · 二标段 · 晴 26℃</div>
+        <div class="report-row"><span>视频巡检点位</span><i>148 / 148 完成</i></div>
+        <div class="report-row"><span>AI 识别事件</span><i>${ALARMS.length} 起</i></div>
+        <div class="report-row"><span>已闭环处置</span><i style="color:var(--grn)">${ALARMS.filter(a=>a.st).length} 起</i></div>
+        <div class="report-row"><span>隐患整改进度</span><i style="color:var(--yel)">${hazards.filter(h=>h.st===1).length} 项整改中</i></div>
+        <div class="report-row"><span>环境监测</span><i>PM2.5 ${Math.round(env.pm25)} μg/m³ · ${env.pm25>75?'超标，喷淋已联动':'达标'}</i></div>
+        <div class="report-tip">📌 重点提示：基坑临边为今日高风险区域，建议明日加密巡检频次；塔吊吊装时段请保持警戒区清场。</div>
+        <div class="report-tip" style="color:var(--dim2)">* 本报告由 AI 自动汇总生成（演示）· 真实部署接入巡检与告警数据库后自动生成</div>
+        <div style="margin-top:16px;display:flex;gap:12px">
+          <button class="btn btn-primary" id="mArchive" style="flex:1">打印 / 存档（演示）</button>
+          <button class="btn btn-ghost" id="mClose2" style="flex:1">关闭</button>
+        </div>`;
+      $('#modal').classList.add('show');
+      $('#mArchive').addEventListener('click',()=>{toast('📄 日报已归档（演示）');$('#modal').classList.remove('show');});
+      $('#mClose2').addEventListener('click',()=>$('#modal').classList.remove('show'));
+    });
   }
 };
 $$('#cNav button').forEach(b=>b.addEventListener('click',()=>showModule(b.dataset.m)));
@@ -1087,6 +1193,13 @@ new IntersectionObserver(e=>consoleVisible=e[0].isIntersecting).observe($('#cons
 /* 驾驶舱全局模拟时钟 */
 setInterval(()=>{
   if(!consoleVisible)return;
+  tickN++;
+  /* 随机新告警：全模块联动演示 */
+  if(tickN%38===0){
+    const p=feedPool[Math.floor(Math.random()*feedPool.length)];
+    const lvMap={'高':'h','中':'m','低':'l'},tMap={'高':'高风险','中':'警戒','低':'低'};
+    raiseAlarm(p[1],p[0],lvMap[p[2]],tMap[p[2]]);
+  }
   const t=$('#bigTime');if(t)t.textContent=nowStr();
   if(curMod==='people')moveWorkers();
   if(curMod==='machine'){
@@ -1235,6 +1348,74 @@ $$('.metric').forEach(m=>metricIO.observe(m));
 
 /* modal 关闭 */
 $('#modal').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#modal').classList.remove('show');});
+
+/* ============================================================
+   产品导览（评委零门槛看懂全系统）
+   ============================================================ */
+const TOUR=[
+  {mod:'overview',title:'① 驾驶舱总览',desc:'一屏掌握全场态势：在册人员、今日告警、待处置隐患、设备在线率，还有小时告警趋势与区域风险热力图。',sel:'#cBody .kpis'},
+  {mod:'video',title:'② 视频 AI 识别',desc:'真实监控画面形态：点下方机位切换场景；用识别类型开关控制安全帽 / 反光衣 / 吸烟 / 越界检测，还能拖时间轴回放。',sel:'#cBody .bigview'},
+  {mod:'alarm',title:'③ 告警中心',desc:'告警按等级分类、可筛选；点「处理」完成闭环，处置率与推送触达率实时统计。',sel:'#cBody .grid-2'},
+  {mod:'people',title:'④ 人员定位',desc:'点地图上的绿点查看工人档案；开启基坑电子围栏后，人员闯入危险区立即触发越界告警。',sel:'#cBody .sitemap'},
+  {mod:'machine',title:'⑤ 机械设备监测',desc:'塔吊吊重与力矩、升降机载重与人数、基坑位移——数值实时波动，超限即报警。',sel:'#cBody .grid-3'},
+  {mod:'env',title:'⑥ 环境监测联动',desc:'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。',sel:'#cBody .gauge-grid'},
+  {mod:'hazard',title:'⑦ 隐患闭环治理',desc:'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。',sel:'#cBody .hz-stats'},
+  {mod:'report',title:'⑧ 数据报表',desc:'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。',sel:'#cBody .grid-2'}
+];
+let tourIdx=-1;
+const hole=document.createElement('div');hole.className='tour-hole';hole.style.display='none';document.body.appendChild(hole);
+const bubble=document.createElement('div');bubble.className='tour-bubble';bubble.style.display='none';document.body.appendChild(bubble);
+function tourPos(){
+  if(tourIdx<0)return;
+  const el=$(TOUR[tourIdx].sel);
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  if(r.bottom<80||r.top>innerHeight-80){el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(tourPos,450);return;}
+  hole.style.display='block';
+  hole.style.left=(r.left-6)+'px';hole.style.top=(r.top-6)+'px';
+  hole.style.width=(r.width+12)+'px';hole.style.height=(r.height+12)+'px';
+  const bw=Math.min(bubble.offsetWidth||380,innerWidth-24),bh=bubble.offsetHeight||200;
+  let bx=Math.min(Math.max(r.left+r.width/2-bw/2,10),innerWidth-bw-10);
+  let by=r.bottom+16;
+  if(by+bh>innerHeight-14)by=r.top-bh-16;
+  bubble.style.left=bx+'px';bubble.style.top=Math.max(10,by)+'px';
+}
+function tourEnd(){
+  tourIdx=-1;
+  hole.style.display='none';bubble.style.display='none';
+}
+function tourGo(i){
+  tourIdx=i;
+  if(tourIdx<0||tourIdx>=TOUR.length){tourEnd();return;}
+  const s=TOUR[tourIdx];
+  showModule(s.mod);
+  bubble.style.display='block';
+  bubble.innerHTML=`<span class="tb-step">产品导览 ${i+1} / ${TOUR.length}</span>
+    <h3>${s.title}</h3><p>${s.desc}</p>
+    <div class="tb-btns">
+      <div class="tour-dots">${TOUR.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
+      <button class="btn btn-primary" id="tbNext">${i===TOUR.length-1?'完成 ✓':'下一步 →'}</button>
+      <button class="btn btn-ghost" id="tbPrev" ${i===0?'style="opacity:.4"':''}>← 上一步</button>
+      <span class="tb-skip" id="tbSkip">跳过导览</span>
+    </div>`;
+  bubble.querySelector('#tbNext').addEventListener('click',()=>{if(i===TOUR.length-1){tourEnd();toast('🎉 导览完成 · 现在可以自由操作每个模块');}else tourGo(i+1);});
+  bubble.querySelector('#tbPrev').addEventListener('click',()=>{if(i>0)tourGo(i-1);});
+  bubble.querySelector('#tbSkip').addEventListener('click',tourEnd);
+  setTimeout(tourPos,420);
+}
+function tourStart(){
+  $('#consoleBox').scrollIntoView({block:'start',behavior:'smooth'});
+  setTimeout(()=>tourGo(0),600);
+}
+$('#tourBtn').addEventListener('click',tourStart);
+$('#fsBtn').addEventListener('click',()=>{
+  if(!document.fullscreenElement)$('#consoleBox').requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+});
+$('#topBell').addEventListener('click',()=>{showModule('alarm');toast('🔔 当前 '+ALARMS.filter(a=>!a.st).length+' 条告警待处置');});
+addEventListener('scroll',()=>{if(tourIdx>=0)tourPos();},{passive:true});
+addEventListener('resize',()=>{if(tourIdx>=0)tourPos();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&tourIdx>=0)tourEnd();});
 
 /* 初始化 */
 showModule('overview');
