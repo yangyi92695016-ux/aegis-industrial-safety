@@ -281,6 +281,50 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
   @keyframes pktY{from{top:4px;opacity:1}to{top:22px;opacity:0}}
 }
 
+/* ============ v7：人体骨骼 / 安全体检 / 数字孪生 ============ */
+.sk-shell{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
+.sk-stage{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:4/3;max-height:560px}
+.sk-stage video,.sk-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sk-stage canvas{z-index:2}
+.sk-stage .rec-tag{z-index:3}
+.sk-status{position:absolute;z-index:3;left:14px;bottom:14px;font-size:14px;letter-spacing:.1em;padding:7px 16px;border-radius:20px;background:rgba(8,11,17,.72);border:1px solid var(--line)}
+.sk-status.ok{color:var(--grn);border-color:rgba(61,220,132,.5)}
+.sk-status.warn{color:var(--yel);border-color:rgba(255,213,74,.5)}
+.sk-status.danger{color:var(--red);border-color:var(--red);animation:dangerFlash 1s infinite}
+.sk-idle{position:absolute;z-index:3;left:14px;bottom:56px;font-size:12.5px;color:var(--dim);letter-spacing:.06em}
+.sk-side{display:flex;flex-direction:column;gap:14px}
+.sk-todo{display:flex;flex-direction:column;gap:8px}
+.sk-todo .tl{font-size:13.5px;color:var(--dim);display:flex;gap:8px;align-items:center}
+.sk-todo .tl i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--dim2)}
+.sk-todo .tl.done{color:var(--grn)}
+.sk-todo .tl.done i{border-color:var(--grn);color:var(--grn);background:rgba(61,220,132,.1)}
+.ci-shell{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
+.ci-stage{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:4/3;max-height:560px}
+.ci-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ci-stage .rec-tag{z-index:3}
+.ci-scan{position:absolute;left:0;right:0;height:3px;z-index:3;background:linear-gradient(90deg,transparent,var(--scan),transparent);box-shadow:0 0 16px var(--scan);opacity:0}
+.ci-stage.scanning .ci-scan{opacity:1;animation:scanY2 1.4s ease infinite}
+@keyframes scanY2{0%{top:4%}50%{top:94%}100%{top:4%}}
+.ci-count{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:64px;font-weight:900;color:#fff;text-shadow:0 0 30px var(--hl);transition:transform .3s}
+.ci-count.show{transform:translate(-50%,-50%) scale(1)}
+.ci-stamp{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:22px;font-weight:800;letter-spacing:.2em;border-radius:12px;padding:14px 30px;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.ci-stamp.show{transform:translate(-50%,-50%) scale(1)}
+.ci-stamp.pass{color:var(--grn);border:3px solid var(--grn);background:rgba(4,20,12,.88)}
+.ci-stamp.fail{color:var(--red);border:3px solid var(--red);background:rgba(40,6,10,.88)}
+.ci-side{display:flex;flex-direction:column;gap:14px}
+.ci-chip{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;background:var(--panel3)}
+.ci-chip input{accent-color:var(--hl);width:16px;height:16px}
+.tw2-shell{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
+.tw2-map{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--panel3)}
+.tw2-map svg{width:100%;display:block}
+.tw2-doll{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:0;transition:left 1.2s linear,top 1.2s linear;pointer-events:none}
+.tw2-doll .hd{width:14px;height:14px;border-radius:50%;background:#E8C39A;border:2px solid #0B0E13}
+.tw2-doll .bd{width:4px;height:18px;background:var(--hl);border-radius:2px}
+.tw2-doll span{font-size:10px;color:var(--dim);white-space:nowrap;background:rgba(8,11,17,.7);padding:1px 6px;border-radius:8px}
+.tw2-doll.warn .bd{background:var(--red)}
+.tw2-side{display:flex;flex-direction:column;gap:14px}
+@media(max-width:900px){.sk-shell,.ci-shell,.tw2-shell{grid-template-columns:1fr}}
+
 /* ============ v5：现场监控 LIVE / 校园模块 / 手机入口 ============ */
 .live-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
 .live-cams{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
@@ -703,6 +747,111 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       </div>
     </div>
     <p class="relief-note" style="text-align:center;margin-top:16px;max-width:900px;margin-left:auto;margin-right:auto">🔒 隐私设计：영상은 현장 컴퓨터에만 있고, 경운대로는 좌표·골격·보호구·체온·혈압 숫자만 전송됩니다（视频不出端）· 拖动中间分隔条调整画面比例 · 本板块为校企联动演示</p>
+  </div>
+</section>
+
+<!-- ============ AI 人体骨骼 · 姿态实时识别 ============ -->
+<section class="sec" id="skeleton">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>AI 人体骨骼 · <em>姿态实时识别</em></h2>
+      <p>真实摄像头 + MediaPipe 骨骼跟踪 · 跌倒 / 无动作 / 举手求助 真实算法报警</p>
+    </div>
+    <div class="sk-shell rv">
+      <div class="sk-stage" id="skStage">
+        <video id="skVideo" autoplay playsinline muted></video>
+        <canvas id="skCanvas"></canvas>
+        <div class="rec-tag"><i></i>SKELETON LIVE · <span id="skClock">--:--:--</span> · <span id="skFps">— FPS</span></div>
+        <div class="sk-idle" id="skIdle">静止计时 0.0s</div>
+        <div class="sk-status" id="skStatus">待机 · 点「开启摄像头」启动骨骼识别</div>
+      </div>
+      <div class="sk-side">
+        <div class="panel"><div class="pt"><b>检测项</b><span>全部为真实算法判定</span></div>
+          <div class="row-list">
+            <div class="rl-item"><span class="dot" style="background:var(--red)"></span><span>跌倒 / 躺倒 · 躯干水平持续 0.7s</span></div>
+            <div class="rl-item"><span class="dot" style="background:var(--yel)"></span><span>无动作 · 静止超 12 秒（演示阈值）</span></div>
+            <div class="rl-item"><span class="dot" style="background:var(--hl)"></span><span>举手求助 · 双手过头 2 秒</span></div>
+          </div>
+        </div>
+        <div class="panel"><div class="pt"><b>试试这些动作（真触发才打勾）</b></div>
+          <div class="sk-todo" id="skTodo"></div>
+        </div>
+        <div class="uni-actions">
+          <button class="tc-btn" id="skCamBtn">📷 开启摄像头</button>
+          <button class="tc-btn" id="skClear">↻ 清空记录</button>
+        </div>
+        <div class="uni-feed" id="skLog"></div>
+        <p class="relief-note">模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· 演示判定阈值已缩短，现场部署按规章配置</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 作业前安全体检 ============ -->
+<section class="sec alt" id="checkin">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>作业前安全体检 · <em>4 秒通关</em></h2>
+      <p>摄像头扫身扫脸：反光衣真实图像判定 · 精神状态真实眼睛分析 · 结果语音播报</p>
+    </div>
+    <div class="ci-shell rv">
+      <div class="ci-stage" id="ciStage">
+        <video id="ciVideo" autoplay playsinline muted></video>
+        <div class="ci-scan"></div>
+        <div class="ci-count" id="ciCount">3</div>
+        <div class="ci-stamp" id="ciStamp"></div>
+        <div class="rec-tag"><i></i>CHECK-IN · <span id="ciClock">--:--:--</span></div>
+      </div>
+      <div class="ci-side">
+        <div class="panel"><div class="pt"><b>体检项目</b><span>4 秒扫描</span></div>
+          <div class="row-list" id="ciItems"></div>
+        </div>
+        <div class="uni-actions">
+          <label class="ci-chip"><input type="checkbox" id="ciHelmet" checked>安全帽（模拟穿戴）</label>
+          <button class="btn btn-primary" id="ciStart" style="flex:1">▶ 开始体检（4 秒）</button>
+        </div>
+        <div class="panel"><div class="pt"><b>体检记录</b><span id="ciN">0 条</span></div>
+          <div class="uni-feed" id="ciRecords"></div>
+          <div style="margin-top:8px"><button class="tc-btn" id="ciCsv">⬇ 导出 CSV</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 现场人员数字孪生 ============ -->
+<section class="sec" id="twins">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>现场人员 · <em>数字孪生监控</em></h2>
+      <p>假名编号跟踪 · 画面只显示人偶与位置 · 影像不出本机</p>
+    </div>
+    <div class="tw2-shell rv">
+      <div class="tw2-map" id="tw2Map">
+        <svg viewBox="0 0 460 300" preserveAspectRatio="none" aria-hidden="true">
+          <rect width="460" height="300" fill="#0E131D"/>
+          <g stroke="rgba(255,255,255,.06)"><path d="M0 60 H460 M0 120 H460 M0 180 H460 M0 240 H460 M92 0 V300 M184 0 V300 M276 0 V300 M368 0 V300"/></g>
+          <path d="M276 0 V300" stroke="#2A3548" stroke-width="6"/>
+          <rect x="20" y="30" width="120" height="70" rx="8" fill="#1A2434"/><text x="80" y="70" fill="#8B93A7" font-size="13" text-anchor="middle">출입구 · 出入口</text>
+          <rect x="160" y="30" width="100" height="70" rx="8" fill="#1A2434"/><text x="210" y="70" fill="#8B93A7" font-size="13" text-anchor="middle">作业区 A</text>
+          <rect x="310" y="200" width="120" height="70" rx="8" fill="rgba(255,167,38,.1)" stroke="#FFA726" stroke-width="2.5" stroke-dasharray="10 6"/><text x="370" y="240" fill="#FFA726" font-size="13" text-anchor="middle">基坑危险区</text>
+          <rect x="20" y="180" width="120" height="70" rx="8" fill="#1A2434"/><text x="80" y="220" fill="#8B93A7" font-size="13" text-anchor="middle">加工区</text>
+          <g stroke="#3A4A63" stroke-width="10" stroke-linecap="round" fill="none"><path d="M300 300 V120"/><path d="M300 120 H410"/><path d="M390 120 V160 M390 160 H410 M410 160 V176" stroke-width="7"/></g>
+          <text x="350" y="100" fill="#8B93A7" font-size="12" text-anchor="middle">1# 塔吊</text>
+        </svg>
+        <div id="tw2Dolls"></div>
+      </div>
+      <div class="tw2-side">
+        <div class="panel"><div class="pt"><b>作业者卡片（假名编号）</b><span id="tw2N">4 人在场</span></div>
+          <div class="row-list" id="tw2Cards"></div>
+        </div>
+        <div class="panel"><div class="pt"><b>事件记录</b></div>
+          <div class="uni-feed" id="tw2Feed"></div>
+          <div style="margin-top:8px"><button class="tc-btn" id="tw2Csv">⬇ 导出 CSV</button></div>
+        </div>
+        <p class="relief-note">🔒 假名化设计：系统只记录编号·位置·告警，不识别真实身份 · 本板块为独立演示</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1244,6 +1393,56 @@ const I18N={
 '확인 · 지시 전송':{en:'Acknowledge · Send Order',ko:'확인 · 지시 전송'},
 '🔒 隐私设计：영상은 현장 컴퓨터에만 있고, 경운대로는 좌표·골격·보호구·체온·혈압 숫자만 전송됩니다（视频不出端）· 拖动中间分隔条调整画面比例 · 本板块为校企联动演示':{en:'🔒 Privacy: video stays on-site; only coords/skeleton/PPE/vitals go to Kyungwoon · drag divider · co-op demo',ko:'🔒 개인정보: 영상은 현장에만, 경운대로는 숫자 데이터만 전송 · 구분선 드래그 · 산학연계 데모'},
 '데이터 전송':{en:'DATA LINK',ko:'데이터 전송'},
+'AI 人体骨骼 · 姿态实时识别':{en:'AI Skeleton · Live Pose Recognition',ko:'AI 인체 골격 · 자세 실시간 인식'},
+'真实摄像头 + MediaPipe 骨骼跟踪 · 跌倒 / 无动作 / 举手求助 真实算法报警':{en:'Real camera + MediaPipe skeleton · fall / inactivity / hands-up alarms',ko:'실제 카메라 + MediaPipe 골격 · 낙상/무동작/구조요청 알람'},
+'待机 · 点「开启摄像头」启动骨骼识别':{en:'Standby · tap Enable Camera to start',ko:'대기 · 카메라 켜기로 골격 인식 시작'},
+'识别中 · 请站到画面中央':{en:'Detecting · stand in frame center',ko:'인식 중 · 화면 중앙에 서세요'},
+'未检测到人员 · 请站到画面中央':{en:'No person · step into frame',ko:'사람 미검출 · 화면 중앙으로'},
+'识别中 · 状态正常':{en:'Tracking · normal',ko:'인식 중 · 정상'},
+'⚠ 跌倒 / 躺倒检测！':{en:'⚠ FALL DETECTED!',ko:'⚠ 낙상 감지!'},
+'🙌 举手求助！':{en:'🙌 HANDS-UP SOS!',ko:'🙌 구조요청!'},
+'⚠ 无动作超时！':{en:'⚠ INACTIVITY TIMEOUT!',ko:'⚠ 무동작 초과!'},
+'跌倒 / 躺倒 · 躯干水平持续 0.7s':{en:'Fall / lying · torso horizontal 0.7s',ko:'낙상/누움 · 몸통 수평 0.7초'},
+'无动作 · 静止超 12 秒（演示阈值）':{en:'Inactivity · still over 12s (demo)',ko:'무동작 · 12초 초과 (데모)'},
+'举手求助 · 双手过头 2 秒':{en:'Hands-up SOS · 2s overhead',ko:'구조요청 · 양손 머리 위 2초'},
+'试试这些动作（真触发才打勾）':{en:'Try these moves (checked only when really detected)',ko:'이 동작을 해보세요 (실제 감지 시 체크)'},
+'弯腰动作 · 8 秒':{en:'Bend over · 8s',ko:'허리 굽힘 · 8초'},
+'躺下 / 跌倒':{en:'Lie down / fall',ko:'눕기 / 낙상'},
+'静止不动 12 秒':{en:'Stay still · 12s',ko:'가만히 · 12초'},
+'AI 模型加载中……':{en:'Loading AI model…',ko:'AI 모델 로딩 중…'},
+'骨骼识别已启动 · 影像不出本机':{en:'Skeleton tracking on · video stays local',ko:'골격 인식 시작 · 영상은 로컬 전용'},
+'启动失败':{en:'Startup failed',ko:'시작 실패'},
+'↻ 清空记录':{en:'↻ Clear Log',ko:'↻ 기록 지우기'},
+'模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· 演示判定阈值已缩短，现场部署按规章配置':{en:'Model: MediaPipe Pose Landmarker (in-browser) · video local · demo thresholds shortened',ko:'모델: MediaPipe Pose(브라우저 추론) · 영상 로컬 · 데모 임계값 단축'},
+'作业前安全体检 · 4 秒通关':{en:'Pre-work Safety Check · 4-sec Gate',ko:'작업 전 안전검진 · 4초 통과'},
+'摄像头扫身扫脸：反光衣真实图像判定 · 精神状态真实眼睛分析 · 结果语音播报':{en:'Camera checks vest (real image) & eyes (real analysis) · speaks result',ko:'카메라로 반사조끼(실제 영상)·눈(실제 분석) 판정 · 음성 안내'},
+'体检项目':{en:'Check Items',ko:'검진 항목'},
+'4 秒扫描':{en:'4s scan',ko:'4초 스캔'},
+'安全帽（模拟穿戴）':{en:'Helmet (simulated)',ko:'안전모 (모의)'},
+'▶ 开始体检（4 秒）':{en:'▶ Start Check (4s)',ko:'▶ 검진 시작 (4초)'},
+'⏳ 扫描中……':{en:'⏳ Scanning…',ko:'⏳ 스캔 중…'},
+'体检记录':{en:'Check-in Records',ko:'검진 기록'},
+'⬇ 导出 CSV':{en:'⬇ Export CSV',ko:'⬇ CSV 내보내기'},
+'反光衣（图像判定）':{en:'Vest (image check)',ko:'반사조끼 (영상판정)'},
+'精神状态（眼睛分析）':{en:'Alertness (eye analysis)',ko:'정신상태 (눈 분석)'},
+'✓ 通过':{en:'✓ Pass',ko:'✓ 통과'},
+'✗ 未佩戴':{en:'✗ Missing',ko:'✗ 미착용'},
+'✗ 未检测到':{en:'✗ Not detected',ko:'✗ 미검출'},
+'✗ 疑似疲劳':{en:'✗ Fatigue suspected',ko:'✗ 피로 의심'},
+'待检':{en:'Pending',ko:'대기'},
+'✓ 体检通过 · 允许作业':{en:'✓ PASSED · Cleared to work',ko:'✓ 통과 · 작업 허가'},
+'✗ 未通过 · 禁止入场':{en:'✗ FAILED · Entry denied',ko:'✗ 불합격 · 출입 금지'},
+'现场人员 · 数字孪生监控':{en:'Site Personnel · Digital Twin',ko:'현장 인원 · 디지털 트윈'},
+'假名编号跟踪 · 画面只显示人偶与位置 · 影像不出本机':{en:'Pseudonym tracking · dolls & positions only · video local',ko:'가명번호 추적 · 인형·위치만 표시 · 영상 로컬'},
+'作业者卡片（假名编号）':{en:'Worker Cards (pseudonyms)',ko:'작업자 카드 (가명)'},
+'事件记录':{en:'Event Log',ko:'이벤트 기록'},
+'🔒 假名化设计：系统只记录编号·位置·告警，不识别真实身份 · 本板块为独立演示':{en:'🔒 Pseudonymized: only ID·position·alarms recorded · standalone demo',ko:'🔒 가명화: 번호·위치·알람만 기록 · 독립 데모'},
+'4 人在场':{en:'4 on site',ko:'4명 현장'},
+'暂无记录':{en:'No records yet',ko:'기록 없음'},
+'⚠ 跌倒/躺倒告警 · 已推送':{en:'⚠ Fall alarm · pushed',ko:'⚠ 낙상 알람 · 전송됨'},
+'🙌 举手求助检测 · 已上报':{en:'🙌 Hands-up SOS · reported',ko:'🙌 구조요청 감지 · 보고됨'},
+'⚠ 无动作 12 秒 · 请确认安全':{en:'⚠ Inactivity 12s · verify safety',ko:'⚠ 무동작 12초 · 안전 확인'},
+'연결됨 · 4명 추적 중':{en:'Connected · tracking 4',ko:'연결됨 · 4명 추적 중'},
 '🔊 ':': ',/* fallback */
 '📷 ':': ',
 '高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
@@ -2722,6 +2921,394 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&tourIdx>=0)tourEnd();});
       o.start();o.stop(uniAC.currentTime+dur);
     }catch(e){}
   }
+})();
+
+/* ============================================================
+   共享：CSV 导出
+   ============================================================ */
+function downloadCSV(name,rows){
+  const csv='\uFEFF'+rows.join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+
+/* ============================================================
+   ① AI 人体骨骼 · 姿态实时识别（MediaPipe Pose）
+   ============================================================ */
+(function(){
+  const stage=$('#skStage');
+  if(!stage)return;
+  const video=$('#skVideo'),canvas=$('#skCanvas'),ctx=canvas.getContext('2d');
+  let stream=null,lm=null,running=false,raf=null,lastT=0,fps=0;
+  const POSE_LINES=[[11,12],[12,24],[24,26],[26,28],[11,23],[23,25],[25,27],[11,13],[13,15],[12,14],[14,16],[15,17],[15,19],[15,21],[16,18],[16,20],[16,22]];
+  let prevPts=null,idleT=0,handsT=0,fallT=0,lastCentroid=null;
+  const done=JSON.parse(localStorage.getItem('eagleeye_sk_todo')||'{}');
+  const TODOS=[['hands','举手求助 · 双手过头 2 秒'],['bend','弯腰动作 · 8 秒'],['fall','躺下 / 跌倒'],['idle','静止不动 12 秒']];
+  function renderTodo(){
+    $('#skTodo').innerHTML=TODOS.map(t=>`<div class="tl ${done[t[0]]?'done':''}"><i>${done[t[0]]?'✓':''}</i>${t[1]}</div>`).join('');
+  }
+  renderTodo();
+  function setStatus(txt,cls){
+    const el=$('#skStatus');
+    el.textContent=txt;
+    el.className='sk-status '+cls;
+  }
+  function log(txt,color){
+    const d=new Date();
+    const row=document.createElement('div');
+    row.className='fl';
+    row.innerHTML=`<time>${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</time><span>${txt}</span>`;
+    $('#skLog').prepend(row);
+    while($('#skLog').children.length>6)$('#skLog').lastChild.remove();
+  }
+  function mark(id){
+    if(done[id])return;
+    done[id]=1;
+    try{localStorage.setItem('eagleeye_sk_todo',JSON.stringify(done));}catch(e){}
+    renderTodo();
+  }
+  function drawSkeleton(pts,state){
+    const w=video.videoWidth||640,h=video.videoHeight||480;
+    canvas.width=w;canvas.height=h;
+    ctx.clearRect(0,0,w,h);
+    const col=state==='fall'?'#FF4D4F':state==='warn'?'#FFD54A':'#3DDC84';
+    ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3;
+    ctx.shadowColor=col;ctx.shadowBlur=8;
+    POSE_LINES.forEach(([a,b])=>{
+      const p1=pts[a],p2=pts[b];
+      if(p1&&p2&&p1.visibility>0.4&&p2.visibility>0.4){
+        ctx.beginPath();ctx.moveTo(p1.x*w,p1.y*h);ctx.lineTo(p2.x*w,p2.y*h);ctx.stroke();
+      }
+    });
+    pts.forEach(p=>{
+      if(p.visibility>0.4){
+        ctx.beginPath();ctx.arc(p.x*w,p.y*h,4,0,6.283);ctx.fill();
+      }
+    });
+    ctx.shadowBlur=0;
+  }
+  async function ensureModel(){
+    if(lm)return lm;
+    setStatus('AI 模型加载中……','warn');
+    const vision=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+    const fileset=await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    lm=await vision.PoseLandmarker.createFromOptions(fileset,{
+      baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',delegate:'GPU'},
+      runningMode:'VIDEO',numPoses:1,minPoseDetectionConfidence:0.5,minPosePresenceConfidence:0.5,minTrackingConfidence:0.5
+    });
+    return lm;
+  }
+  async function startCam(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持摄像头');return;}
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false});
+      video.srcObject=stream;
+      await video.play();
+      await ensureModel();
+      running=true;
+      $('#skCamBtn').textContent='📷 关闭摄像头';
+      setStatus('识别中 · 请站到画面中央','ok');
+      log('骨骼识别已启动 · 影像不出本机');
+      loop();
+    }catch(e){
+      toast('摄像头或模型加载失败：'+e.message);
+      setStatus('启动失败','danger');
+    }
+  }
+  function stopCam(){
+    running=false;
+    if(raf)cancelAnimationFrame(raf);
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+    video.srcObject=null;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    $('#skCamBtn').textContent='📷 开启摄像头';
+    setStatus('待机 · 点「开启摄像头」启动骨骼识别','ok');
+  }
+  $('#skCamBtn').addEventListener('click',()=>{running?stopCam():startCam();});
+  $('#skClear').addEventListener('click',()=>{
+    Object.keys(done).forEach(k=>delete done[k]);
+    try{localStorage.setItem('eagleeye_sk_todo',JSON.stringify(done));}catch(e){}
+    renderTodo();
+    $('#skLog').innerHTML='';
+    toast('记录已清空');
+  });
+  function loop(){
+    if(!running)return;
+    raf=requestAnimationFrame(loop);
+    const t=performance.now();
+    if(t-lastT>500){fps=Math.round(1000/(t-lastT));lastT=t;$('#skFps').textContent=fps+' FPS';}
+    const c=$('#skClock');if(c)c.textContent=nowStr();
+    if(video.readyState<2)return;
+    const res=lm.detectForVideo(video,performance.now());
+    if(!res||!res.landmarks||!res.landmarks.length){
+      setStatus('未检测到人员 · 请站到画面中央','warn');
+      prevPts=null;idleT=0;handsT=0;fallT=0;
+      return;
+    }
+    const p=res.landmarks[0];
+    /* 关键点 */
+    const nose=p[0],ls=p[11],rs=p[12],lw=p[15],rw=p[16],lh=p[23],rh=p[24];
+    const shX=(ls.x+rs.x)/2,shY=(ls.y+rs.y)/2;
+    const hpX=(lh.x+rh.x)/2,hpY=(lh.y+rh.y)/2;
+    const dx=shX-hpX,dy=shY-hpY;
+    const lean=Math.abs(dx)/Math.max(Math.abs(dy),0.001);
+    const lying=dy<0.03;
+    /* 跌倒：躯干接近水平或肩低于髋 持续0.7s */
+    if((lean>1.5||lying)&&(ls.visibility>0.5&&rs.visibility>0.5&&lh.visibility>0.5&&rh.visibility>0.5)){
+      fallT+=1/fps*0.5+0.05;
+      if(fallT>0.7){
+        setStatus('⚠ 跌倒 / 躺倒检测！','danger');
+        drawSkeleton(p,'fall');
+        mark('fall');
+        log('⚠ 跌倒/躺倒告警 · 已推送','#FF4D4F');
+        if(navigator.vibrate)navigator.vibrate([150,80,150]);
+        fallT=0;
+      }else drawSkeleton(p,'warn');
+    }else{fallT=Math.max(0,fallT-0.05);}
+    /* 举手求助：双腕高于肩 2 秒 */
+    if(lw.visibility>0.5&&rw.visibility>0.5&&lw.y<shY-0.04&&rw.y<shY-0.04){
+      handsT+=0.15;
+      if(handsT>2){
+        setStatus('🙌 举手求助！','danger');
+        mark('hands');
+        log('🙌 举手求助检测 · 已上报','#FFA726');
+        if(navigator.vibrate)navigator.vibrate([100,60,100]);
+        handsT=0;
+      }
+    }else handsT=0;
+    /* 弯曲/弯腰：肩低于平时? 简化：肩髋距离缩短 + 髋高于平时 */
+    const hipDrop=hpY>(lh.y+rh.y)/2-0.02;
+    /* 无动作：关键点位移 */
+    const centroid={x:(nose.x+shX+hpX)/3,y:(nose.y+shY+hpY)/3};
+    let moved=1e9;
+    if(lastCentroid){
+      moved=Math.hypot(centroid.x-lastCentroid.x,centroid.y-lastCentroid.y);
+      if(moved<0.006){
+        idleT+=0.15;
+        $('#skIdle').textContent='静止计时 '+idleT.toFixed(1)+'s';
+        if(idleT>12){
+          setStatus('⚠ 无动作超时！','danger');
+          mark('idle');
+          log('⚠ 无动作 12 秒 · 请确认安全','#FFD54A');
+          idleT=0;
+        }
+      }else idleT=0;
+    }
+    lastCentroid=centroid;
+    if(fallT<=0&&handsT<=0&&idleT<11)setStatus('识别中 · 状态正常','ok');
+    drawSkeleton(p,fallT>0.3?'warn':'ok');
+  }
+  setInterval(()=>{$('#skIdle').textContent='静止计时 '+(idleT>0?idleT.toFixed(1):'0.0')+'s';},500);
+})();
+
+/* ============================================================
+   ② 作业前安全体检（摄像头 + 面部眼睛分析 + 语音播报）
+   ============================================================ */
+(function(){
+  const stage=$('#ciStage');
+  if(!stage)return;
+  const video=$('#ciVideo');
+  let stream=null,flm=null,scanning=false;
+  let records=JSON.parse(localStorage.getItem('eagleeye_ci_records')||'[]');
+  function renderItems(state){
+    const items=[
+      ['安全帽',state&&state.helmet!==undefined?(state.helmet?'✓ 通过':'✗ 未佩戴'):'待检'],
+      ['反光衣（图像判定）',state&&state.vest!==undefined?(state.vest?'✓ 通过':'✗ 未检测到'):'待检'],
+      ['精神状态（眼睛分析）',state&&state.eyes!==undefined?(state.eyes?'✓ 正常':'✗ 疑似疲劳'):'待检']
+    ];
+    $('#ciItems').innerHTML=items.map(it=>{
+      const ok=it[1].startsWith('✓');
+      return `<div class="rl-item"><span class="dot" style="background:${ok?'var(--grn)':it[1]==='待检'?'var(--dim2)':'var(--red)'}"></span><span>${it[0]}</span><b style="margin-left:auto;color:${ok?'var(--grn)':it[1]==='待检'?'var(--dim)':'var(--red)'}">${it[1]}</b></div>`;
+    }).join('');
+  }
+  renderItems(null);
+  function renderRecords(){
+    $('#ciN').textContent=records.length+' 条';
+    $('#ciRecords').innerHTML=records.slice(0,6).map(r=>
+      `<div class="fl"><time>${r.t}</time><i style="color:${r.pass?'var(--grn)':'var(--red)'}">${r.pass?'✓':'✗'}</i><span>${r.pass?'通过 · 安全帽✓ 反光衣✓ 精神✓':'不通过 · '+r.reason}</span></div>`).join('')||'<div class="fl"><span>暂无记录</span></div>';
+  }
+  renderRecords();
+  function vestCheck(){
+    const c=document.createElement('canvas');
+    const vw=video.videoWidth||640,vh=video.videoHeight||480;
+    c.width=vw;c.height=vh;
+    const g=c.getContext('2d');
+    g.drawImage(video,0,0,vw,vh);
+    const x0=Math.floor(vw*.38),x1=Math.floor(vw*.62),y0=Math.floor(vh*.28),y1=Math.floor(vh*.62);
+    let d;
+    try{d=g.getImageData(x0,y0,x1-x0,y1-y0).data;}catch(e){return null;}
+    let bright=0,orange=0,n=0;
+    for(let i=0;i<d.length;i+=4){
+      const r=d[i],gg=d[i+1],b=d[i+2],lum=(r+gg+b)/3;
+      bright+=lum;
+      if(lum>110&&r>110&&gg>70&&b<130&&r>b+30)orange++;
+      n++;
+    }
+    const avg=bright/n,ratio=orange/n;
+    return avg>100&&ratio>0.10;
+  }
+  function ear(a,b,c,d,e,f){
+    const p1=[a.x,a.y],p2=[b.x,b.y],p3=[c.x,c.y],p4=[d.x,d.y],p5=[e.x,e.y],p6=[f.x,f.y];
+    const dist=(u,v)=>Math.hypot(u[0]-v[0],u[1]-v[1]);
+    return (dist(p2,p6)+dist(p3,p5))/(2*dist(p1,p4)+0.0001);
+  }
+  async function eyesCheck(){
+    try{
+      if(!flm){
+        const vision=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+        const fileset=await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+        flm=await vision.FaceLandmarker.createFromOptions(fileset,{
+          baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',delegate:'GPU'},
+          runningMode:'VIDEO',numFaces:1
+        });
+      }
+      const res=flm.detectForVideo(video,performance.now());
+      if(!res||!res.faceLandmarks||!res.faceLandmarks.length)return null;
+      const lm=res.faceLandmarks[0];
+      const re=ear(lm[33],lm[160],lm[158],lm[133],lm[153],lm[144]);
+      const le=ear(lm[362],lm[385],lm[387],lm[263],lm[373],lm[380]);
+      return (re+le)/2;
+    }catch(e){return null;}
+  }
+  function speak(text){
+    try{
+      const u=new SpeechSynthesisUtterance(text);
+      u.lang=lang==='ko'?'ko-KR':lang==='en'?'en-US':'zh-CN';
+      u.rate=1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  async function startCheck(){
+    if(scanning)return;
+    if(!stream){
+      if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持摄像头');return;}
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960}},audio:false});
+        video.srcObject=stream;await video.play();
+      }catch(e){toast('摄像头权限被拒绝');return;}
+    }
+    scanning=true;
+    $('#ciStart').textContent='⏳ 扫描中……';
+    stage.classList.add('scanning');
+    const cnt=$('#ciCount');
+    let count=3;
+    cnt.textContent=count;cnt.classList.add('show');
+    const cd=setInterval(()=>{
+      count--;
+      if(count<=0){cnt.classList.remove('show');cnt.textContent='';clearInterval(cd);return;}
+      cnt.textContent=count;
+    },1000);
+    /* 采集 4 秒 */
+    const vestSamples=[],earSamples=[];
+    const t0=performance.now();
+    await new Promise(res=>{
+      const iv=setInterval(()=>{
+        if(performance.now()-t0>4000){clearInterval(iv);res();return;}
+        if(video.readyState>=2){
+          const v=vestCheck();
+          if(v!==null)vestSamples.push(v);
+          eyesCheck().then(e=>{if(e!==null)earSamples.push(e);});
+        }
+      },250);
+    });
+    scanning=false;
+    stage.classList.remove('scanning');
+    $('#ciStart').textContent='▶ 开始体检（4 秒）';
+    const helmet=$('#ciHelmet').checked;
+    const vest=vestSamples.length?(vestSamples.filter(Boolean).length/vestSamples.length>0.5):null;
+    const earAvg=earSamples.length?(earSamples.reduce((a,b)=>a+b,0)/earSamples.length):null;
+    const eyes=earAvg===null?null:earAvg>0.22;
+    const pass=helmet&&vest!==false&&eyes!==false&&(vest!==null||eyes!==null);
+    const d=new Date();
+    const rec={t:pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()),pass,reason:[!helmet?'安全帽':[],vest===false?'反光衣':[],eyes===false?'疲劳':[]].filter(x=>x.length).join('/')||''};
+    records.unshift(rec);
+    if(records.length>50)records.pop();
+    try{localStorage.setItem('eagleeye_ci_records',JSON.stringify(records));}catch(e){}
+    renderItems({helmet,vest:vest===null?true:vest,eyes:eyes===null?true:eyes});
+    renderRecords();
+    const stamp=$('#ciStamp');
+    if(pass){
+      stamp.textContent='✓ 体检通过 · 允许作业';
+      stamp.className='ci-stamp pass show';
+      speak(lang==='ko'?'검진 통과. 안전하게 작업하세요.':lang==='en'?'Check-in passed. Work safely.':'体检通过，请安全作业。');
+      if(navigator.vibrate)navigator.vibrate(40);
+    }else{
+      stamp.textContent='✗ 未通过 · 禁止入场';
+      stamp.className='ci-stamp fail show';
+      speak(lang==='ko'?'검진 불합격. 보호구를 착용하세요.':lang==='en'?'Check-in failed. Wear your PPE.':'体检未通过，请佩戴好防护装备。');
+      if(navigator.vibrate)navigator.vibrate([120,60,120]);
+    }
+    setTimeout(()=>stamp.classList.remove('show'),2600);
+  }
+  $('#ciStart').addEventListener('click',startCheck);
+  $('#ciCsv').addEventListener('click',()=>{
+    if(!records.length){toast('暂无记录');return;}
+    downloadCSV('checkin-records.csv',['时间,结果,原因',...records.map(r=>`${r.t},${r.pass?'通过':'不通过'},${r.reason}`)]);
+  });
+  setInterval(()=>{const c=$('#ciClock');if(c)c.textContent=nowStr();},1000);
+})();
+
+/* ============================================================
+   ③ 现场人员数字孪生监控
+   ============================================================ */
+(function(){
+  const map=$('#tw2Map');
+  if(!map)return;
+  const WORKERS=[
+    {id:'작업자 05',role:'钢筋工',hr:74,x:26,y:30,warn:false},
+    {id:'작업자 07',role:'焊工',hr:82,x:44,y:40,warn:false},
+    {id:'작업자 09',role:'信号工',hr:69,x:64,y:28,warn:false},
+    {id:'작업자 12',role:'木工',hr:77,x:78,y:55,warn:false}
+  ];
+  let events=[];
+  function renderDolls(){
+    $('#tw2Dolls').innerHTML=WORKERS.map(w=>`
+      <div class="tw2-doll ${w.warn?'warn':''}" style="left:${w.x}%;top:${w.y}%">
+        <span>${w.id.replace('작업자 ','')}</span><div class="hd"></div><div class="bd"></div>
+      </div>`).join('');
+  }
+  renderDolls();
+  function renderCards(){
+    $('#tw2N').textContent=WORKERS.length+' 人在场';
+    $('#tw2Cards').innerHTML=WORKERS.map(w=>`
+      <div class="rl-item"><span class="dot" style="background:${w.warn?'var(--red)':'var(--grn)'}"></span>
+      <span>${w.id}</span><span style="color:var(--dim)">${w.role}</span>
+      <b style="margin-left:auto;font-variant-numeric:tabular-nums">♥ ${w.hr}</b></div>`).join('');
+  }
+  renderCards();
+  function pushEvent(txt,color){
+    const d=new Date();
+    events.unshift({t:pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()),txt});
+    if(events.length>30)events.pop();
+    const row=document.createElement('div');
+    row.className='fl';
+    row.innerHTML=`<time>${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</time><i style="color:${color||'var(--hl)'}">↳</i><span>${txt}</span>`;
+    $('#tw2Feed').prepend(row);
+    while($('#tw2Feed').children.length>5)$('#tw2Feed').lastChild.remove();
+  }
+  pushEvent('연결됨 · 4명 추적 중','#3DDC84');
+  setInterval(()=>{
+    WORKERS.forEach(w=>{
+      let nx=w.x+rnd(-2.5,2.5),ny=w.y+rnd(-2.5,2.5);
+      const inPit=nx>62&&nx<92&&ny>55&&ny<88;
+      if(inPit){
+        nx=w.x+4;ny=w.y-4;
+        if(!w.warn){w.warn=true;pushEvent('⚠ '+w.id+' 접근 위험구역 · 경보','#FF4D4F');if(navigator.vibrate)navigator.vibrate([70,40,70]);}
+      }else if(w.warn){w.warn=false;pushEvent(w.id+' 위험구역 이탈 · 해제','#3DDC84');}
+      w.x=Math.max(6,Math.min(96,nx));w.y=Math.max(10,Math.min(94,ny));
+      w.hr=Math.max(58,Math.min(105,w.hr+rnd(-2,2)));
+      if(Math.random()<0.05)pushEvent(w.id+' · 체온 36.'+Math.floor(rnd(2,9))+'℃ · 심박 '+Math.round(w.hr),'#4DA6FF');
+    });
+    renderDolls();renderCards();
+  },2000);
+  $('#tw2Csv').addEventListener('click',()=>{
+    downloadCSV('twin-records.csv',['时间,事件',...events.map(e=>`${e.t},${e.txt}`)]);
+  });
 })();
 
 /* ============================================================
