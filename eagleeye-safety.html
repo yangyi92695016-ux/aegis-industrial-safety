@@ -243,6 +243,44 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .report-tip{margin-top:12px;font-size:13px;color:var(--dim2);line-height:1.8}
 @media(max-width:640px){.tour-bubble{left:12px!important;right:12px;max-width:none}}
 
+/* ============ v6：庆云大学 · 校企实时监测（分屏联动） ============ */
+.uni-shell{display:grid;grid-template-columns:var(--lw,50%) 34px 1fr;background:var(--panel2);border:1px solid var(--line);border-radius:18px;overflow:hidden;position:relative;max-width:1180px;margin:0 auto;box-shadow:0 30px 70px rgba(0,0,0,.4)}
+.uni-pane{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.uni-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap}
+.uni-head b{letter-spacing:.04em}
+.uni-head span{font-size:12px;color:var(--dim);letter-spacing:.06em}
+.uni-stage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--sky2);min-height:250px}
+.uni-stage video,.uni-stage svg{width:100%;height:auto;display:block;max-height:320px;object-fit:cover}
+.uni-stage .rec-tag{top:8px;left:10px}
+.uni-strip{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--dim);background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.uni-strip b{color:var(--hl);font-variant-numeric:tabular-nums}
+.uni-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.uni-reply{font-size:13.5px;color:var(--grn);background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.4);border-radius:10px;padding:10px 14px;animation:popIn .3s ease;flex:1;min-width:200px}
+.uni-divider{background:var(--panel3);cursor:col-resize;display:flex;align-items:center;justify-content:center;position:relative;user-select:none;touch-action:none;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.uni-divider em{writing-mode:vertical-lr;font-style:normal;font-size:11px;color:var(--dim);letter-spacing:.24em;white-space:nowrap}
+.uni-divider::before{content:"";position:absolute;top:50%;left:6px;right:6px;height:1px;background:rgba(255,167,38,.4)}
+.uni-packets{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.packet{position:absolute;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:var(--hl);box-shadow:0 0 10px var(--hl);animation:pkt .85s linear forwards}
+@keyframes pkt{from{left:4px;opacity:1}to{left:58px;opacity:0;transform:scale(.4)}}
+.uni-map{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel3)}
+.uni-map svg{width:100%;display:block}
+.uni-map .pdot{cursor:default}
+.uni-feed{background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:132px;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.uni-feed .fl{font-size:12.5px;color:var(--dim);display:flex;gap:8px;align-items:center;animation:popIn .3s ease}
+.uni-feed .fl time{color:var(--dim2);font-variant-numeric:tabular-nums;font-size:11px}
+.uni-feed .fl i{font-style:normal;color:var(--hl)}
+.uni-alert{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#fff;background:rgba(255,77,79,.14);border:1px solid var(--red);border-radius:10px;padding:10px 14px;animation:dangerFlash 1s infinite;flex-wrap:wrap}
+.uni-alert .tc-btn{margin-left:auto}
+.uni-stage.alarm{animation:redflash .7s ease 2}
+@media(max-width:900px){
+  .uni-shell{grid-template-columns:1fr}
+  .uni-divider{height:28px;cursor:row-resize;border-left:none;border-right:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .uni-divider em{writing-mode:horizontal-tb;letter-spacing:.4em}
+  .uni-divider::before{top:6px;bottom:6px;left:50%;width:1px;height:auto}
+  .packet{top:4px;left:50%;animation:pktY .85s linear forwards}
+  @keyframes pktY{from{top:4px;opacity:1}to{top:22px;opacity:0}}
+}
+
 /* ============ v5：现场监控 LIVE / 校园模块 / 手机入口 ============ */
 .live-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
 .live-cams{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
@@ -605,6 +643,66 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       <div class="cmp-handle"></div>
     </div>
     <div class="cmp-note"><span>◀ 拖动对比</span><b>从「发现靠运气」到「识别常态化」</b><span>拖动对比 ▶</span></div>
+  </div>
+</section>
+
+<!-- ============ 庆云大学 · 校企实时监测（分屏联动） ============ -->
+<section class="sec alt" id="unilink">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>庆云大学 · <em>校企实时监测</em></h2>
+      <p>企业现场 AI 监测 ↔ 경운대학교 관제실 数字孪生 · 只传数据不传影像</p>
+    </div>
+    <div class="uni-shell rv" id="uniShell">
+      <div class="uni-pane uni-left">
+        <div class="uni-head"><b>① 企业现场 · 카메라 + 스마트워치 + YOLO</b><span id="uniCamState">摄像头未开启</span></div>
+        <div class="uni-stage" id="uniStage">
+          <video id="uniVideo" autoplay playsinline muted style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#0E131D;display:block"></video>
+          <svg id="uniSvg" viewBox="0 0 480 270" preserveAspectRatio="xMidYMid slice" style="width:100%;height:auto">
+            <rect width="480" height="270" fill="var(--sky2)"/>
+            <rect y="226" width="480" height="44" fill="#0E141F"/>
+            <g stroke="#3A4A63" stroke-width="6"><path d="M40 226 V120 H440 V226"/><path d="M40 160 H440 M40 190 H440"/></g>
+            <g fill="#1A2434"><rect x="330" y="80" width="120" height="100"/></g>
+          </svg>
+          <div class="rec-tag"><i></i>기업 현장 · <span id="uniClock">--:--:--</span></div>
+          <div class="dbox" data-tag="작업자 07" style="left:40%;top:30%;width:16%;height:45%"></div>
+        </div>
+        <div class="uni-strip">
+          <span>🩺</span><span>体温 <b id="uniTemp">36.5</b>℃</span>
+          <span>血压 <b id="uniBp">118/76</b></span>
+          <span>心率 <b id="uniHr">72</b></span>
+          <span>步数 <b id="uniSteps">8412</b></span>
+        </div>
+        <div class="uni-actions">
+          <button class="tc-btn" id="uniCamBtn">📷 开启摄像头</button>
+          <button class="tc-btn danger" id="uniSos">🚨 发送求助警报</button>
+          <div class="uni-reply" id="uniReply" hidden>📟 관제실 지시：현장 확인 완료 · 继续作业</div>
+        </div>
+      </div>
+      <div class="uni-divider" id="uniDivider"><em>데이터 전송</em><div class="uni-packets" id="uniPackets"></div></div>
+      <div class="uni-pane uni-right">
+        <div class="uni-head"><b>② 경운대학교 관제실 · 실시간 디지털 트윈</b><span>산학협력단</span></div>
+        <div class="uni-map" id="uniMap">
+          <svg viewBox="0 0 460 300" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="460" height="300" fill="#0E131D"/>
+            <g stroke="rgba(255,255,255,.06)"><path d="M0 60 H460 M0 120 H460 M0 180 H460 M0 240 H460 M92 0 V300 M184 0 V300 M276 0 V300 M368 0 V300"/></g>
+            <path d="M276 0 V300" stroke="#2A3548" stroke-width="6"/>
+            <rect x="20" y="30" width="120" height="70" rx="8" fill="#1A2434"/><text x="80" y="70" fill="#8B93A7" font-size="13" text-anchor="middle">출입구 · 出入口</text>
+            <rect x="160" y="30" width="100" height="70" rx="8" fill="#1A2434"/><text x="210" y="70" fill="#8B93A7" font-size="13" text-anchor="middle">作业区 A</text>
+            <rect x="310" y="200" width="120" height="70" rx="8" fill="rgba(255,167,38,.1)" stroke="#FFA726" stroke-width="2.5" stroke-dasharray="10 6"/><text x="370" y="240" fill="#FFA726" font-size="13" text-anchor="middle">基坑危险区</text>
+            <rect x="20" y="180" width="120" height="70" rx="8" fill="#1A2434"/><text x="80" y="220" fill="#8B93A7" font-size="13" text-anchor="middle">加工区</text>
+            <g stroke="#3A4A63" stroke-width="10" stroke-linecap="round" fill="none"><path d="M300 300 V120"/><path d="M300 120 H410"/><path d="M390 120 V160 M390 160 H410 M410 160 V176" stroke-width="7"/></g>
+            <text x="350" y="100" fill="#8B93A7" font-size="12" text-anchor="middle">1# 塔吊</text>
+            <circle cx="410" cy="30" r="26" fill="none" stroke="#FFA726" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="410" y="34" fill="#FFA726" font-size="11" text-anchor="middle">경운대</text>
+          </svg>
+          <div id="uniDots"></div>
+        </div>
+        <div class="uni-feed" id="uniFeed"></div>
+        <div class="uni-alert" id="uniAlert" hidden>🚨 현장 구조 요청 수신 · 작업자 07<button class="tc-btn" id="uniAck">확인 · 지시 전송</button></div>
+      </div>
+    </div>
+    <p class="relief-note" style="text-align:center;margin-top:16px;max-width:900px;margin-left:auto;margin-right:auto">🔒 隐私设计：영상은 현장 컴퓨터에만 있고, 경운대로는 좌표·골격·보호구·체온·혈압 숫자만 전송됩니다（视频不出端）· 拖动中间分隔条调整画面比例 · 本板块为校企联动演示</p>
   </div>
 </section>
 
@@ -1128,6 +1226,24 @@ const I18N={
 '🥈 放松达人':{en:'🥈 Relief Pro',ko:'🥈 이완 달인'},
 '🥉 新手放松员':{en:'🥉 Rookie',ko:'🥉 초보'},
 '还需要多多拉伸':{en:'Stretch more!',ko:'스트레칭이 더 필요해요!'},
+'庆云大学 · 校企实时监测':{en:'Kyungwoon Univ. · Industry-Academia Live Monitoring',ko:'경운대학교 · 산학 실시간 모니터링'},
+'企业现场 AI 监测 ↔ 경운대학교 관제실 数字孪生 · 只传数据不传影像':{en:'Site AI monitoring ↔ Kyungwoon control room twin · data only, no video',ko:'현장 AI 모니터링 ↔ 경운대 관제실 트윈 · 영상 없이 데이터만'},
+'① 企业现场 · 카메라 + 스마트워치 + YOLO':{en:'① Enterprise Site · Camera + Smartwatch + YOLO',ko:'① 기업 현장 · 카메라 + 스마트워치 + YOLO'},
+'摄像头已开启 · 影像仅在本机':{en:'Camera on · video stays local',ko:'카메라 켜짐 · 영상은 로컬 전용'},
+'기업 현장':{en:'Enterprise Site',ko:'기업 현장'},
+'体温':{en:'Temp',ko:'체온'},'血压':{en:'BP',ko:'혈압'},
+'心率':{en:'HR',ko:'심박'},'步数':{en:'Steps',ko:'걸음'},
+'📷 关闭摄像头':{en:'📷 Stop Camera',ko:'📷 카메라 끄기'},
+'🚨 发送求助警报':{en:'🚨 Send SOS Alarm',ko:'🚨 구조요청 전송'},
+'📟 관제실 지시：현장 확인 완료 · 继续作业':{en:'📟 Control room: verified · resume work',ko:'📟 관제실 지시: 현장 확인 완료 · 작업 계속'},
+'② 경운대학교 관제실 · 실시간 디지털 트윈':{en:'② Kyungwoon Control Room · Live Digital Twin',ko:'② 경운대학교 관제실 · 실시간 디지털 트윈'},
+'산학협력단':{en:'IACF',ko:'산학협력단'},
+'출입구 · 出入口':{en:'Gate · Entrance',ko:'출입구'},
+'作业区 A':{en:'Work Zone A',ko:'작업구역 A'},
+'🚨 현장 구조 요청 수신 · 작업자 07':{en:'🚨 SOS received · Worker 07',ko:'🚨 현장 구조요청 수신 · 작업자 07'},
+'확인 · 지시 전송':{en:'Acknowledge · Send Order',ko:'확인 · 지시 전송'},
+'🔒 隐私设计：영상은 현장 컴퓨터에만 있고, 경운대로는 좌표·골격·보호구·체온·혈압 숫자만 전송됩니다（视频不出端）· 拖动中间分隔条调整画面比例 · 本板块为校企联动演示':{en:'🔒 Privacy: video stays on-site; only coords/skeleton/PPE/vitals go to Kyungwoon · drag divider · co-op demo',ko:'🔒 개인정보: 영상은 현장에만, 경운대로는 숫자 데이터만 전송 · 구분선 드래그 · 산학연계 데모'},
+'데이터 전송':{en:'DATA LINK',ko:'데이터 전송'},
 '🔊 ':': ',/* fallback */
 '📷 ':': ',
 '高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
@@ -2472,6 +2588,141 @@ $('#topBell').addEventListener('click',()=>{showModule('alarm');toast('🔔 当�
 addEventListener('scroll',()=>{if(tourIdx>=0)tourPos();},{passive:true});
 addEventListener('resize',()=>{if(tourIdx>=0)tourPos();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&tourIdx>=0)tourEnd();});
+
+/* ============================================================
+   庆云大学 · 校企实时监测（分屏联动）
+   ============================================================ */
+(function(){
+  const shell=$('#uniShell');
+  if(!shell)return;
+  /* ---- 分隔条拖动 ---- */
+  const divider=$('#uniDivider');
+  let dragging=false;
+  function setSplit(x){
+    const r=shell.getBoundingClientRect();
+    const p=Math.max(28,Math.min(72,(x-r.left)/r.width*100));
+    shell.style.setProperty('--lw',p+'%');
+  }
+  divider.addEventListener('pointerdown',e=>{dragging=true;divider.setPointerCapture(e.pointerId);});
+  divider.addEventListener('pointermove',e=>{if(dragging)setSplit(e.clientX);});
+  divider.addEventListener('pointerup',()=>dragging=false);
+  /* ---- 摄像头（影像留在本地，不上传） ---- */
+  let uniStream=null;
+  $('#uniCamBtn').addEventListener('click',()=>{
+    if(uniStream){
+      uniStream.getTracks().forEach(t=>t.stop());
+      uniStream=null;
+      const v=$('#uniVideo');v.srcObject=null;
+      $('#uniSvg').style.display='block';
+      $('#uniCamState').textContent='摄像头未开启';
+      $('#uniCamBtn').textContent='📷 开启摄像头';
+      toast('摄像头已关闭 · 影像从未离开本机');
+      return;
+    }
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持摄像头');return;}
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:960}},audio:false})
+    .then(stream=>{
+      uniStream=stream;
+      $('#uniVideo').srcObject=stream;
+      $('#uniSvg').style.display='none';
+      $('#uniCamState').textContent='摄像头已开启 · 影像仅在本机';
+      $('#uniCamBtn').textContent='📷 关闭摄像头';
+      toast('📷 现场画面已开启（只在本机，不上传）');
+    })
+    .catch(()=>toast('未获得摄像头权限 · 使用示意图模式'));
+  });
+  /* ---- 生命体征模拟 ---- */
+  const v1={temp:36.5,bp1:118,bp2:76,hr:72,steps:8412};
+  setInterval(()=>{
+    v1.temp=Math.max(36.1,Math.min(37.3,v1.temp+rnd(-.05,.05)));
+    v1.hr=Math.max(62,Math.min(98,v1.hr+rnd(-2,2)));
+    v1.bp1=Math.max(105,Math.min(132,v1.bp1+rnd(-2,2)));
+    v1.bp2=Math.max(70,Math.min(86,v1.bp2+rnd(-1,1)));
+    v1.steps+=Math.random()<.5?Math.floor(rnd(1,4)):0;
+    $('#uniTemp').textContent=v1.temp.toFixed(1);
+    $('#uniBp').textContent=Math.round(v1.bp1)+'/'+Math.round(v1.bp2);
+    $('#uniHr').textContent=Math.round(v1.hr);
+    $('#uniSteps').textContent=v1.steps;
+  },2000);
+  setInterval(()=>{const c=$('#uniClock');if(c)c.textContent=nowStr();},1000);
+  /* ---- 右侧数字孪生工人点 ---- */
+  const DOTS=[
+    {n:'작업자 05',x:30,y:26},
+    {n:'작업자 07',x:46,y:42},
+    {n:'작업자 09',x:66,y:30}
+  ];
+  function renderDots(){
+    $('#uniDots').innerHTML=DOTS.map(w=>`<div class="pdot" data-n="${w.n}" style="left:${w.x}%;top:${w.y}%"></div>`).join('');
+  }
+  renderDots();
+  setInterval(()=>{
+    $$('#uniDots .pdot').forEach(dot=>{
+      const i=Array.from(dot.parentElement.children).indexOf(dot),w=DOTS[i];
+      let nx=w.x+rnd(-2.5,2.5),ny=w.y+rnd(-2.5,2.5);
+      const inPit=nx>62&&nx<92&&ny>55&&ny<88;
+      if(inPit){nx=w.x+4;ny=w.y-4;dot.classList.add('warn');feed('⚠ 좌표 경보 · 작업자 '+w.n.replace('작업자 ','')+' 접근 위험구역','#FFD54A');}
+      else dot.classList.remove('warn');
+      w.x=Math.max(6,Math.min(96,nx));w.y=Math.max(10,Math.min(92,ny));
+      dot.style.left=w.x+'%';dot.style.top=w.y+'%';
+    });
+  },1800);
+  /* ---- 数据包 + 遥测流 ---- */
+  const feedEl=$('#uniFeed');
+  const PACK_LABELS=['좌표','체온','혈압','심박'];
+  let packSeq=0;
+  function feed(txt,color){
+    const d=new Date();
+    const row=document.createElement('div');
+    row.className='fl';
+    row.innerHTML=`<time>${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</time><i style="color:${color||'var(--hl)'}">↳</i><span>${txt}</span>`;
+    feedEl.prepend(row);
+    while(feedEl.children.length>5)feedEl.lastChild.remove();
+  }
+  function packet(){
+    const p=document.createElement('div');
+    p.className='packet';
+    $('#uniPackets').appendChild(p);
+    setTimeout(()=>p.remove(),900);
+  }
+  setInterval(()=>{
+    packet();
+    const w=DOTS[Math.floor(Math.random()*DOTS.length)];
+    const l=PACK_LABELS[packSeq++%PACK_LABELS.length];
+    feed(`${w.n.replace('작업자 ','')} · ${l} ${l==='좌표'?`(${Math.round(w.x*4)},${Math.round(w.y*4)})`:l==='체온'?v1.temp.toFixed(1)+'℃':l==='혈압'?Math.round(v1.bp1)+'/'+Math.round(v1.bp2):Math.round(v1.hr)+' bpm'}`,'#4DA6FF');
+  },2600);
+  feed('연결됨 · 경운대 관제실 ↔ 기업 현장','#3DDC84');
+  /* ---- 求助警报双向联动 ---- */
+  $('#uniSos').addEventListener('click',()=>{
+    $('#uniStage').classList.remove('alarm');void $('#uniStage').offsetWidth;
+    $('#uniStage').classList.add('alarm');
+    for(let i=0;i<7;i++)setTimeout(packet,i*130);
+    feed('🚨 구조 요청 · 작업자 07','#FF4D4F');
+    $('#uniAlert').hidden=false;
+    sfxUni(880,.4,'square');
+    if(navigator.vibrate)navigator.vibrate([120,60,120]);
+    toast('🚨 求助警报已发送至 경운대 관제실');
+  });
+  $('#uniAck').addEventListener('click',()=>{
+    $('#uniAlert').hidden=true;
+    $('#uniReply').hidden=false;
+    feed('확인 · 지시 전송 ✓','#3DDC84');
+    sfxUni(660,.2,'triangle');
+    toast('📟 庆云大学观制室已确认并发送指示');
+  });
+  let uniAC=null;
+  function sfxUni(freq,dur,type){
+    try{
+      uniAC=uniAC||new (window.AudioContext||window.webkitAudioContext)();
+      uniAC.resume();
+      const o=uniAC.createOscillator(),g=uniAC.createGain();
+      o.type=type;o.frequency.value=freq;
+      g.gain.setValueAtTime(.12,uniAC.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,uniAC.currentTime+dur);
+      o.connect(g).connect(uniAC.destination);
+      o.start();o.stop(uniAC.currentTime+dur);
+    }catch(e){}
+  }
+})();
 
 /* ============================================================
    现场事实监控 LIVE
