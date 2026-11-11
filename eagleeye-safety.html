@@ -87,7 +87,7 @@ input,select{font-family:inherit}
 
 /* ============ 驾驶舱 ============ */
 .console{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.55);display:grid;grid-template-columns:210px 1fr;min-height:680px}
-.c-side{background:var(--panel3);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.c-side{background:var(--panel3);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
 .c-brand{display:flex;align-items:center;gap:10px;padding:6px 12px 18px;border-bottom:1px solid var(--line);margin-bottom:12px}
 .c-brand b{font-size:16px}
 .c-brand span{font-size:12px;color:var(--dim);display:block;letter-spacing:.06em}
@@ -417,6 +417,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
     <p class="sub">视频 AI 识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环</p>
     <div class="hero-cta">
       <a class="btn btn-primary" href="#console">▶ 进入监管驾驶舱</a>
+      <a class="btn btn-ghost" href="#ppe">🧍 PPE 摄像头警报演示</a>
       <a class="btn btn-ghost" href="#scenes">AI 识别能力</a>
     </div>
     <div class="hero-tags">
@@ -2096,6 +2097,16 @@ showModule('overview');
 $$('#langSw button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
 if(lang!=='zh')setLang(lang);
 else $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l==='zh'));
+/* 哈希路由：#ppe 直达 PPE 摄像头警报演示 */
+function hashRoute(){
+  if(location.hash==='#ppe'){
+    $('#consoleBox').scrollIntoView({block:'start',behavior:'smooth'});
+    showModule('ppe');
+    setTimeout(()=>{if(curMod==='ppe')toast('🧍 点「📷 开启摄像头」接入真人画面 → 脱掉装备 → 点「▶ 开始检测」触发真实警报');},700);
+  }
+}
+hashRoute();
+addEventListener('hashchange',hashRoute);
 })();
 </script>
 </body>
