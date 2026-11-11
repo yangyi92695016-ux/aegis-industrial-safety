@@ -132,6 +132,15 @@ nav.tab button.on .ic{filter:drop-shadow(0 0 8px rgba(255,167,38,.7))}
   <main>
     <!-- 总览 -->
     <div class="page on" data-t="overview">
+      <div class="card" id="installBanner" style="border-color:rgba(255,167,38,.4);background:rgba(255,167,38,.05)">
+        <h3>📲 下载安装 App</h3>
+        <div class="row"><span style="color:var(--dim)">安装到主屏幕后即可像原生 App 使用：全屏启动 · 离线可用 · 告警通知</span></div>
+        <button class="btn" id="installBtn">立即安装 App</button>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="ghost" id="dlFile" style="flex:1">⬇ 下载离线版文件</button>
+          <button class="ghost" id="hideBanner" style="flex:1">稍后再说</button>
+        </div>
+      </div>
       <div class="kpis">
         <div class="kpi"><div class="v" style="color:var(--hl)" id="mKpiW">863</div><div class="l">在场人员 / 1286</div></div>
         <div class="kpi"><div class="v" style="color:var(--red)" id="mKpiA">0</div><div class="l">今日告警 · 待处置 <b id="mKpiP" style="color:var(--yel)">0</b></div></div>
@@ -207,11 +216,19 @@ nav.tab button.on .ic{filter:drop-shadow(0 0 8px rgba(255,167,38,.7))}
       </div>
       <div class="card menu">
         <h3>⚙️ 系统</h3>
+        <div class="row"><span>🌐 语言 / Language</span><b style="display:flex;gap:6px"><button class="ghost on" data-l="zh">中</button><button class="ghost" data-l="en">EN</button><button class="ghost" data-l="ko">한</button></b></div>
+        <div class="row" id="mDl"><span>⬇ 下载离线版（单文件）</span><b style="color:var(--hl)">下载 ›</b></div>
         <div class="row" onclick="location.href='eagleeye-safety.html'"><span>🖥 桌面版完整驾驶舱</span><b style="color:var(--hl)">打开 ›</b></div>
         <div class="row" onclick="location.href='eagleeye-safety.html#live'"><span>📡 现场事实监控 LIVE</span><b style="color:var(--hl)">打开 ›</b></div>
         <div class="row" id="mInstall"><span>📲 安装到主屏幕</span><b style="color:var(--hl)">安装 ›</b></div>
+        <div class="row"><span>🤖 Android APK 打包</span><b style="color:var(--hl)" onclick="location.href='https://www.pwabuilder.com'">PWABuilder ›</b></div>
         <div class="row"><span>🔔 通知提醒</span><b style="color:var(--grn)">已开启（模拟）</b></div>
         <div class="row"><span>版本</span><b>v3.2 · DEMO</b></div>
+      </div>
+      <div class="card" style="text-align:center">
+        <h3 style="justify-content:center">📱 扫码打开 App</h3>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fyangyi92695016-ux.github.io%2Faegis-industrial-safety%2Feagleeye-app.html" alt="App 二维码" style="width:150px;margin:8px auto;border-radius:12px" onerror="this.style.display='none'">
+        <p style="font-size:12px;color:var(--dim)">手机相机扫码 → 浏览器打开 → 菜单安装</p>
       </div>
       <div class="card menu">
         <h3>📞 联系我们</h3>
@@ -241,6 +258,150 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const pad=n=>String(n).padStart(2,'0'),rnd=(a,b)=>a+Math.random()*(b-a);
 let toastT=null;
 function toast(m){const t=$('#mToast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ===== 三语 i18n（与桌面版共用语言设置） ===== */
+const I18N={
+'总览':{en:'Overview',ko:'개요'},'视频':{en:'Video',ko:'영상'},'告警':{en:'Alarms',ko:'알람'},
+'人员':{en:'People',ko:'인원'},'我的':{en:'Me',ko:'내정보'},
+'高新区城市更新项目':{en:'High-tech Zone Renewal',ko:'첨단지구 재개발'},
+'二标段 · 鹰眼AI v3.2':{en:'Lot 2 · EagleEye v3.2',ko:'2공구 · EagleEye v3.2'},
+'在场人员 / 1286':{en:'On Site / 1286',ko:'현장 / 1286'},
+'今日告警 · 待处置 ':{en:'Alarms · pending ',ko:'알람 · 미처리 '},
+'设备在线率':{en:'Devices Online',ko:'장비 가동률'},
+'PM2.5 μg/m³':{en:'PM2.5 μg/m³',ko:'PM2.5 μg/m³'},
+'🔔 最新告警':{en:'🔔 Latest Alarms',ko:'🔔 최신 알람'},
+'点击进入告警中心':{en:'Tap for Alarm Center',ko:'알람센터로'},
+'🌫 环境实时':{en:'🌫 Live Environment',ko:'🌫 실시간 환경'},
+'🏛 경운대학교 · 庆云大学产学研':{en:'🏛 Kyungwoon Univ. Co-op',ko:'🏛 경운대학교 산학협력'},
+'校园安全事件':{en:'Campus Events',ko:'교내 사건'},
+'实验室点检率':{en:'Lab Check Rate',ko:'실험실 점검률'},
+'AI 安全监测实训':{en:'AI Safety Training',ko:'AI 안전실습'},
+'本周五 14:00':{en:'Fri 14:00',ko:'금요일 14:00'},
+'安全帽':{en:'Helmet',ko:'안전모'},'反光衣':{en:'Vest',ko:'반사조끼'},
+'吸烟':{en:'Smoking',ko:'흡연'},'越界':{en:'Intrusion',ko:'경계침입'},
+'工地出入口':{en:'Site Entrance',ko:'현장 출입구'},
+'吊装区':{en:'Lifting Zone',ko:'양중구역'},
+'基坑临边':{en:'Pit Edge',ko:'굴토 가장자리'},
+'● 直播中（模拟）':{en:'● Live (sim)',ko:'● 생방송 (모의)'},
+'全部':{en:'All',ko:'전체'},'高风险':{en:'High',ko:'고위험'},
+'警戒':{en:'Warning',ko:'경계'},'低':{en:'Low',ko:'낮음'},
+'已处置':{en:'Resolved',ko:'처리완료'},'处理':{en:'Resolve',ko:'처리'},
+'未佩戴安全帽':{en:'No Helmet',ko:'안전모 미착용'},
+'高处作业未系安全带':{en:'No Harness at Height',ko:'안전벨트 미착용'},
+'吸烟行为':{en:'Smoking Detected',ko:'흡연 행위'},
+'临边越界':{en:'Edge Crossing',ko:'가장자리 접근'},
+'进入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중구역 침입'},
+'扬尘超标 · 喷淋联动':{en:'Dust · Sprinkler ON',ko:'먼지 · 살수 가동'},
+'🛡 开启基坑电子围栏':{en:'🛡 Enable Pit E-fence',ko:'🛡 굴토 전자울타리 켜기'},
+'🛡 围栏布防中 · 点击关闭':{en:'🛡 Fence ON · tap to close',ko:'🛡 가동 중 · 닫기'},
+'办公区':{en:'Office',ko:'사무구역'},'生活区':{en:'Living Area',ko:'생활구역'},
+'加工区':{en:'Fabrication Yard',ko:'가공구역'},
+'基坑危险区':{en:'Pit Danger Zone',ko:'굴토 위험구역'},
+'1# 塔吊':{en:'Crane #1',ko:'1번 크레인'},
+'👷 在场工种分布':{en:'👷 Workforce Mix',ko:'👷 직종 분포'},
+'钢筋工':{en:'Rebar Worker',ko:'철근공'},'木工':{en:'Carpenter',ko:'목수'},
+'架子工':{en:'Scaffolder',ko:'비계공'},'特种作业':{en:'Special Ops',ko:'특수작업'},
+'管理 / 安全':{en:'Mgmt / Safety',ko:'관리 / 안전'},
+'鹰眼 AI · 工地安全监管':{en:'EagleEye AI · Site Safety',ko:'EagleEye AI · 현장안전'},
+'경운대학교 산학협력 · 演示账号 安全总监':{en:'Kyungwoon Co-op · Demo Safety Director',ko:'경운대 산학협력 · 데모 안전총괄'},
+'🏛 庆云大学 · 产学研':{en:'🏛 Kyungwoon Co-op',ko:'🏛 경운대 산학협력'},
+'⚙️ 系统':{en:'⚙️ System',ko:'⚙️ 시스템'},
+'🌐 语言 / Language':{en:'🌐 Language',ko:'🌐 언어'},
+'⬇ 下载离线版（单文件）':{en:'⬇ Download Offline File',ko:'⬇ 오프라인 파일 다운'},
+'下载 ›':{en:'Download ›',ko:'다운 ›'},
+'🖥 桌面版完整驾驶舱':{en:'🖥 Desktop Console',ko:'🖥 데스크톱 관제센터'},
+'打开 ›':{en:'Open ›',ko:'열기 ›'},
+'📡 现场事实监控 LIVE':{en:'📡 Live Monitoring',ko:'📡 실시간 모니터링'},
+'📲 安装到主屏幕':{en:'📲 Add to Home Screen',ko:'📲 홈화면에 추가'},
+'安装 ›':{en:'Install ›',ko:'설치 ›'},
+'🤖 Android APK 打包':{en:'🤖 Android APK Build',ko:'🤖 안드로이드 APK'},
+'🔔 通知提醒':{en:'🔔 Notifications',ko:'🔔 알림'},
+'已开启（模拟）':{en:'On (sim)',ko:'켜짐 (모의)'},
+'版本':{en:'Version',ko:'버전'},
+'📱 扫码打开 App':{en:'📱 Scan to Open App',ko:'📱 QR로 앱 열기'},
+'手机相机扫码 → 浏览器打开 → 菜单安装':{en:'Scan → open in browser → install',ko:'QR 스캔 → 브라우저 → 설치'},
+'📞 联系我们':{en:'📞 Contact',ko:'📞 연락처'},
+'电话':{en:'Phone',ko:'전화'},'邮箱':{en:'Email',ko:'이메일'},'公司':{en:'Company',ko:'회사'},
+'演示数据均为模拟 · 指标以真实测试为准':{en:'Demo data simulated · specs subject to real testing',ko:'데모 데이터는 모의 · 지표는 실제 시험 기준'},
+'📲 下载安装 App':{en:'📲 Install the App',ko:'📲 앱 설치'},
+'安装到主屏幕后即可像原生 App 使用：全屏启动 · 离线可用 · 告警通知':{en:'Install to home screen: fullscreen · offline · alerts',ko:'홈화면 설치 시 전체화면 · 오프라인 · 알람'},
+'立即安装 App':{en:'Install App Now',ko:'앱 설치하기'},
+'⬇ 下载离线版文件':{en:'⬇ Download Offline File',ko:'⬇ 오프라인 파일'},
+'稍后再说':{en:'Later',ko:'나중에'},
+'✅ 当前无待处置告警':{en:'✅ No pending alarms',ko:'✅ 미처리 알람 없음'},
+'最新告警':{en:'Latest Alarms',ko:'최신 알람'},
+'环境实时':{en:'Live Environment',ko:'실시간 환경'}
+};
+let lang='zh';
+try{lang=localStorage.getItem('eagleeye_lang')||'zh';}catch(e){}
+const DONE=new WeakSet(),SKIP=new Set(['SCRIPT','STYLE']);
+function trText(node){
+  if(node.nodeType!==3)return;
+  const s=node.textContent.trim();
+  if(!s||DONE.has(node))return;
+  const m=I18N[s];
+  if(m&&m[lang]){node.textContent=node.textContent.replace(s,m[lang]);DONE.add(node);}
+}
+function trNode(root){
+  if(!root)return;
+  if(root.nodeType===3){trText(root);return;}
+  if(root.nodeType!==1)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  let n;
+  while(n=w.nextNode()){const p=n.parentElement;if(p&&SKIP.has(p.tagName))continue;trText(n);}
+  const attrs=['placeholder','title','aria-label','data-tag','data-n'];
+  const walk=e=>{
+    if(!e||e.nodeType!==1)return;
+    attrs.forEach(a=>{const v=e.getAttribute(a);if(v){const m=I18N[v];if(m&&m[lang])e.setAttribute(a,m[lang]);}});
+    Array.from(e.children||[]).forEach(walk);
+  };
+  walk(root);
+}
+function setLang(l){
+  lang=l;
+  try{localStorage.setItem('eagleeye_lang',l);}catch(e){}
+  $$('.ghost[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  trNode(document.body);
+}
+new MutationObserver(muts=>{
+  muts.forEach(mu=>{
+    if(mu.type==='childList')mu.addedNodes.forEach(n=>trNode(n));
+    else if(mu.type==='characterData')trText(mu.target);
+  });
+}).observe(document.body,{childList:true,subtree:true,characterData:true});
+$$('.ghost[data-l]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
+if(lang!=='zh')setLang(lang);
+
+/* ===== 下载 / 安装 ===== */
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
+$('#installBtn').addEventListener('click',()=>{
+  if(deferred){deferred.prompt();deferred.userChoice.then(()=>{deferred=null;});return;}
+  toast('📲 安装：浏览器菜单 →「安装应用 / 添加到主屏幕」');
+});
+$('#mInstall').addEventListener('click',()=>{
+  if(deferred){deferred.prompt();return;}
+  toast('📲 安装：浏览器菜单 →「安装应用 / 添加到主屏幕」');
+});
+$('#dlFile').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.href='eagleeye-app.html';
+  a.download='eagleeye-app.html';
+  a.click();
+  toast('⬇ 离线版已开始下载（单文件，双击即可离线运行）');
+});
+$('#mDl').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.href='eagleeye-app.html';
+  a.download='eagleeye-app.html';
+  a.click();
+  toast('⬇ 离线版已开始下载');
+});
+$('#hideBanner').addEventListener('click',()=>{
+  $('#installBanner').style.display='none';
+  try{localStorage.setItem('eagleeye_banner_hide','1');}catch(e){}
+});
+try{if(localStorage.getItem('eagleeye_banner_hide')==='1')$('#installBanner').style.display='none';}catch(e){}
 
 /* ===== 启动屏 ===== */
 setTimeout(()=>$('#splash').classList.add('hide'),1300);
@@ -382,14 +543,6 @@ $('#mFence').addEventListener('click',()=>{
   $('#mPit').setAttribute('fill',fenceOn?'rgba(255,77,79,.16)':'rgba(255,167,38,.1)');
   $('#mPit').setAttribute('stroke',fenceOn?'#FF4D4F':'#FFA726');
   toast(fenceOn?'电子围栏已布防':'电子围栏已关闭');
-});
-
-/* ===== 安装 ===== */
-let deferred=null;
-addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
-$('#mInstall').addEventListener('click',()=>{
-  if(deferred){deferred.prompt();deferred=null;return;}
-  toast('📲 安装：浏览器菜单 →「安装应用 / 添加到主屏幕」');
 });
 
 /* ===== SW 注册（离线可用） ===== */

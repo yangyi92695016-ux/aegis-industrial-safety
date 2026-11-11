@@ -254,6 +254,21 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .dev-row i.on{color:var(--grn)}
 .app-link{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--hl);border:1px solid rgba(255,167,38,.5);background:rgba(255,167,38,.08);border-radius:20px;padding:6px 14px;transition:.25s;white-space:nowrap}
 .app-link:hover{background:rgba(255,167,38,.18)}
+.lang-sw{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;flex-shrink:0}
+.lang-sw button{padding:6px 11px;font-size:13px;color:var(--dim);transition:.25s;letter-spacing:.04em}
+.lang-sw button.on{background:rgba(255,167,38,.15);color:var(--hl)}
+.lang-sw button:hover{color:var(--text)}
+/* PPE 检测 */
+.ppe-stage{position:relative;background:var(--panel3);border-radius:12px;overflow:hidden}
+.ppe-stage svg{width:100%;height:auto}
+.ppe-stage .scan-move{position:absolute;left:0;right:0;height:3px;background:var(--scan);box-shadow:0 0 16px var(--scan);opacity:0}
+.ppe-stage.scanning .scan-move{opacity:1;animation:scanMV 1.2s ease 2}
+.ppe-stage.alarming{animation:redflash .8s ease 3;border:2px solid var(--red)}
+.ppe-stage.pass{border:2px solid var(--grn)}
+.ppe-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:18px;font-weight:800;letter-spacing:.14em;border-radius:10px;padding:10px 22px;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.ppe-stamp.show{transform:translate(-50%,-50%) scale(1)}
+.ppe-stamp.bad{color:var(--red);border:3px solid var(--red);background:rgba(40,6,10,.85)}
+.ppe-stamp.good{color:var(--grn);border:3px solid var(--grn);background:rgba(4,20,12,.85)}
 @media(max-width:900px){.live-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.live-cams{grid-template-columns:1fr}.app-link span{display:none}}
 
@@ -355,6 +370,11 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       <b>鹰眼 AI</b><span>工地安全监管驾驶舱</span>
     </a>
     <div class="nav-right">
+      <div class="lang-sw" id="langSw">
+        <button data-l="zh" class="on">中</button>
+        <button data-l="en">EN</button>
+        <button data-l="ko">한</button>
+      </div>
       <button class="toggle" id="modeBtn"><b id="modeIcon">☀</b><span id="modeTxt">白班模式</span></button>
       <a class="app-link" href="eagleeye-app.html" title="手机版 App">📱<span>手机版 App</span></a>
       <a class="btn btn-primary" href="#console">进入监管驾驶舱</a>
@@ -417,7 +437,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
   <div class="wrap">
     <div class="sec-head rv">
       <h2>监管驾驶舱 · <em>这就是系统本身</em></h2>
-      <p>左侧切换 9 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解</p>
+      <p>左侧切换 10 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解</p>
     </div>
 
     <div class="console rv" id="consoleBox">
@@ -433,6 +453,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
           <button data-m="hazard"><span class="ic">📋</span>隐患排查</button>
           <button data-m="report"><span class="ic">📈</span>数据报表</button>
           <button data-m="campus"><span class="ic">🏫</span>庆云大学</button>
+          <button data-m="ppe"><span class="ic">🧍</span>PPE 防护检测</button>
         </nav>
         <div class="c-ver">DEMO · 模拟演示数据<br>真实部署以实测为准</div>
       </aside>
@@ -640,6 +661,359 @@ const io=new IntersectionObserver(es=>es.forEach(en=>{
 }),{threshold:.15,rootMargin:'0px 0px -30px 0px'});
 $$('.rv').forEach((el,i)=>{el.style.setProperty('--d',(i%4*90)+'ms');io.observe(el);});
 
+/* ============================================================
+   三语系统 i18n（中 / EN / 한국어）· 字符串键字典 + 自动翻译
+   ============================================================ */
+const I18N={
+'白班模式':{en:'Day Mode',ko:'주간 모드'},'夜班模式':{en:'Night Mode',ko:'야간 모드'},
+'手机版 App':{en:'Mobile App',ko:'모바일 앱'},'进入监管驾驶舱':{en:'Enter Console',ko:'관제센터 입장'},
+'施工现场安全监管平台 · 全模块演示':{en:'Site Safety Platform · Full Module Demo',ko:'현장안전 플랫폼 · 전체 모듈 데모'},
+'工地的每一个风险':{en:'Every Risk on Site',ko:'현장의 모든 위험을'},
+'AI 都看得见':{en:'AI Sees It All',ko:'AI가 모두 감시합니다'},
+'视频 AI 识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环':{en:'AI Video · Alarm Center · Tracking · Equipment · Environment · Hazard Loop',ko:'AI 영상 · 알람센터 · 위치 · 장비 · 환경 · 위험관리'},
+'AI 识别能力':{en:'AI Recognition',ko:'AI 인식 능력'},
+'安全帽 / 反光衣识别':{en:'Helmet / Vest Detection',ko:'안전모 / 조끼 인식'},
+'行为与越界检测':{en:'Behavior & Intrusion',ko:'행동·경계침입 감지'},
+'塔吊 / 升降机 / 基坑监测':{en:'Crane / Hoist / Pit Monitoring',ko:'크레인·호이스트·굴토 모니터링'},
+'扬尘噪声联动喷淋':{en:'Dust-linked Sprinkler',ko:'먼지·소음 연동 살수'},
+'隐患闭环治理':{en:'Hazard Closed-loop',ko:'위험 폐회로 관리'},
+'实时告警流':{en:'Live Alarm Feed',ko:'실시간 알람'},
+'未佩戴安全帽':{en:'No Helmet',ko:'안전모 미착용'},
+'进入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중 경계구역 진입'},
+'高处作业未系安全带':{en:'No Harness at Height',ko:'고소작업 안전벨트 미착용'},
+'未穿反光背心':{en:'No Reflective Vest',ko:'반사조끼 미착용'},
+'临边越界预警':{en:'Edge Crossing Alert',ko:'가장자리 접근 경고'},
+'扬尘超标 · 喷淋已联动':{en:'Dust Exceeded · Sprinkler ON',ko:'먼지 초과 · 살수 가동'},
+'吸烟行为':{en:'Smoking Detected',ko:'흡연 행위'},
+'C-03 塔吊东侧':{en:'C-03 Crane East',ko:'C-03 크레인 동측'},
+'B-01 吊装区':{en:'B-01 Lifting Zone',ko:'B-01 양중구역'},
+'A-02 3号楼':{en:'A-02 Building 3',ko:'A-02 3동'},
+'D-05 基坑西侧':{en:'D-05 Pit West',ko:'D-05 굴토 서측'},
+'C-07 夜间出入口':{en:'C-07 Night Gate',ko:'C-07 야간 출입구'},
+'E-01 环境站':{en:'E-01 Env Station',ko:'E-01 환경센서'},
+'E-03 材料加工区':{en:'E-03 Material Yard',ko:'E-03 자재가공장'},
+'已联动报警':{en:'Alarm Linked',ko:'알람 연동'},
+'监管驾驶舱 · 这就是系统本身':{en:'Supervision Console · The System Itself',ko:'관제센터 · 시스템 그 자체'},
+'左侧切换 10 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解':{en:'10 modules, all hands-on · click Tour for auto guide',ko:'좌측 10개 모듈 직접 조작 · 우측 상단 투어로 자동 안내'},
+'驾驶舱总览':{en:'Overview',ko:'대시보드'},
+'视频 AI 识别':{en:'Video AI',ko:'영상 AI'},
+'告警中心':{en:'Alarm Center',ko:'알람센터'},
+'人员定位':{en:'Tracking',ko:'인원 위치'},
+'机械设备':{en:'Equipment',ko:'장비'},
+'环境监测':{en:'Environment',ko:'환경'},
+'隐患排查':{en:'Hazard Control',ko:'위험점검'},
+'数据报表':{en:'Reports',ko:'보고서'},
+'庆云大学':{en:'Kyungwoon Univ.',ko:'경운대학교'},
+'PPE 防护检测':{en:'PPE Check',ko:'보호구 검측'},
+'产品导览':{en:'Product Tour',ko:'제품 투어'},
+'智慧工地监管平台 v3.2':{en:'Smart Site Safety v3.2',ko:'스마트 현장안전 v3.2'},
+'高新区城市更新项目 · 二标段':{en:'High-tech Zone Renewal · Lot 2',ko:'첨단지구 재개발 · 2공구'},
+'系统运行中':{en:'Running',ko:'가동 중'},
+'时间':{en:'Time',ko:'시간'},'天气':{en:'Weather',ko:'날씨'},
+'晴 26℃':{en:'Sunny 26℃',ko:'맑음 26℃'},'在线设备':{en:'Devices',ko:'가동장비'},
+'待处置告警':{en:'Pending Alarms',ko:'미처리 알람'},
+'在册劳务人员':{en:'Registered Workers',ko:'등록 근로자'},
+'今日在场':{en:'On Site Today',ko:'오늘 현장'},
+'今日告警':{en:'Alarms Today',ko:'오늘 알람'},
+'高风险':{en:'High-risk',ko:'고위험'},'已处置':{en:'Resolved',ko:'처리 완료'},
+'待处置隐患':{en:'Pending Hazards',ko:'미처리 위험'},
+'超 24h 未闭环':{en:'>24h unclosed',ko:'24h 초과 미해결'},
+'设备在线率':{en:'Device Online Rate',ko:'장비 가동률'},
+'今日告警趋势（小时）':{en:'Alarm Trend (hourly)',ko:'시간별 알람 추이'},
+'单位：起':{en:'Unit: count',ko:'단위: 건'},
+'告警类型分布':{en:'Type Distribution',ko:'유형 분포'},
+'今日':{en:'Today',ko:'오늘'},
+'实时快讯':{en:'Live Brief',ko:'실시간 브리핑'},
+'滚动更新':{en:'Auto Update',ko:'자동 갱신'},
+'区域风险热力':{en:'Zone Risk Heatmap',ko:'구역 위험 히트맵'},
+'红>橙>黄>蓝':{en:'Red>Orange>Yellow>Blue',ko:'빨강>주황>노랑>파랑'},
+'基坑区 · 高':{en:'Pit · High',ko:'굴토 · 높음'},
+'吊装区 · 较高':{en:'Lifting · Elevated',ko:'양중 · 다소 높음'},
+'加工区 · 中':{en:'Yard · Mid',ko:'가공장 · 중간'},
+'生活区 · 低':{en:'Living · Low',ko:'생활구역 · 낮음'},
+'出入口 · 正常':{en:'Gate · Normal',ko:'출입구 · 정상'},
+'工地出入口':{en:'Site Entrance',ko:'현장 출입구'},
+'吊装区':{en:'Lifting Zone',ko:'양중구역'},
+'基坑临边':{en:'Pit Edge',ko:'굴토 가장자리'},
+'材料加工区':{en:'Material Yard',ko:'자재가공장'},
+'识别类型开关：':{en:'Detection types:',ko:'인식 유형:'},
+'安全帽':{en:'Helmet',ko:'안전모'},'反光衣':{en:'Reflective Vest',ko:'반사조끼'},
+'吸烟':{en:'Smoking',ko:'흡연'},'越界':{en:'Intrusion',ko:'경계침입'},
+'临边':{en:'Edge',ko:'가장자리'},'人员':{en:'Person',ko:'사람'},
+'回放时间轴':{en:'Playback Timeline',ko:'재생 타임라인'},
+'实时':{en:'Live',ko:'실시간'},
+'筛选：':{en:'Filter:',ko:'필터:'},
+'全部':{en:'All',ko:'전체'},'警戒':{en:'Warning',ko:'경계'},
+'低风险':{en:'Low-risk',ko:'저위험'},'全部类型':{en:'All Types',ko:'전체 유형'},
+'告警事件列表':{en:'Alarm Events',ko:'알람 이벤트'},
+'点击「处理」完成闭环':{en:'Click Resolve to close loop',ko:'「처리」클릭 시 폐회로 완료'},
+'机位':{en:'Camera',ko:'카메라'},'类型':{en:'Type',ko:'유형'},
+'等级':{en:'Level',ko:'등급'},'状态':{en:'Status',ko:'상태'},
+'待处理':{en:'Pending',ko:'미처리'},'处理':{en:'Resolve',ko:'처리'},
+'已处置 ✓':{en:'Resolved ✓',ko:'처리완료 ✓'},
+'本周告警分布':{en:'Weekly Mix',ko:'주간 분포'},
+'按类型':{en:'By type',ko:'유형별'},
+'处置率':{en:'Resolution Rate',ko:'처리율'},
+'本周':{en:'This Week',ko:'이번 주'},
+'平均处置时长':{en:'Avg. Resolution',ko:'평균 처리시간'},
+'推送触达率':{en:'Push Delivery',ko:'푸시 도달률'},
+'基坑电子围栏：':{en:'Pit E-fence:',ko:'굴토 전자울타리:'},
+'围栏开启中 · 点击关闭':{en:'Fence ON · tap to close',ko:'울타리 가동 중 · 닫기'},
+'点击开启电子围栏':{en:'Tap to enable E-fence',ko:'전자울타리 켜기'},
+'点地图上的绿点查看人员档案':{en:'Tap green dots for profiles',ko:'지도의 녹색 점으로 인원정보 확인'},
+'办公区':{en:'Office',ko:'사무구역'},'生活区':{en:'Living Area',ko:'생활구역'},
+'加工区':{en:'Fabrication Yard',ko:'가공구역'},
+'基坑危险区':{en:'Pit Danger Zone',ko:'굴토 위험구역'},
+'围栏布防中':{en:'Fence Armed',ko:'울타리 방어 중'},
+'围栏未开启':{en:'Fence Off',ko:'울타리 미가동'},
+'在线 9 人':{en:'9 Online',ko:'9명 온라인'},
+'1# 塔吊':{en:'Crane #1',ko:'1번 크레인'},
+'进场时间':{en:'Onboard Since',ko:'입장일'},
+'今日工时':{en:'Hours Today',ko:'오늘 근무시간'},
+'培训状态':{en:'Training',ko:'교육 상태'},
+'已通过 · 2026-08':{en:'Passed · 2026-08',ko:'합격 · 2026-08'},
+'钢筋工':{en:'Rebar Worker',ko:'철근공'},'塔吊司机':{en:'Crane Operator',ko:'크레인 기사'},
+'信号工':{en:'Rigger',ko:'신호수'},'木工':{en:'Carpenter',ko:'목수'},
+'安全员':{en:'Safety Officer',ko:'안전관리자'},'电工':{en:'Electrician',ko:'전기공'},
+'架子工':{en:'Scaffolder',ko:'비계공'},'资料员':{en:'Clerk',ko:'서류담당'},
+'焊工':{en:'Welder',ko:'용접공'},
+'1# 塔吊 · 运行中':{en:'Crane #1 · Running',ko:'1번 크레인 · 가동 중'},
+'吊重（额定 5t）':{en:'Load (rated 5t)',ko:'하중 (정격 5t)'},
+'力矩比':{en:'Torque Ratio',ko:'토크 비율'},
+'风速':{en:'Wind Speed',ko:'풍속'},
+'回转角':{en:'Slewing Angle',ko:'선회각'},
+'高度':{en:'Height',ko:'높이'},
+'2# 施工升降机 · 运行中':{en:'Hoist #2 · Running',ko:'2번 호이스트 · 가동 중'},
+'载重（额定 2t）':{en:'Load (rated 2t)',ko:'하중 (정격 2t)'},
+'轿厢人数（限 9 人）':{en:'Occupants (max 9)',ko:'탑승인원 (최대 9)'},
+'当前高度':{en:'Current Height',ko:'현재 높이'},
+'门联锁':{en:'Door Interlock',ko:'도어 인터록'},
+'正常':{en:'Normal',ko:'정상'},
+'基坑监测 · 位移曲线':{en:'Pit Monitoring · Displacement',ko:'굴토 모니터링 · 변위'},
+'深层水平位移 mm':{en:'Horizontal Displacement mm',ko:'수평변위 mm'},
+'累计位移':{en:'Cumulative Disp.',ko:'누적 변위'},
+'速率':{en:'Rate',ko:'속도'},'水位':{en:'Water Level',ko:'수위'},
+'运行中':{en:'Running',ko:'가동 중'},
+'扬尘超标联动：':{en:'Dust Auto-link:',ko:'먼지 연동:'},
+'手动触发喷淋':{en:'Trigger Sprinkler',ko:'살수 수동'},
+'喷淋开启中（模拟）':{en:'Sprinkler ON (sim)',ko:'살수 가동 중 (모의)'},
+'PM2.5 > 75μg/m³ 自动联动':{en:'PM2.5 > 75 auto trigger',ko:'PM2.5 75 초과 자동'},
+'噪声':{en:'Noise',ko:'소음'},'温度':{en:'Temp',ko:'온도'},
+'今日扬尘走势':{en:'Dust Trend Today',ko:'오늘 먼지 추이'},
+'联动记录':{en:'Linkage Log',ko:'연동 기록'},
+'自动触发':{en:'Auto',ko:'자동'},
+'待整改':{en:'To Rectify',ko:'시정 대기'},'整改中':{en:'Rectifying',ko:'시정 중'},
+'已闭环':{en:'Closed',ko:'해결 완료'},
+'闭环流程：':{en:'Loop Flow:',ko:'폐회로 흐름:'},
+'上报':{en:'Report',ko:'신고'},'整改':{en:'Rectify',ko:'시정'},
+'复查':{en:'Recheck',ko:'재점검'},'销项':{en:'Close',ko:'해소'},
+'隐患台账':{en:'Hazard Ledger',ko:'위험 대장'},
+'模拟演示 · 数据保存在浏览器本地':{en:'Demo · saved locally',ko:'데모 · 로컬 저장'},
+'编号':{en:'No.',ko:'번호'},'位置':{en:'Location',ko:'위치'},
+'上报人':{en:'Reporter',ko:'신고자'},'操作':{en:'Action',ko:'조치'},
+'＋ 新增隐患（模拟上报）':{en:'+ New Hazard (sim)',ko:'+ 신규 위험 (모의)'},
+'开始整改':{en:'Start Rectify',ko:'시정 시작'},
+'复查销项':{en:'Recheck & Close',ko:'재점검·해소'},
+'已归档':{en:'Archived',ko:'보관됨'},
+'新增隐患上报':{en:'New Hazard Report',ko:'신규 위험 신고'},
+'如：2号楼 5F 电梯井':{en:'e.g. Bldg 2, 5F shaft',ko:'예: 2동 5F 샤프트'},
+'临边防护缺失':{en:'Missing Edge Guard',ko:'방호 미설치'},
+'用电安全':{en:'Electrical Safety',ko:'전기 안전'},
+'消防设施':{en:'Fire Facility',ko:'소방시설'},
+'机械防护':{en:'Machine Guarding',ko:'기계 방호'},
+'文明施工':{en:'Housekeeping',ko:'정리정돈'},
+'描述':{en:'Description',ko:'설명'},
+'简要描述隐患情况':{en:'Brief description',ko:'상황 간단 설명'},
+'提交上报':{en:'Submit',ko:'제출'},
+'近 7 日告警趋势':{en:'7-day Alarm Trend',ko:'7일 알람 추이'},
+'识别类型占比':{en:'Type Mix',ko:'인식 유형 비중'},
+'月度统计':{en:'Monthly Stats',ko:'월간 통계'},
+'月份':{en:'Month',ko:'월'},
+'告警总数':{en:'Total Alarms',ko:'알람 합계'},
+'隐患闭环率':{en:'Closure Rate',ko:'해결률'},
+'导出报表（演示）':{en:'Export Report (demo)',ko:'보고서 내보내기 (데모)'},
+'生成今日 AI 巡检日报':{en:'Generate AI Inspection Report',ko:'AI 점검일지 생성'},
+'演示数据':{en:'Demo Data',ko:'데모 데이터'},
+'今日入校人员':{en:'On-campus Today',ko:'오늘 교내 인원'},
+'学生':{en:'Students',ko:'학생'},'教职工':{en:'Faculty',ko:'교직원'},
+'访客':{en:'Visitors',ko:'방문객'},
+'实验室安全点检率':{en:'Lab Inspection Rate',ko:'실험실 점검률'},
+'本周完成':{en:'Done This Week',ko:'이번 주 완료'},
+'消防设施在线':{en:'Fire Devices Online',ko:'소방시설 가동'},
+'烟感':{en:'Smoke Det.',ko:'연기감지기'},
+'消火栓':{en:'Hydrants',ko:'소화전'},
+'今日校园安全事件':{en:'Campus Safety Events',ko:'오늘 교내 안전사건'},
+'处置中':{en:'In Progress',ko:'처리 중'},
+'경운대학교 캠퍼스 · 实时人流量热力':{en:'Kyungwoon Campus · Live Heatmap',ko:'경운대학교 캠퍼스 · 실시간 유동'},
+'演示数据 · 可替换为真实校园地图':{en:'Demo · replace with real map',ko:'데모 · 실제 지도로 교체'},
+'实时联动':{en:'Live Linked',ko:'실시간 연동'},
+'安全管理课程 · 产学研联动':{en:'Safety Courses · Industry-Academia',ko:'안전교육 · 산학협력'},
+'示例数据 · 请替换为真实课程':{en:'Sample · replace with real courses',ko:'샘플 · 실제 과정으로 교체'},
+'课程 / 项目':{en:'Course / Program',ko:'과정 / 프로그램'},
+'对象':{en:'Audience',ko:'대상'},
+'AI 安全监测实训（鹰眼 AI 平台）':{en:'AI Safety Training (EagleEye)',ko:'AI 안전실습 (EagleEye)'},
+'[安全管理相关专业]':{en:'[Safety-related Major]',ko:'[안전관리 관련 학과]'},
+'本周五 14:00':{en:'Fri 14:00',ko:'금요일 14:00'},
+'报名中':{en:'Open',ko:'접수 중'},
+'消防安全实务演练':{en:'Fire Drill',ko:'소방 실습'},
+'全校新生':{en:'All Freshmen',ko:'전체 신입생'},
+'下周二':{en:'Next Tue',ko:'다음 주 화'},
+'已排期':{en:'Scheduled',ko:'예정됨'},
+'应急救护（CPR / AED）培训':{en:'CPR/AED Training',ko:'응급처치 교육'},
+'每月第 2 周':{en:'2nd week monthly',ko:'매월 둘째 주'},
+'常态开展':{en:'Ongoing',ko:'상시 운영'},
+'施工现场安全见习（产学研基地）':{en:'Site Internship (Co-op Base)',ko:'현장실습 (산학기지)'},
+'高年级':{en:'Senior Students',ko:'고학년'},
+'学期内':{en:'In Semester',ko:'학기 중'},
+'对接中':{en:'Arranging',ko:'협의 중'},
+'AI 识别能力 · 4 类典型风险':{en:'AI Recognition · 4 Typical Risks',ko:'AI 인식 · 4대 전형 위험'},
+'每个场景 = 识别 → 判定 → 报警 → 闭环':{en:'Each scene = Detect→Judge→Alarm→Close',ko:'인식→판정→알람→폐회로'},
+'闯入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중 경계구역 침입'},
+'夜班未穿反光背心':{en:'No Vest at Night',ko:'야간 반사조끼 미착용'},
+'夜间模式':{en:'Night Mode',ko:'야간 모드'},
+'识别':{en:'Detect',ko:'인식'},'判定':{en:'Judge',ko:'판정'},
+'报警':{en:'Alarm',ko:'알람'},'闭环':{en:'Close',ko:'폐회로'},
+'一道题 · 谁来盯工地':{en:'One Question · Who Watches the Site',ko:'한 가지 질문 · 누가 지킬까'},
+'拖动中间滑块对比':{en:'Drag the slider to compare',ko:'슬라이더를 끌어 비교'},
+'人工巡检':{en:'Manual Patrol',ko:'인력 순찰'},
+'1 天 3 次 · 靠经验 · 会疲劳':{en:'3×/day · tired',ko:'하루 3회 · 피로'},
+'AI 监督':{en:'AI Supervision',ko:'AI 감시'},
+'7×24 · 秒级告警 · 不眨眼':{en:'24/7 · real-time alarms',ko:'연중무휴 · 실시간 알람'},
+'◀ 拖动对比':{en:'◀ Drag',ko:'◀ 드래그'},
+'从「发现靠运气」到「识别常态化」':{en:'From luck to always-on detection',ko:'운에서 상시 인식으로'},
+'拖动对比 ▶':{en:'Drag ▶',ko:'드래그 ▶'},
+'现场事实监控 · LIVE':{en:'Live Site Monitoring',ko:'현장 실시간 · LIVE'},
+'四路实时画面 · 实时告警流 · 环境读数 · 可接入真实现场视频流':{en:'4 live feeds · alarm stream · sensors · real stream ready',ko:'4채널 실시간 · 알람 · 센서 · 실영상 연동'},
+'自动推送':{en:'Auto Push',ko:'자동 푸시'},
+'环境实时读数':{en:'Live Environment',ko:'실시간 환경'},
+'设备在线状态':{en:'Device Status',ko:'장비 상태'},
+'2# 施工升降机':{en:'Hoist #2',ko:'2번 호이스트'},
+'雾炮喷淋':{en:'Mist Cannon',ko:'미스트 살수'},
+'闸机通道':{en:'Turnstile',ko:'개찰구'},
+'环境监测站':{en:'Env Station',ko:'환경센서'},
+'应急广播':{en:'Broadcast',ko:'비상방송'},
+'2# 塔吊':{en:'Crane #2',ko:'2번 크레인'},
+'● 直播中（模拟流）':{en:'● Live (sim)',ko:'● 생방송 (모의)'},
+'● 在线':{en:'● Online',ko:'● 온라인'},
+'○ 检修':{en:'○ Maintenance',ko:'○ 점검 중'},
+'接入真实现场画面':{en:'Connect Real Feeds',ko:'실제 영상 연결'},
+'：在文件顶部 ':{en:': set ',ko:': 상단 '},
+' 填入现场 RTSP/HLS 视频流地址，四路模拟画面即替换为实况监控；当前为演示流，指标以真实测试为准。':{en:' to a live RTSP/HLS stream to replace sim feeds; currently demo.',ko:'에 실시간 RTSP/HLS 주소를 넣으면 실영상으로 교체; 현재 데모.'},
+'联系方式':{en:'Contact',ko:'연락처'},
+'公司信息':{en:'Company',ko:'회사 정보'},
+'产学研合作：[韩国庆云大学 산학협력단]':{en:'Co-op: [Kyungwoon Univ. IACF]',ko:'산학협력: [경운대학교 산학협력단]'},
+'产品入口':{en:'Product Links',ko:'제품 바로가기'},
+'桌面版监管驾驶舱':{en:'Desktop Console',ko:'데스크톱 관제센터'},
+'📱 手机版 App':{en:'📱 Mobile App',ko:'📱 모바일 앱'},
+'© 2026 鹰眼 AI · 工地安全监管驾驶舱':{en:'© 2026 EagleEye AI · Site Safety Console',ko:'© 2026 EagleEye AI · 현장안전 관제센터'},
+'页面演示数据均为模拟 · 产品指标以真实测试为准':{en:'Demo data simulated · specs subject to real testing',ko:'데모 데이터는 모의 · 지표는 실제 시험 기준'},
+'鹰眼 AI · 工地安全监管驾驶舱':{en:'EagleEye AI · Site Safety Console',ko:'EagleEye AI · 현장안전 관제센터'},
+'下一步 →':{en:'Next →',ko:'다음 →'},
+'← 上一步':{en:'← Back',ko:'← 이전'},
+'跳过导览':{en:'Skip Tour',ko:'투어 건너뛰기'},
+'完成 ✓':{en:'Done ✓',ko:'완료 ✓'},
+'产品导览 ':{en:'Product Tour ',ko:'제품 투어 '},
+'① 驾驶舱总览':{en:'① Overview',ko:'① 대시보드'},
+'② 视频 AI 识别':{en:'② Video AI',ko:'② 영상 AI'},
+'③ 告警中心':{en:'③ Alarm Center',ko:'③ 알람센터'},
+'④ 人员定位':{en:'④ Tracking',ko:'④ 인원 위치'},
+'⑤ 机械设备监测':{en:'⑤ Equipment',ko:'⑤ 장비 모니터링'},
+'⑥ 环境监测联动':{en:'⑥ Environment',ko:'⑥ 환경 연동'},
+'⑦ 隐患闭环治理':{en:'⑦ Hazard Loop',ko:'⑦ 위험 폐회로'},
+'⑧ 数据报表':{en:'⑧ Reports',ko:'⑧ 보고서'},
+'⑨ 庆云大学 · 校园管理':{en:'⑨ Kyungwoon Campus',ko:'⑨ 경운대 캠퍼스'},
+'⑩ PPE 防护检测':{en:'⑩ PPE Check',ko:'⑩ 보호구 검측'},
+'一屏掌握全场态势：在册人员、今日告警、待处置隐患、设备在线率，还有小时告警趋势与区域风险热力图。':{en:'One screen, full status: workers, alarms, hazards, devices, trend & heatmap.',ko:'한 화면으로 전체 현황: 인원·알람·위험·장비·추이·히트맵.'},
+'真实监控画面形态：点下方机位切换场景；用识别类型开关控制安全帽 / 反光衣 / 吸烟 / 越界检测，还能拖时间轴回放。':{en:'Real VMS view: switch cameras below; toggle detection types; drag timeline to replay.',ko:'실제 관제 화면: 카메라 전환, 인식 유형 토글, 타임라인 재생.'},
+'告警按等级分类、可筛选；点「处理」完成闭环，处置率与推送触达率实时统计。':{en:'Alarms graded & filterable; click Resolve to close loop; live stats.',ko:'등급별 알람 필터, 「처리」로 폐회로, 실시간 통계.'},
+'点地图上的绿点查看工人档案；开启基坑电子围栏后，人员闯入危险区立即触发越界告警。':{en:'Tap green dots for profiles; the E-fence alarms on pit intrusion.',ko:'녹색 점으로 인원정보, 전자울타리로 침입 경보.'},
+'塔吊吊重与力矩、升降机载重与人数、基坑位移——数值实时波动，超限即报警。':{en:'Crane load/torque, hoist load/people, pit displacement — live & alarmed.',ko:'크레인·호이스트·굴토 실시간 계측, 초과 시 경보.'},
+'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。':{en:'5 env parameters online; dust auto-triggers sprinkler with logs.',ko:'5개 환경항목, 먼지 초과 시 살수 자동, 기록 유지.'},
+'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。':{en:'Full loop: report → rectify → recheck & close, all logged.',ko:'신고→시정→재점검·해소, 전 과정 기록.'},
+'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。':{en:'Weekly trend, type mix, monthly stats, export & AI report.',ko:'주간 추이·유형 비중·월간 통계, 내보내기·AI 일지.'},
+'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。':{en:'Same platform for campus: flow, lab checks, fire devices, events, co-op training.',ko:'캠퍼스 확장: 유동인구·실험실 점검·소방·사건 연동, 산학 실습.'},
+'脱掉某件防护装备再点检测——系统会真实播放警报声、震动并推送告警到告警中心。':{en:'Remove any PPE and run detection — real siren, vibration & alarm push.',ko:'보호구 미착용 후 검측 — 실제 사이렌·진동·알람 푸시.'},
+'防护装备：':{en:'PPE Gear:',ko:'보호구:'},
+'护目镜':{en:'Goggles',ko:'보안경'},
+'手套':{en:'Gloves',ko:'장갑'},
+'安全带':{en:'Safety Belt',ko:'안전벨트'},
+'点击装备 = 模拟脱下（反光衣由摄像头真实识别）':{en:'Tap = simulate removal (vest really detected by camera)',ko:'클릭 = 미착용 모의 (반사조끼는 카메라 실제 판정)'},
+'📷 检测站 C-03 · 实时画面':{en:'📷 Station C-03 · Live Feed',ko:'📷 검측소 C-03 · 실시간'},
+'摄像头未开启':{en:'Camera Off',ko:'카메라 꺼짐'},
+'检测结果':{en:'Detection Result',ko:'판정 결과'},
+'AI 判定':{en:'AI Verdict',ko:'AI 판정'},
+'触发动作':{en:'Triggered Actions',ko:'연동 조치'},
+'现场声光报警器':{en:'On-site Siren',ko:'현장 사이렌'},
+'推送安全员 / 负责人':{en:'Push to Safety Officer',ko:'안전관리자 푸시'},
+'写入告警中心':{en:'Logged to Alarm Center',ko:'알람센터 기록'},
+'▶ 开始检测':{en:'▶ Start Detection',ko:'▶ 검측 시작'},
+'📷 开启摄像头':{en:'📷 Enable Camera',ko:'📷 카메라 켜기'},
+'尚未开始检测':{en:'Not started yet',ko:'아직 검측 전'},
+'检测通过':{en:'Passed',ko:'통과'},
+'未检测到反光衣':{en:'Vest NOT detected',ko:'반사조끼 미검출'},
+'反光衣检测（真实图像判定）':{en:'Vest (real image check)',ko:'반사조끼 (실제 영상판정)'},
+'请点击「开启摄像头」或保持全部装备穿戴':{en:'Enable camera or keep all gear on',ko:'카메라를 켜거나 보호구를 모두 착용하세요'},
+'声光报警器已触发':{en:'Siren triggered',ko:'사이렌 가동'},
+'未检测到 ':{en:'Missing: ',ko:'미착용: '},
+'📷 本模板接入真实摄像头':{en:'📷 This template uses your real camera',ko:'📷 이 템플릿은 실제 카메라 사용'},
+'（画面中心区域亮度/颜色分析）':{en:'(brightness/color analysis of center region)',ko:'(화면 중앙 밝기·색상 분석)'},
+'，其余装备为模拟开关；检测不通过将':{en:'; other gear is simulated. Failure will ',ko:'; 나머지는 모의. 불합격 시 '},
+'真实触发警报':{en:'really trigger the alarm',ko:'실제 알람 발생'},
+'（警笛声 + 震动 + 系统通知 + 告警中心记录）。':{en:' (siren + vibration + notification + alarm log).',ko:' (사이렌+진동+알림+기록).'},
+'反光衣检测为真实图像判定':{en:'Vest detection is real image analysis',ko:'반사조끼는 실제 영상판정'},
+'摄像头已开启':{en:'Camera On',ko:'카메라 켜짐'},
+'检测中……':{en:'Scanning…',ko:'검측 중…'},
+'🔊 ':': ',/* fallback */
+'📷 ':': ',
+'高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
+};
+let lang='zh';
+try{lang=localStorage.getItem('eagleeye_lang')||'zh';}catch(e){}
+const I18N_DONE=new WeakSet();
+const I18N_SKIP=new Set(['SCRIPT','STYLE']);
+function trText(node){
+  if(node.nodeType!==3)return;
+  const s=node.textContent.trim();
+  if(!s||I18N_DONE.has(node))return;
+  const m=I18N[s];
+  if(m&&m[lang]){node.textContent=node.textContent.replace(s,m[lang]);I18N_DONE.add(node);}
+}
+function trNode(root){
+  if(!root)return;
+  if(root.nodeType===3){trText(root);return;}
+  if(root.nodeType!==1)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  let n;
+  while(n=w.nextNode()){
+    const p=n.parentElement;
+    if(p&&I18N_SKIP.has(p.tagName))continue;
+    trText(n);
+  }
+  const attrs=['placeholder','title','aria-label','data-tag'];
+  const walk=e=>{
+    if(!e||e.nodeType!==1)return;
+    attrs.forEach(a=>{
+      const v=e.getAttribute(a);
+      if(v){const m=I18N[v];if(m&&m[lang])e.setAttribute(a,m[lang]);}
+    });
+    Array.from(e.children||[]).forEach(walk);
+  };
+  walk(root);
+}
+function setLang(l){
+  lang=l;
+  try{localStorage.setItem('eagleeye_lang',l);}catch(e){}
+  $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  trNode(document.body);
+  document.title=I18N['鹰眼 AI · 工地安全监管驾驶舱'][lang]||'EagleEye AI';
+}
+new MutationObserver(muts=>{
+  muts.forEach(mu=>{
+    if(mu.type==='childList')mu.addedNodes.forEach(n=>trNode(n));
+    else if(mu.type==='characterData')trText(mu.target);
+  });
+}).observe(document.body,{childList:true,subtree:true,characterData:true});
+
 /* ===== toast ===== */
 let toastTimer=null;
 function toast(msg){
@@ -756,6 +1130,10 @@ function workerSVG(x,y,s,opts){
   let svg=`<rect x="${x-13*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x+2*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x-15*sc}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x-15*sc}" y="${y+16*sc}" width="${30*sc}" height="${24*sc}" rx="${6*sc}" fill="${shirt}"/><rect x="${x-22*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x+14*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x-15*sc}" y="${y+22*sc}" width="${30*sc}" height="${3*sc}" fill="#FFD9A0" opacity=".9"/><circle cx="${x}" cy="${y+8*sc}" r="${11*sc}" fill="${skin}"/><circle cx="${x-16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/><circle cx="${x+16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/>`;
   if(opts.helmet===false){svg+=`<path d="M${x-11*sc} ${y+2*sc} a11 11 0 0 1 ${22*sc} 0 z" fill="#3A2A1A"/>`;}
   else{svg+=`<path d="M${x-13*sc} ${y+3*sc} a13 13 0 0 1 ${26*sc} 0 l-2 -2 l${-22*sc} 0 z" fill="#FFA726" stroke="#D97F00" stroke-width="1.2"/><rect x="${x-4*sc}" y="${y-14*sc}" width="${8*sc}" height="${3*sc}" rx="1.5" fill="#FFD9A0"/>`;}
+  if(opts.goggles){svg+=`<rect x="${x-11*sc}" y="${y-1*sc}" width="${22*sc}" height="${6*sc}" rx="2.5" fill="#1F2937"/><circle cx="${x-5*sc}" cy="${y+2*sc}" r="${3.2*sc}" fill="#4DA6FF"/><circle cx="${x+5*sc}" cy="${y+2*sc}" r="${3.2*sc}" fill="#4DA6FF"/>`;}
+  if(opts.gloves){svg+=`<circle cx="${x-20*sc}" cy="${y+37*sc}" r="${5*sc}" fill="#7A5A30"/><circle cx="${x+20*sc}" cy="${y+37*sc}" r="${5*sc}" fill="#7A5A30"/>`;}
+  if(opts.belt){svg+=`<rect x="${x-13*sc}" y="${y+28*sc}" width="${26*sc}" height="${5*sc}" fill="#22303C"/><rect x="${x-4*sc}" y="${y+27*sc}" width="${8*sc}" height="${7*sc}" rx="1.5" fill="#FFD54A"/>`;}
+  else if(opts.belt===false){svg+=`<path d="M${x-10*sc} ${y+30*sc} q10 8 20 0" stroke="#FF4D4F" stroke-width="3" fill="none" stroke-dasharray="4 3"/>`;}
   return svg;
 }
 const DBOXES={
@@ -1095,9 +1473,53 @@ MODULES.campus=function(){
   `;
 };
 
+/* ⑩ PPE 防护检测（真实摄像头 + 真实警报） */
+let ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
+let ppeCamOn=false,ppeCamStream=null,ppeCanvas=null;
+MODULES.ppe=function(){
+  return `
+  <div class="filter-row"><span>防护装备：</span>
+    <button class="ai-chip on" data-g="helmet">安全帽</button>
+    <button class="ai-chip on" data-g="goggles">护目镜</button>
+    <button class="ai-chip on" data-g="gloves">手套</button>
+    <button class="ai-chip on" data-g="belt">安全带</button>
+    <button class="ai-chip on" data-g="vest">反光衣</button>
+    <span style="margin-left:auto">点击装备 = 模拟脱下（反光衣由摄像头真实识别）</span>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="pt"><b>📷 检测站 C-03 · 实时画面</b><span id="ppeCamState">摄像头未开启</span></div>
+      <div class="ppe-stage" id="ppeStage">
+        <video id="ppeVideo" autoplay playsinline muted style="width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E131D;display:block"></video>
+        <div id="ppeFallback" hidden style="position:absolute;inset:0"><svg id="ppeSvg" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%"></svg></div>
+        <div class="scan-move"></div>
+        <div class="rec-tag"><i></i>C-03 PPE 检测站 · <span id="ppeClock">--:--:--</span></div>
+        <div class="dbox" data-tag="人员" style="left:38%;top:16%;width:24%;height:64%"></div>
+        <div class="ppe-stamp" id="ppeStamp"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel"><div class="pt"><b>检测结果</b><span>AI 判定</span></div>
+        <div class="row-list" id="ppeResult"><div class="rl-item"><span style="color:var(--dim)">尚未开始检测</span></div></div>
+      </div>
+      <div class="panel"><div class="pt"><b>触发动作</b></div>
+        <div class="row-list">
+          <div class="rl-item"><span>🔊</span>现场声光报警器</div>
+          <div class="rl-item"><span>📲</span>推送安全员 / 负责人</div>
+          <div class="rl-item"><span>🚨</span>写入告警中心</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="ppeStart" style="width:100%">▶ 开始检测</button>
+      <button class="btn btn-ghost" id="ppeCamBtn" style="width:100%;margin-top:10px">📷 开启摄像头</button>
+    </div>
+  </div>
+  <p class="live-note">📷 本模板接入真实摄像头：<b>反光衣检测为真实图像判定</b>（画面中心区域亮度/颜色分析），其余装备为模拟开关；检测不通过将<b>真实触发警报</b>（警笛声 + 震动 + 系统通知 + 告警中心记录）。</p>`;
+};
+
 /* ---- 模块路由 ---- */
 let curMod='overview',consoleVisible=true;
 function showModule(m){
+  if(curMod==='ppe'&&window.ppeStop)window.ppeStop();
   curMod=m;
   cBody.classList.add('swap');
   cBody.innerHTML=MODULES[m]();
@@ -1108,6 +1530,39 @@ function showModule(m){
   cBody.scrollTop=0;
 }
 const afterRender={
+  ppe(){
+    ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
+    const ppeStage=$('#ppeStage');
+    window.ppeStop=()=>{if(ppeCamStream){ppeCamStream.getTracks().forEach(t=>t.stop());ppeCamStream=null;}ppeCamOn=false;};
+    $('#ppeFallback').hidden=false;
+    renderPpeWorker();
+    $$('#cBody .ai-chip[data-g]').forEach(ch=>ch.addEventListener('click',()=>{
+      const g=ch.dataset.g;
+      ppeGear[g]=!ppeGear[g];
+      ch.classList.toggle('on',ppeGear[g]);
+      renderPpeWorker();
+    }));
+    $('#ppeCamBtn').addEventListener('click',()=>{
+      if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持摄像头（演示环境）');return;}
+      navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false})
+      .then(stream=>{
+        ppeCamStream=stream;ppeCamOn=true;
+        const v=$('#ppeVideo');v.srcObject=stream;
+        $('#ppeCamState').textContent='摄像头已开启';
+        $('#ppeFallback').hidden=true;
+        $('#ppeCamBtn').textContent='📷 摄像头已开启';
+        toast('📷 摄像头已接入 · 反光衣将由真实图像判定');
+      })
+      .catch(()=>{toast('未获得摄像头权限 · 使用示意图模式');$('#ppeFallback').hidden=false;});
+    });
+    $('#ppeStart').addEventListener('click',()=>{
+      if('Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(e){}}
+      ppeStage.classList.remove('alarming','pass');
+      const st=$('#ppeStamp');st.className='ppe-stamp';
+      ppeStage.classList.add('scanning');
+      setTimeout(ppeJudge,1600);
+    });
+  },
   overview(){
     drawLine($('#cvTrend'),[8,12,9,15,11,18,14,23,17,13,10,16],'#FFA726',true);
     const kv=$('#kvList');
@@ -1273,6 +1728,97 @@ const afterRender={
     });
   }
 };
+/* ---- PPE 检测核心逻辑 ---- */
+function renderPpeWorker(){
+  const svg=$('#ppeSvg');
+  if(!svg)return;
+  svg.innerHTML=`<rect width="480" height="360" fill="var(--sky2)"/>
+    <rect y="300" width="480" height="60" fill="#0E141F"/>
+    <g stroke="#3A4A63" stroke-width="7"><path d="M40 300 V120 H440 V300"/><path d="M40 160 H440 M40 200 H440 M40 240 H440"/></g>
+    ${workerSVG(240,190,1.15,{helmet:ppeGear.helmet,vest:ppeGear.vest,goggles:ppeGear.goggles,gloves:ppeGear.gloves,belt:ppeGear.belt})}`;
+}
+function detectVest(){
+  const v=$('#ppeVideo');
+  if(!v||!v.videoWidth||!ppeCamOn)return null;
+  if(!ppeCanvas)ppeCanvas=document.createElement('canvas');
+  const vw=v.videoWidth,vh=v.videoHeight;
+  ppeCanvas.width=vw;ppeCanvas.height=vh;
+  const ctx=ppeCanvas.getContext('2d');
+  ctx.drawImage(v,0,0,vw,vh);
+  const x0=Math.floor(vw*0.38),x1=Math.floor(vw*0.62);
+  const y0=Math.floor(vh*0.30),y1=Math.floor(vh*0.62);
+  const img=ctx.getImageData(x0,y0,x1-x0,y1-y0);
+  const d=img.data;
+  let bright=0,orange=0,n=0;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const lum=(r+g+b)/3;
+    bright+=lum;
+    if(lum>110&&r>110&&g>70&&b<130&&r>b+30)orange++;
+    n++;
+  }
+  const avg=bright/n,ratio=orange/n;
+  return {avg,ratio,pass:avg>100&&ratio>0.10};
+}
+function ppeSiren(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    const ctx=ppeSiren.ctx||(ppeSiren.ctx=new AC());
+    ctx.resume();
+    for(let i=0;i<3;i++){
+      const t=ctx.currentTime+i*0.9;
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='square';
+      o.frequency.setValueAtTime(880,t);
+      o.frequency.setValueAtTime(620,t+0.4);
+      g.gain.setValueAtTime(0.001,t);
+      g.gain.exponentialRampToValueAtTime(0.25,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.82);
+      o.connect(g).connect(ctx.destination);
+      o.start(t);o.stop(t+0.85);
+    }
+  }catch(e){}
+}
+function ppeJudge(){
+  const stage=document.getElementById('ppeStage');
+  stage.classList.remove('scanning');
+  const missing=[];
+  [['helmet','安全帽'],['goggles','护目镜'],['gloves','手套'],['belt','安全带']].forEach(g=>{
+    if(!ppeGear[g[0]])missing.push(g[1]);
+  });
+  let vestResult='通过',vestOK=true;
+  if(ppeCamOn){
+    const v=detectVest();
+    if(v===null){vestOK=true;vestResult='—';}
+    else{vestOK=v.pass;vestResult=v.pass?'通过':'未检测到反光衣';}
+  }else if(!ppeGear.vest){vestOK=false;vestResult='未检测到反光衣';}
+  const resultEl=$('#ppeResult');
+  const rows=[['helmet','安全帽',!missing.includes('安全帽')],['goggles','护目镜',!missing.includes('护目镜')],['gloves','手套',!missing.includes('手套')],['belt','安全带',!missing.includes('安全带')],['vest','反光衣',vestOK]];
+  resultEl.innerHTML=rows.map(r=>`
+    <div class="rl-item"><span class="dot" style="background:${r[2]?'var(--grn)':'var(--red)'}"></span><span>${r[1]}</span>
+    <b style="margin-left:auto;color:${r[2]?'var(--grn)':'var(--red)'}">${r[2]?'✓ 通过':(r[0]==='vest'&&ppeCamOn?'✗ 真实图像判定未通过':'✗ 缺失')}</b></div>`).join('');
+  const stamp=$('#ppeStamp');
+  if(!missing.length&&vestOK){
+    stage.classList.add('pass');
+    stamp.textContent='✓ 检测通过';
+    stamp.className='ppe-stamp good show';
+    toast('✅ PPE 检测通过 · 允许进入作业区');
+    if(navigator.vibrate)navigator.vibrate(40);
+  }else{
+    stage.classList.add('alarming');
+    stamp.textContent='⚠ 防护缺失 '+(missing.length+(vestOK?0:1))+' 项';
+    stamp.className='ppe-stamp bad show';
+    ppeSiren();
+    if(navigator.vibrate)navigator.vibrate([200,100,200,100,500]);
+    const all=missing.slice();
+    if(!vestOK)all.push('反光衣');
+    if('Notification' in window&&Notification.permission==='granted'){
+      try{new Notification('鹰眼AI 现场警报',{body:'未检测到 '+all.join('、')+' · C-03 检测站',tag:'ppe'});}catch(e){}
+    }
+    raiseAlarm('C-03 PPE检测站','未检测到 '+all[0]+(all.length>1?' 等'+all.length+'项':''),'h','高风险');
+    toast('🚨 警报已触发：'+all.join('、'));
+  }
+}
 $$('#cNav button').forEach(b=>b.addEventListener('click',()=>showModule(b.dataset.m)));
 new IntersectionObserver(e=>consoleVisible=e[0].isIntersecting).observe($('#consoleBox'));
 
@@ -1287,6 +1833,7 @@ setInterval(()=>{
     raiseAlarm(p[1],p[0],lvMap[p[2]],tMap[p[2]]);
   }
   const t=$('#bigTime');if(t)t.textContent=nowStr();
+  if(curMod==='ppe'){const pc=$('#ppeClock');if(pc)pc.textContent=nowStr();}
   if(curMod==='people')moveWorkers();
   if(curMod==='machine'){
     tower.load=Math.max(.8,Math.min(4.8,tower.load+rnd(-.15,.15)));
@@ -1447,7 +1994,8 @@ const TOUR=[
   {mod:'env',title:'⑥ 环境监测联动',desc:'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。',sel:'#cBody .gauge-grid'},
   {mod:'hazard',title:'⑦ 隐患闭环治理',desc:'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。',sel:'#cBody .hz-stats'},
   {mod:'report',title:'⑧ 数据报表',desc:'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。',sel:'#cBody .grid-2'},
-  {mod:'campus',title:'⑨ 庆云大学 · 校园管理',desc:'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。',sel:'#cBody .kpis'}
+  {mod:'campus',title:'⑨ 庆云大学 · 校园管理',desc:'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。',sel:'#cBody .kpis'},
+  {mod:'ppe',title:'⑩ PPE 防护检测',desc:'脱掉某件防护装备再点检测——系统会真实播放警报声、震动并推送告警到告警中心。',sel:'#cBody .grid-2'}
 ];
 let tourIdx=-1;
 const hole=document.createElement('div');hole.className='tour-hole';hole.style.display='none';document.body.appendChild(hole);
@@ -1544,6 +2092,10 @@ if(liveCamsEl){
 
 /* 初始化 */
 showModule('overview');
+/* 语言切换绑定 + 初始应用 */
+$$('#langSw button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
+if(lang!=='zh')setLang(lang);
+else $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l==='zh'));
 })();
 </script>
 </body>
