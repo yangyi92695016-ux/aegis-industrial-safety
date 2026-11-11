@@ -1,7 +1,7 @@
 // 鹰眼 AI App Service Worker v2：HTML 网络优先，资源缓存优先
 const CACHE='eagleeye-app-v2';
 const ASSETS=[
-  './eagleeye-app.html','./eagleeye-safety.html','./manifest-eagleeye.webmanifest',
+  './index.html','./eagleeye-app.html','./eagleeye-safety.html','./manifest-eagleeye.webmanifest',
   './icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png'
 ];
 self.addEventListener('install',e=>{

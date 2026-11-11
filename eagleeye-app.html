@@ -402,6 +402,25 @@ $('#hideBanner').addEventListener('click',()=>{
   try{localStorage.setItem('eagleeye_banner_hide','1');}catch(e){}
 });
 try{if(localStorage.getItem('eagleeye_banner_hide')==='1')$('#installBanner').style.display='none';}catch(e){}
+/* 已安装为 App → 显示安装成功状态 */
+if(matchMedia('(display-mode: standalone)').matches){
+  const b=$('#installBanner');
+  if(b)b.innerHTML='<h3>✅ 已安装为 App</h3><div class="row"><span style="color:var(--grn)">当前正以 App 模式运行 · 全屏 · 离线可用 · 告警通知已就绪</span></div>';
+}
+/* iOS 安装提示 */
+if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
+  const row=$('#installBanner .row span');
+  if(row)row.textContent='iOS 安装：Safari 打开 → 分享按钮 → 「添加到主屏幕」→ 桌面出现图标';
+}
+/* 桌面快捷方式哈希路由：#alarm / #people */
+(function(){
+  const map={alarm:'alarm',people:'people',me:'me',video:'video',overview:'overview'};
+  const t=map[location.hash.slice(1)];
+  if(t){
+    $$('nav.tab button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+    $$('.page').forEach(p=>p.classList.toggle('on',p.dataset.t===t));
+  }
+})();
 
 /* ===== 启动屏 ===== */
 setTimeout(()=>$('#splash').classList.add('hide'),1300);

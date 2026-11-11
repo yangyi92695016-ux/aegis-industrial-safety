@@ -1,11 +1,12 @@
 // AEGIS Service Worker v4：HTML 永远网络优先（不再出现旧版页面），静态资源缓存优先
 const CACHE='aegis-v4';
 const STATIC_ASSETS=[
+  './index.html','./eagleeye-safety.html','./eagleeye-app.html',
   './css/style.css','./css/upgrade.css','./css/watch.css',
   './js/main.js','./js/pwa.js','./js/three-twin.js','./js/hazard-game.js',
   './js/drill.js','./js/radar.js','./js/watch.js',
   './icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png',
-  './eagleeye-safety.html','./eagleeye-app.html','./manifest.webmanifest','./manifest-eagleeye.webmanifest'
+  './manifest.webmanifest','./manifest-eagleeye.webmanifest'
 ];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(STATIC_ASSETS.map(p=>new URL(p,self.registration.scope).href))).then(()=>self.skipWaiting()));

@@ -269,6 +269,14 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .ppe-stamp.show{transform:translate(-50%,-50%) scale(1)}
 .ppe-stamp.bad{color:var(--red);border:3px solid var(--red);background:rgba(40,6,10,.85)}
 .ppe-stamp.good{color:var(--grn);border:3px solid var(--grn);background:rgba(4,20,12,.85)}
+/* 手机访问推荐 App 版 */
+.m-gate{position:fixed;inset:0;z-index:800;background:rgba(4,6,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;padding:24px}
+.m-gate-card{background:var(--panel2);border:1px solid rgba(255,167,38,.5);border-radius:18px;padding:30px 26px;max-width:370px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.m-gate-card .gl{font-size:46px}
+.m-gate-card h3{font-size:19px;margin:12px 0 8px;letter-spacing:.05em}
+.m-gate-card p{font-size:14px;color:var(--dim);margin-bottom:18px;line-height:1.8}
+.m-gate-card .btn{display:block;text-align:center;margin-top:10px}
 @media(max-width:900px){.live-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.live-cams{grid-template-columns:1fr}.app-link span{display:none}}
 
@@ -561,6 +569,17 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
     </div>
   </div>
 </footer>
+
+<!-- 手机访问推荐 App 版 -->
+<div class="m-gate" id="mGate" hidden>
+  <div class="m-gate-card">
+    <div class="gl">🦅</div>
+    <h3>📱 检测到手机访问</h3>
+    <p>推荐使用手机 App 版：底部导航 · 告警推送 · 一键安装到桌面 · 离线可用</p>
+    <a class="btn btn-primary" href="eagleeye-app.html">进入手机 App 版</a>
+    <button class="btn btn-ghost" id="mGateSkip">继续浏览网页版</button>
+  </div>
+</div>
 
 <div class="modal" id="modal"><div class="modal-card" id="modalCard"></div></div>
 <div class="toast" id="toast"></div>
@@ -2107,6 +2126,17 @@ function hashRoute(){
 }
 hashRoute();
 addEventListener('hashchange',hashRoute);
+/* 手机访问 → 推荐 App 版 */
+(function(){
+  if(matchMedia('(display-mode: standalone)').matches)return;
+  const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if(!mobile)return;
+  try{if(localStorage.getItem('eagleeye_mgate')==='skip')return;}catch(e){}
+  const gate=$('#mGate');
+  if(!gate)return;
+  gate.hidden=false;
+  $('#mGateSkip').addEventListener('click',()=>{gate.hidden=true;try{localStorage.setItem('eagleeye_mgate','skip');}catch(e){}});
+})();
 })();
 </script>
 </body>

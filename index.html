@@ -2,25 +2,2142 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="refresh" content="0; url=eagleeye-safety.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0B0E13">
 <title>鹰眼 AI · 工地安全监管驾驶舱</title>
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="description" content="施工现场安全监管平台：视频AI识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环">
 <style>
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0B0E13;color:#F2F4F8;font-family:system-ui,sans-serif;text-align:center;padding:20px;box-sizing:border-box}
-a{color:#FFA726}
-.box{max-width:480px}
-h1{font-size:26px;letter-spacing:.1em}
-p{color:#8B93A7;font-size:15px;line-height:1.8}
-.btn{display:inline-block;margin-top:14px;padding:13px 30px;border-radius:10px;background:linear-gradient(135deg,#FFB000,#FFA726);color:#1a1206;font-weight:700;text-decoration:none;letter-spacing:.06em}
+/* ============ 基础 ============ */
+:root{
+  --bg:#0B0E13; --panel:#12161F; --panel2:#161B27; --panel3:#0E131D; --line:rgba(255,255,255,.09);
+  --hl:#FFA726; --red:#FF4D4F; --yel:#FFD54A; --grn:#3DDC84; --blue:#4DA6FF;
+  --text:#F2F4F8; --dim:#8B93A7; --dim2:#5D6B7E;
+  --sky1:#101A2C; --sky2:#0C1420; --bld:#1A2434; --bld-w:#FFE9A8; --crane:#2A3548; --crane-l:#3A4A63;
+  --moon:#FFD9A0; --dust:rgba(255,217,160,.55); --scan:#4DA6FF;
+}
+body.night{--sky1:#060910;--sky2:#04060B;--bld:#101722;--bld-w:#FFD77A;--crane:#141C2A;--crane-l:#1E2A3E;--moon:#C9E4FF;--dust:rgba(201,228,255,.4);--scan:#3DDC84}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--hl);color:#0B0E13}
+svg{display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--hl);box-shadow:0 0 12px var(--hl);z-index:300;transition:width .15s linear}
+
+/* ============ 导航 ============ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 0;transition:.35s}
+.nav.solid{background:rgba(11,14,19,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.45);padding:10px 0}
+.nav-in{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo svg{width:34px;height:34px}
+.logo b{font-size:20px;letter-spacing:.06em}
+.logo span{font-size:13px;color:var(--dim);letter-spacing:.1em}
+.nav-right{display:flex;align-items:center;gap:12px}
+.toggle{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:6px 12px;font-size:14px;color:var(--dim);transition:.3s}
+.toggle b{color:var(--hl);font-weight:600}
+.btn{padding:12px 26px;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:.06em;transition:transform .25s,box-shadow .25s;display:inline-block}
+.btn-primary{background:linear-gradient(135deg,#FFB000,var(--hl));color:#1a1206;box-shadow:0 6px 22px rgba(255,167,38,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,167,38,.5)}
+.btn-ghost{border:1px solid rgba(255,255,255,.22);color:var(--text)}
+.btn-ghost:hover{border-color:var(--hl);color:var(--hl)}
+@media(max-width:640px){.logo span{display:none}.toggle span{display:none}}
+
+/* ============ HERO ============ */
+.hero{position:relative;height:92vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,var(--sky1),var(--sky2))}
+.pl{position:absolute;inset:-4% 0;pointer-events:none;will-change:transform}
+.pl svg{width:100%;height:100%}
+#dust{position:absolute;inset:0;z-index:4;pointer-events:none}
+.vignette{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 75% 65% at 50% 42%,transparent 40%,rgba(6,9,14,.72) 100%)}
+.scanline{position:absolute;left:0;right:0;height:2px;z-index:6;background:linear-gradient(90deg,transparent,var(--scan),transparent);box-shadow:0 0 18px var(--scan);opacity:.5;animation:scanY 7s linear infinite;pointer-events:none}
+.beam{position:absolute;top:0;bottom:0;width:3px;z-index:6;background:linear-gradient(180deg,transparent,var(--scan),transparent);opacity:.28;animation:scanX 9s ease-in-out infinite;pointer-events:none}
+@keyframes scanY{0%{top:8%}50%{top:92%}100%{top:8%}}
+@keyframes scanX{0%{left:6%}50%{left:92%}100%{left:6%}}
+@keyframes crane{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.hero-in{position:relative;z-index:10;padding:0 24px;max-width:900px}
+.hero-kicker{display:inline-block;font-size:14px;letter-spacing:.28em;color:var(--hl);border:1px solid rgba(255,167,38,.35);background:rgba(255,167,38,.08);padding:8px 22px;border-radius:30px;margin-bottom:30px}
+.hero h1{font-size:clamp(38px,6vw,74px);font-weight:900;line-height:1.14;letter-spacing:.04em;margin-bottom:18px}
+.hero h1 em{font-style:normal;color:var(--hl)}
+.hero .sub{font-size:17px;color:var(--dim);letter-spacing:.12em;margin-bottom:40px}
+.hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.hero-tags{margin-top:34px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hero-tags span{font-size:13px;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);padding:6px 14px;border-radius:20px;letter-spacing:.06em}
+.feed{position:absolute;left:0;right:0;bottom:0;z-index:12;background:rgba(8,11,17,.78);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.feed-in{display:flex;align-items:center;overflow:hidden;height:52px;max-width:1280px;margin:0 auto;padding:0 24px}
+.feed-label{flex-shrink:0;font-size:13px;letter-spacing:.14em;color:var(--hl);padding-right:18px;border-right:1px solid var(--line)}
+.feed-label .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:8px;animation:blink 1.2s infinite;vertical-align:1px}
+@keyframes blink{50%{opacity:.25}}
+.feed-list{flex:1;overflow:hidden;position:relative;height:100%}
+.feed-item{position:absolute;top:50%;left:100%;transform:translateY(-50%);white-space:nowrap;font-size:14px;color:var(--dim);animation:feedIn 14s linear}
+.feed-item b{color:var(--text);font-weight:600}
+.feed-item .t{color:var(--hl);font-variant-numeric:tabular-nums}
+@keyframes feedIn{0%{left:100%}100%{left:-120%}}
+
+/* ============ 通用 ============ */
+.sec{padding:100px 0}
+.sec.alt{background:var(--panel)}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-head h2{font-size:clamp(26px,3.6vw,40px);font-weight:800;letter-spacing:.06em;margin-bottom:12px}
+.sec-head h2 em{font-style:normal;color:var(--hl)}
+.sec-head p{font-size:16px;color:var(--dim);letter-spacing:.08em}
+.rv{opacity:0;transform:translateY(42px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+
+/* ============ 驾驶舱 ============ */
+.console{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.55);display:grid;grid-template-columns:210px 1fr;min-height:680px}
+.c-side{background:var(--panel3);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.c-brand{display:flex;align-items:center;gap:10px;padding:6px 12px 18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.c-brand b{font-size:16px}
+.c-brand span{font-size:12px;color:var(--dim);display:block;letter-spacing:.06em}
+.c-nav{display:flex;flex-direction:column;gap:4px}
+.c-nav button{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 14px;border-radius:10px;font-size:15px;color:var(--dim);transition:.25s;letter-spacing:.04em}
+.c-nav button .ic{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:rgba(255,255,255,.05);font-size:14px}
+.c-nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.c-nav button.on{background:rgba(255,167,38,.13);color:var(--hl)}
+.c-nav button.on .ic{background:rgba(255,167,38,.2)}
+.c-side .c-ver{margin-top:auto;font-size:12px;color:var(--dim2);text-align:center;letter-spacing:.08em}
+.c-main{display:flex;flex-direction:column;min-width:0}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.c-top .proj{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;letter-spacing:.04em}
+.c-top .proj .st{font-size:12px;font-weight:400;color:var(--grn);border:1px solid rgba(61,220,132,.4);background:rgba(61,220,132,.08);padding:2px 10px;border-radius:20px}
+.c-top .sys{display:flex;gap:16px;font-size:13px;color:var(--dim);letter-spacing:.04em}
+.c-top .sys b{color:var(--text);font-variant-numeric:tabular-nums}
+.c-body{padding:20px;overflow:hidden;position:relative}
+.c-body .panel{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.c-body .pt{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.c-body .pt b{font-size:15px;letter-spacing:.06em}
+.c-body .pt span{font-size:12px;color:var(--dim);letter-spacing:.06em}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-22px;top:-22px;width:74px;height:74px;border-radius:50%;background:var(--kc,rgba(255,167,38,.1))}
+.kpi .v{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .l{font-size:13px;color:var(--dim);letter-spacing:.06em;margin-top:4px}
+.kpi .d{font-size:12px;margin-top:6px;color:var(--dim2);letter-spacing:.04em}
+.grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+canvas.chart{width:100%;height:180px;display:block}
+.row-list{display:flex;flex-direction:column;gap:8px}
+.rl-item{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:9px 12px;background:var(--panel3);border:1px solid var(--line);border-radius:10px}
+.rl-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rl-item time{color:var(--dim2);font-variant-numeric:tabular-nums;margin-left:auto;font-size:12px}
+.lv{font-size:11px;padding:2px 8px;border-radius:20px;letter-spacing:.04em;white-space:nowrap}
+.lv.h{background:rgba(255,77,79,.14);color:var(--red)}
+.lv.m{background:rgba(255,213,74,.12);color:var(--yel)}
+.lv.l{background:rgba(61,220,132,.12);color:var(--grn)}
+.lv.b{background:rgba(77,166,255,.12);color:var(--blue)}
+
+/* 视频AI */
+.camgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.camcell{background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:.25s;position:relative}
+.camcell:hover{border-color:rgba(255,167,38,.5);transform:translateY(-2px)}
+.camcell.sel{border-color:var(--hl);box-shadow:0 0 0 2px rgba(255,167,38,.3)}
+.camcell .v{position:relative;aspect-ratio:16/9;background:var(--sky2);overflow:hidden}
+.camcell .v svg{width:100%;height:100%}
+.camcell .meta{display:flex;justify-content:space-between;padding:8px 12px;font-size:12.5px;color:var(--dim);letter-spacing:.04em}
+.camcell .meta b{color:var(--text)}
+.dbox{position:absolute;border:2px solid var(--blue);border-radius:4px;animation:track 4s ease-in-out infinite;transition:opacity .3s}
+.dbox::before{content:attr(data-tag);position:absolute;top:-24px;left:-2px;font-size:11px;letter-spacing:.04em;color:#fff;background:rgba(77,166,255,.9);padding:1px 7px;border-radius:4px;white-space:nowrap}
+.dbox.red{border-color:var(--red)}.dbox.red::before{background:rgba(255,77,79,.92)}
+.dbox.yel{border-color:var(--yel)}.dbox.yel::before{background:rgba(255,213,74,.92);color:#231a05}
+.dbox.org{border-color:var(--hl)}.dbox.org::before{background:rgba(255,167,38,.94);color:#1a1206}
+.dbox.off{opacity:0}
+@keyframes track{0%,100%{transform:translate(0,0)}30%{transform:translate(4px,-3px)}60%{transform:translate(-3px,3px)}}
+.ai-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ai-chips span{font-size:13px;color:var(--dim);letter-spacing:.06em}
+.ai-chip{font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid var(--line);color:var(--dim);transition:.25s}
+.ai-chip.on{border-color:var(--hl);color:var(--hl);background:rgba(255,167,38,.1)}
+.bigview{position:relative;background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bigview .v{position:relative;aspect-ratio:16/7.5;background:var(--sky2)}
+.bigview .v svg{width:100%;height:100%}
+.bigview .ctrl{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+.bigview .ctrl input{flex:1;accent-color:var(--hl)}
+.rec-tag{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);background:rgba(8,11,17,.6);padding:4px 10px;border-radius:6px;letter-spacing:.04em}
+.rec-tag i{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
+
+/* 告警中心 */
+.alarm-table{width:100%;border-collapse:collapse;font-size:14px}
+.alarm-table th{text-align:left;padding:10px 12px;color:var(--dim);font-size:13px;letter-spacing:.06em;border-bottom:1px solid var(--line);white-space:nowrap}
+.alarm-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap}
+.alarm-table tr:hover td{background:rgba(255,167,38,.04)}
+.mini-btn{padding:5px 14px;border-radius:8px;border:1px solid var(--line);font-size:13px;color:var(--hl);transition:.25s}
+.mini-btn:hover{background:rgba(255,167,38,.12)}
+.mini-btn.done{color:var(--grn);border-color:rgba(61,220,132,.4);cursor:default}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-row select{background:var(--panel3);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 12px;font-size:13px;outline:none}
+
+/* 人员定位 */
+.sitemap{position:relative;aspect-ratio:16/8.6;background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sitemap svg{width:100%;height:100%}
+.pdot{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--grn);border:2px solid #0B0E13;box-shadow:0 0 8px rgba(61,220,132,.7);transition:left 1.2s linear,top 1.2s linear;cursor:pointer;z-index:3}
+.pdot.warn{background:var(--red);box-shadow:0 0 10px rgba(255,77,79,.8)}
+.pdot::after{content:attr(data-n);position:absolute;left:16px;top:-4px;font-size:11px;color:var(--dim);white-space:nowrap}
+.fence-note{position:absolute;bottom:12px;left:14px;font-size:12.5px;color:var(--dim);display:flex;gap:12px;flex-wrap:wrap;background:rgba(8,11,17,.6);padding:6px 12px;border-radius:8px}
+.worker-card{position:absolute;z-index:6;background:var(--panel2);border:1px solid var(--hl);border-radius:12px;padding:12px 16px;font-size:13.5px;min-width:190px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.worker-card b{font-size:15px}
+.worker-card .close{position:absolute;top:6px;right:10px;color:var(--dim)}
+.worker-card .row{display:flex;justify-content:space-between;gap:14px;padding:2px 0;color:var(--dim)}
+.worker-card .row i{font-style:normal;color:var(--text)}
+
+/* 仪表盘 */
+.gauge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.gauge{background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;position:relative}
+.gauge svg{width:100%;height:auto}
+.gauge .gv{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:-6px}
+.gauge .gl{font-size:12.5px;color:var(--dim);letter-spacing:.06em}
+.gauge.over{border-color:rgba(255,77,79,.5)}
+.gauge.over .gv{color:var(--red)}
+.tower-strip{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+.tower-strip b{color:var(--text);font-variant-numeric:tabular-nums}
+
+/* 隐患闭环 */
+.hz-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.hz-stat{background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+.hz-stat b{font-size:24px;font-variant-numeric:tabular-nums;display:block}
+.hz-stat span{font-size:12.5px;color:var(--dim);letter-spacing:.05em}
+.hz-flow{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--dim2);margin:8px 0 14px}
+.hz-flow i{font-style:normal;padding:3px 10px;border-radius:14px;border:1px solid var(--line)}
+.hz-flow i.now{color:var(--hl);border-color:var(--hl);background:rgba(255,167,38,.1)}
+.hz-flow i.passed{color:var(--grn);border-color:rgba(61,220,132,.4)}
+
+/* 弹层 */
+.modal{position:fixed;inset:0;z-index:400;background:rgba(4,6,10,.7);backdrop-filter:blur(6px);display:none;place-items:center;padding:20px}
+.modal.show{display:grid}
+.modal-card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:26px;width:100%;max-width:430px;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.modal-card h3{font-size:18px;margin-bottom:18px;letter-spacing:.06em}
+.mfield{margin-bottom:14px}
+.mfield label{display:block;font-size:13.5px;color:var(--dim);margin-bottom:7px;letter-spacing:.05em}
+.mfield input,.mfield select{width:100%;background:var(--panel3);border:1px solid var(--line);border-radius:9px;color:var(--text);font-size:15px;padding:11px 14px;outline:none}
+.mfield input:focus,.mfield select:focus{border-color:var(--hl)}
+.modal-card .btn{width:100%;text-align:center}
+.toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(20px);background:var(--panel2);border:1px solid rgba(255,167,38,.5);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14.5px;letter-spacing:.05em;opacity:0;pointer-events:none;transition:.35s;z-index:500;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ============ v4：导览 / 告警铃 / 过渡 ============ */
+.c-top .bell-ui{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:6px 14px;cursor:pointer;transition:.25s}
+.c-top .bell-ui:hover{border-color:rgba(255,77,79,.5);color:var(--text)}
+.c-top .bell-ui b{color:#fff;background:var(--red);border-radius:50%;min-width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-variant-numeric:tabular-nums;padding:0 4px}
+.c-top .bell-ui b.zero{background:var(--dim2)}
+.tour-btn{font-size:14px;color:var(--hl);border:1px solid rgba(255,167,38,.5);background:rgba(255,167,38,.08);border-radius:20px;padding:6px 16px;transition:.25s;letter-spacing:.04em}
+.tour-btn:hover{background:rgba(255,167,38,.18)}
+.c-body{transition:opacity .22s ease,transform .22s ease}
+.c-body.swap{opacity:0;transform:translateY(10px)}
+@keyframes alarmPulse{0%,100%{box-shadow:0 40px 100px rgba(0,0,0,.55)}50%{box-shadow:0 40px 100px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,77,79,.9)}}
+body.alarming .console{animation:alarmPulse 1.6s ease infinite}
+.tour-hole{position:fixed;z-index:601;border-radius:14px;box-shadow:0 0 0 9999px rgba(3,5,9,.82),0 0 0 2px var(--hl);transition:all .45s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.tour-bubble{position:fixed;z-index:602;background:var(--panel2);border:1px solid rgba(255,167,38,.5);border-radius:16px;padding:20px 24px;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.6);transition:all .45s cubic-bezier(.22,1,.36,1)}
+.tour-bubble .tb-step{font-size:12px;letter-spacing:.2em;color:var(--hl)}
+.tour-bubble h3{font-size:19px;margin:6px 0 8px;letter-spacing:.04em}
+.tour-bubble p{font-size:14px;color:var(--dim);line-height:1.7}
+.tour-bubble .tb-btns{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
+.tour-bubble .tb-btns .btn{padding:9px 20px;font-size:14px}
+.tour-bubble .tb-skip{font-size:13px;color:var(--dim2);cursor:pointer}
+.tour-bubble .tb-skip:hover{color:var(--text)}
+.tour-dots{display:flex;gap:6px}
+.tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--dim2);transition:.3s}
+.tour-dots i.on{background:var(--hl);box-shadow:0 0 8px var(--hl)}
+.report-row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.08);font-size:14px;color:var(--dim)}
+.report-row i{font-style:normal;color:var(--text)}
+.report-tip{margin-top:12px;font-size:13px;color:var(--dim2);line-height:1.8}
+@media(max-width:640px){.tour-bubble{left:12px!important;right:12px;max-width:none}}
+
+/* ============ v5：现场监控 LIVE / 校园模块 / 手机入口 ============ */
+.live-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+.live-cams{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.live-side{display:flex;flex-direction:column;gap:14px}
+.live-note{margin-top:2px;font-size:13px;color:var(--dim2);line-height:1.8;background:rgba(77,166,255,.06);border:1px dashed rgba(77,166,255,.35);border-radius:10px;padding:12px 14px}
+.live-note b{color:var(--blue)}
+.dev-row{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.dev-row i{font-style:normal;margin-left:auto;font-size:12px}
+.dev-row i.on{color:var(--grn)}
+.app-link{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--hl);border:1px solid rgba(255,167,38,.5);background:rgba(255,167,38,.08);border-radius:20px;padding:6px 14px;transition:.25s;white-space:nowrap}
+.app-link:hover{background:rgba(255,167,38,.18)}
+.lang-sw{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;flex-shrink:0}
+.lang-sw button{padding:6px 11px;font-size:13px;color:var(--dim);transition:.25s;letter-spacing:.04em}
+.lang-sw button.on{background:rgba(255,167,38,.15);color:var(--hl)}
+.lang-sw button:hover{color:var(--text)}
+/* PPE 检测 */
+.ppe-stage{position:relative;background:var(--panel3);border-radius:12px;overflow:hidden}
+.ppe-stage svg{width:100%;height:auto}
+.ppe-stage .scan-move{position:absolute;left:0;right:0;height:3px;background:var(--scan);box-shadow:0 0 16px var(--scan);opacity:0}
+.ppe-stage.scanning .scan-move{opacity:1;animation:scanMV 1.2s ease 2}
+.ppe-stage.alarming{animation:redflash .8s ease 3;border:2px solid var(--red)}
+.ppe-stage.pass{border:2px solid var(--grn)}
+.ppe-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:18px;font-weight:800;letter-spacing:.14em;border-radius:10px;padding:10px 22px;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.ppe-stamp.show{transform:translate(-50%,-50%) scale(1)}
+.ppe-stamp.bad{color:var(--red);border:3px solid var(--red);background:rgba(40,6,10,.85)}
+.ppe-stamp.good{color:var(--grn);border:3px solid var(--grn);background:rgba(4,20,12,.85)}
+/* 手机访问推荐 App 版 */
+.m-gate{position:fixed;inset:0;z-index:800;background:rgba(4,6,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;padding:24px}
+.m-gate-card{background:var(--panel2);border:1px solid rgba(255,167,38,.5);border-radius:18px;padding:30px 26px;max-width:370px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.m-gate-card .gl{font-size:46px}
+.m-gate-card h3{font-size:19px;margin:12px 0 8px;letter-spacing:.05em}
+.m-gate-card p{font-size:14px;color:var(--dim);margin-bottom:18px;line-height:1.8}
+.m-gate-card .btn{display:block;text-align:center;margin-top:10px}
+@media(max-width:900px){.live-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.live-cams{grid-template-columns:1fr}.app-link span{display:none}}
+
+/* ============ AI 能力卡片 ============ */
+.scenes{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .3s,border-color .3s}
+.card:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(255,167,38,.4)}
+.card-vis{position:relative;aspect-ratio:4/3;background:var(--sky2);overflow:hidden}
+.card-vis svg{width:100%;height:100%}
+.sbox{position:absolute;border:2.5px dashed var(--red);border-radius:6px;opacity:0;transition:opacity .3s}
+.sbox::before,.sbox::after{content:"";position:absolute;width:14px;height:14px;border:3px solid var(--red)}
+.sbox::before{top:-3px;left:-3px;border-right:none;border-bottom:none}
+.sbox::after{bottom:-3px;right:-3px;border-left:none;border-top:none}
+.sbox.y{border-color:var(--yel)}.sbox.y::before,.sbox.y::after{border-color:var(--yel)}
+.sbox.o{border-color:var(--hl)}.sbox.o::before,.sbox.o::after{border-color:var(--hl)}
+.sbox.g{border-color:var(--grn)}.sbox.g::before,.sbox.g::after{border-color:var(--grn)}
+.chip{position:absolute;font-size:13px;letter-spacing:.05em;color:#fff;padding:5px 12px;border-radius:6px;white-space:nowrap;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+.chip.red{background:rgba(255,77,79,.92)}.chip.yel{background:rgba(255,213,74,.92);color:#231a05}.chip.org{background:rgba(255,167,38,.94);color:#1a1206}.chip.grn{background:rgba(61,220,132,.92);color:#04140c}
+.scan-move{position:absolute;left:0;right:0;height:2px;background:var(--scan);box-shadow:0 0 14px var(--scan);opacity:0}
+.alarm{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:8px;opacity:0;transform:scale(.6);transition:.3s}
+.alarm .bell{width:34px;height:34px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:17px;animation:ring .5s ease infinite}
+@keyframes ring{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.alarm .wave{display:flex;align-items:center;gap:4px}
+.alarm .wave i{width:4px;background:var(--red);border-radius:2px;animation:wave 1s ease infinite}
+.alarm .wave i:nth-child(1){height:10px}.alarm .wave i:nth-child(2){height:18px;animation-delay:.15s}.alarm .wave i:nth-child(3){height:26px;animation-delay:.3s}.alarm .wave i:nth-child(4){height:18px;animation-delay:.45s}.alarm .wave i:nth-child(5){height:10px;animation-delay:.6s}
+@keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.15)}}
+.done-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:14px;font-weight:700;letter-spacing:.1em;color:var(--grn);border:2.5px solid var(--grn);border-radius:8px;padding:8px 18px;background:rgba(4,20,12,.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.card.on .sbox,.card.judge .sbox,.card.alarm .sbox,.card.done .sbox{opacity:1}
+.card.judge .chip,.card.done .chip{opacity:1;transform:none}
+.card.alarm .scan-move{opacity:1;animation:scanMV 1s linear}
+.card.alarm .alarm{opacity:1;transform:scale(1)}
+.card.alarm .card-vis{animation:redflash .9s ease}
+@keyframes redflash{35%{filter:brightness(1.5) saturate(1.3)}}
+@keyframes scanMV{0%{top:0}100%{top:100%}}
+.card.done .chip{background:rgba(61,220,132,.92);color:#04140c}
+.card.done .done-stamp{transform:translate(-50%,-50%) scale(1)}
+.card.done .sbox,.card.done .sbox::before,.card.done .sbox::after{border-color:var(--grn)}
+.card-foot{padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.card-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.steps{display:flex;justify-content:space-between;gap:4px}
+.steps i{flex:1;text-align:center;font-size:12px;font-style:normal;color:var(--dim);padding:5px 0;border-radius:8px;transition:.3s}
+.steps i b{display:block;font-size:13px}
+.steps i.on{background:rgba(255,167,38,.12);color:var(--hl);font-weight:600}
+.steps i.pass{color:var(--grn)}
+@media(max-width:980px){.scenes{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px}.card{flex:0 0 78%;scroll-snap-align:center}.console{grid-template-columns:1fr}.c-side{flex-direction:row;overflow-x:auto;align-items:center}.c-nav{flex-direction:row}.c-nav button{white-space:nowrap}.c-brand{display:none}.c-side .c-ver{display:none}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.camgrid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ 对比 ============ */
+.cmp{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);user-select:none;touch-action:none;aspect-ratio:16/8;min-height:340px}
+.cmp-layer{position:absolute;inset:0}
+.cmp-right{clip-path:inset(0 0 0 var(--p,50%))}
+.cmp-left svg{filter:grayscale(.92) brightness(.82) contrast(1.05)}
+.cmp-tag{position:absolute;top:18px;font-size:14px;background:rgba(8,11,17,.72);padding:7px 16px;border-radius:8px;z-index:3;letter-spacing:.06em}
+.cmp-tag.l{left:18px;color:var(--dim)}
+.cmp-tag.r{right:18px;color:var(--hl)}
+.cmp-tag b{display:block;font-size:16px;color:var(--text)}
+.cmp-tag.r b{color:var(--hl)}
+.cmp-handle{position:absolute;top:0;bottom:0;left:var(--p,50%);width:3px;background:var(--hl);z-index:4;transform:translateX(-50%);box-shadow:0 0 16px rgba(255,167,38,.6)}
+.cmp-handle::after{content:"⇔";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:var(--hl);color:#1a1206;border-radius:50%;display:grid;place-items:center;font-size:19px;font-weight:700;box-shadow:0 0 0 6px rgba(255,167,38,.25)}
+.cmp-note{display:flex;justify-content:space-between;margin-top:16px;font-size:14px;color:var(--dim);gap:12px}
+.cmp-note b{color:var(--hl)}
+
+/* ============ 数据 ============ */
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.metric{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:34px 26px;text-align:center;transition:transform .3s,border-color .3s}
+.metric:hover{transform:translateY(-6px);border-color:rgba(255,167,38,.4)}
+.metric .num{font-size:clamp(40px,5vw,58px);font-weight:900;color:var(--hl);font-variant-numeric:tabular-nums;line-height:1.1}
+.metric .unit{font-size:18px;color:var(--dim);margin-left:4px}
+.metric .label{margin-top:12px;font-size:16px;color:var(--dim);letter-spacing:.1em}
+.metric svg{width:100%;height:34px;margin-top:16px;opacity:.8}
+.metric svg path{fill:none;stroke:var(--hl);stroke-width:2.4;stroke-dasharray:240;stroke-dashoffset:240;transition:stroke-dashoffset 1.6s ease .3s}
+.metric.in svg path{stroke-dashoffset:0}
+.dash-note{margin-top:28px;text-align:center;font-size:14px;color:var(--dim);letter-spacing:.08em}
+.dash-note b{color:var(--hl)}
+@media(max-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ 页脚 ============ */
+footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;margin-bottom:44px}
+.foot-grid h4{font-size:16px;letter-spacing:.14em;margin-bottom:16px}
+.foot-grid p{font-size:14px;color:var(--dim);line-height:2}
+.foot-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+@media(max-width:700px){.foot-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div class="box">
-  <h1>🦅 鹰眼 AI · 工地安全监管驾驶舱</h1>
-  <p>正在跳转到最新版本……<br>如果没有自动跳转，请点击下方按钮</p>
-  <a class="btn" href="eagleeye-safety.html">进入监管驾驶舱 →</a>
-  <p style="margin-top:18px;font-size:13px">📱 手机版：<a href="eagleeye-app.html">eagleeye-app.html</a></p>
+
+<div class="prog" id="prog"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/>
+        <circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/>
+        <circle cx="20" cy="19" r="2.6" fill="#FFA726"/>
+        <path d="M20 5 L20 11 M20 27 L20 33 M6 13 L11 16 M34 13 L29 16" stroke="#FFA726" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <b>鹰眼 AI</b><span>工地安全监管驾驶舱</span>
+    </a>
+    <div class="nav-right">
+      <div class="lang-sw" id="langSw">
+        <button data-l="zh" class="on">中</button>
+        <button data-l="en">EN</button>
+        <button data-l="ko">한</button>
+      </div>
+      <button class="toggle" id="modeBtn"><b id="modeIcon">☀</b><span id="modeTxt">白班模式</span></button>
+      <a class="app-link" href="eagleeye-app.html" title="手机版 App">📱<span>手机版 App</span></a>
+      <a class="btn btn-primary" href="#console">进入监管驾驶舱</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="pl" id="pl1"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <rect width="1440" height="810" fill="var(--sky2)"/>
+    <circle cx="1150" cy="140" r="46" fill="var(--moon)" opacity=".9"/><circle cx="1138" cy="132" r="42" fill="var(--sky2)" opacity=".55"/>
+    <g fill="var(--bld)" opacity=".85"><rect x="80" y="430" width="150" height="380"/><rect x="250" y="360" width="120" height="450"/><rect x="1200" y="400" width="160" height="410"/><rect x="1050" y="470" width="120" height="340"/><rect x="620" y="500" width="200" height="310"/><rect x="850" y="440" width="150" height="370"/></g>
+    <g fill="var(--bld-w)" opacity=".5"><rect x="100" y="470" width="14" height="18"/><rect x="130" y="470" width="14" height="18"/><rect x="100" y="520" width="14" height="18"/><rect x="130" y="520" width="14" height="18"/><rect x="270" y="400" width="12" height="16"/><rect x="296" y="400" width="12" height="16"/><rect x="870" y="480" width="12" height="16"/><rect x="896" y="480" width="12" height="16"/><rect x="1220" y="440" width="12" height="16"/><rect x="1246" y="440" width="12" height="16"/></g>
+  </svg></div>
+  <div class="pl" id="pl2"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <g stroke="var(--crane)" stroke-width="14" stroke-linecap="round" fill="none">
+      <path d="M300 810 V330"/><path d="M420 810 V300"/>
+      <g style="transform-origin:300px 330px;animation:crane 9s ease-in-out infinite"><path d="M300 330 H700"/><path d="M640 330 V396" stroke-width="10"/><path d="M640 396 H700" stroke-width="10"/></g>
+      <g style="transform-origin:420px 300px;animation:crane 13s ease-in-out infinite reverse"><path d="M420 300 H120" stroke-width="12"/><path d="M180 300 V356" stroke-width="9"/><path d="M180 356 H120" stroke-width="9"/></g>
+    </g>
+    <g stroke="var(--crane-l)" stroke-width="5" fill="none"><path d="M280 380 L320 330 M320 380 L280 330 M400 350 L440 300 M440 350 L400 300"/></g>
+  </svg></div>
+  <div class="pl" id="pl3"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <rect y="600" width="1440" height="210" fill="#0A0E15"/>
+    <g stroke="var(--crane-l)" stroke-width="8" opacity=".9"><path d="M0 810 V520 H240 V810"/><path d="M80 810 V560 H160 V810"/><path d="M1200 810 V500 H1440 V810"/><path d="M1280 810 V540 H1360 V810"/></g>
+    <g stroke="var(--crane)" stroke-width="6" opacity=".9"><path d="M0 560 H240 M0 600 H240 M0 640 H240 M1200 540 H1440 M1200 580 H1440 M1200 620 H1440 M1200 660 H1440"/></g>
+    <g stroke="var(--crane-l)" stroke-width="7"><path d="M80 560 L160 640 M160 560 L80 640 M1280 540 L1360 620 M1360 540 L1280 620" opacity=".8"/></g>
+    <rect x="520" y="740" width="420" height="70" fill="var(--bld)"/>
+    <g fill="var(--bld-w)" opacity=".6"><rect x="560" y="762" width="22" height="26"/><rect x="610" y="762" width="22" height="26"/><rect x="660" y="762" width="22" height="26"/><rect x="710" y="762" width="22" height="26"/><rect x="760" y="762" width="22" height="26"/><rect x="810" y="762" width="22" height="26"/></g>
+  </svg></div>
+  <canvas id="dust"></canvas>
+  <div class="vignette"></div>
+  <div class="scanline"></div>
+  <div class="beam"></div>
+
+  <div class="hero-in">
+    <span class="hero-kicker">施工现场安全监管平台 · 全模块演示</span>
+    <h1>工地的每一个风险<br><em>AI 都看得见</em></h1>
+    <p class="sub">视频 AI 识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#console">▶ 进入监管驾驶舱</a>
+      <a class="btn btn-ghost" href="#ppe">🧍 PPE 摄像头警报演示</a>
+      <a class="btn btn-ghost" href="#scenes">AI 识别能力</a>
+    </div>
+    <div class="hero-tags">
+      <span>安全帽 / 反光衣识别</span><span>行为与越界检测</span><span>塔吊 / 升降机 / 基坑监测</span><span>扬尘噪声联动喷淋</span><span>隐患闭环治理</span>
+    </div>
+  </div>
+
+  <div class="feed" aria-hidden="true">
+    <div class="feed-in">
+      <span class="feed-label"><span class="dot"></span>实时告警流</span>
+      <div class="feed-list" id="feedList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 监管驾驶舱 ============ -->
+<section class="sec" id="console">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>监管驾驶舱 · <em>这就是系统本身</em></h2>
+      <p>左侧切换 10 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解</p>
+    </div>
+
+    <div class="console rv" id="consoleBox">
+      <aside class="c-side">
+        <div class="c-brand"><b>鹰眼 AI</b><span>智慧工地监管平台 v3.2</span></div>
+        <nav class="c-nav" id="cNav">
+          <button class="on" data-m="overview"><span class="ic">📊</span>驾驶舱总览</button>
+          <button data-m="video"><span class="ic">🎥</span>视频 AI 识别</button>
+          <button data-m="alarm"><span class="ic">🚨</span>告警中心</button>
+          <button data-m="people"><span class="ic">👷</span>人员定位</button>
+          <button data-m="machine"><span class="ic">🏗</span>机械设备</button>
+          <button data-m="env"><span class="ic">🌫</span>环境监测</button>
+          <button data-m="hazard"><span class="ic">📋</span>隐患排查</button>
+          <button data-m="report"><span class="ic">📈</span>数据报表</button>
+          <button data-m="campus"><span class="ic">🏫</span>庆云大学</button>
+          <button data-m="ppe"><span class="ic">🧍</span>PPE 防护检测</button>
+        </nav>
+        <div class="c-ver">DEMO · 模拟演示数据<br>真实部署以实测为准</div>
+      </aside>
+      <div class="c-main">
+        <div class="c-top">
+          <div class="proj">🏗 高新区城市更新项目 · 二标段 <span class="st">● 系统运行中</span></div>
+          <div class="sys">
+            <span class="bell-ui" id="topBell" title="待处置告警">🔔<b id="bellCount">0</b></span>
+            <span>时间 <b id="sysClock">--:--:--</b></span>
+            <span>天气 <b>晴 26℃</b></span>
+            <span>在线设备 <b>142/148</b></span>
+            <button class="tour-btn" id="tourBtn">🎬 产品导览</button>
+            <button class="tour-btn" id="fsBtn" title="全屏">⛶</button>
+          </div>
+        </div>
+        <div class="c-body" id="cBody"><!-- 模块内容 --></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AI 识别能力 ============ -->
+<section class="sec alt" id="scenes">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>AI 识别能力 · <em>4 类典型风险</em></h2>
+      <p>每个场景 = 识别 → 判定 → 报警 → 闭环</p>
+    </div>
+    <div class="scenes" id="sceneWrap"></div>
+  </div>
+</section>
+
+<!-- ============ 对比 ============ -->
+<section class="sec" id="compare">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>一道题 · <em>谁来盯工地</em></h2>
+      <p>拖动中间滑块对比</p>
+    </div>
+    <div class="cmp rv" id="cmp">
+      <div class="cmp-layer cmp-left"><svg id="cmpLeft" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+      <div class="cmp-layer cmp-right"><svg id="cmpRight" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
+      <div class="cmp-tag l">人工巡检<b>1 天 3 次 · 靠经验 · 会疲劳</b></div>
+      <div class="cmp-tag r">AI 监督<b>7×24 · 秒级告警 · 不眨眼</b></div>
+      <div class="cmp-handle"></div>
+    </div>
+    <div class="cmp-note"><span>◀ 拖动对比</span><b>从「发现靠运气」到「识别常态化」</b><span>拖动对比 ▶</span></div>
+  </div>
+</section>
+
+<!-- ============ 现场事实监控 LIVE ============ -->
+<section class="sec" id="live">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>现场事实监控 · <em>LIVE</em></h2>
+      <p>四路实时画面 · 实时告警流 · 环境读数 · 可接入真实现场视频流</p>
+    </div>
+    <div class="live-grid rv">
+      <div class="live-cams" id="liveCams"></div>
+      <aside class="live-side">
+        <div class="panel"><div class="pt"><b>实时告警流</b><span>自动推送</span></div><div class="row-list" id="liveAlertList"></div></div>
+        <div class="panel"><div class="pt"><b>环境实时读数</b><span>E-01 环境站</span></div>
+          <div class="rl-item"><span>PM2.5</span><b style="margin-left:auto" id="livePm25">--</b></div>
+          <div class="rl-item"><span>噪声</span><b style="margin-left:auto" id="liveNoise">--</b></div>
+          <div class="rl-item"><span>风速</span><b style="margin-left:auto" id="liveWind">--</b></div>
+          <div class="rl-item"><span>温度</span><b style="margin-left:auto" id="liveTemp">--</b></div>
+        </div>
+        <div class="panel"><div class="pt"><b>设备在线状态</b><span>142 / 148</span></div>
+          <div id="liveDevs"></div>
+        </div>
+        <p class="live-note">🔌 <b>接入真实现场画面</b>：在文件顶部 <b>LIVE_STREAM_URL</b> 填入现场 RTSP/HLS 视频流地址，四路模拟画面即替换为实况监控；当前为演示流，指标以真实测试为准。</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 页脚 ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="logo" href="#top">
+          <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="2.6" fill="#FFA726"/></svg>
+          <b>鹰眼 AI</b>
+        </a>
+        <p style="margin-top:16px">施工现场安全监管平台<br>视频 AI · 设备物联 · 隐患闭环 一体化</p>
+      </div>
+      <div>
+        <h4>联系方式</h4>
+        <p>电话：[010-0000-0000]<br>邮箱：[contact@example.com]<br>地址：[中国 · XX市XX区]</p>
+      </div>
+      <div>
+        <h4>公司信息</h4>
+        <p>[公司全称]<br>产学研合作：[韩国庆云大学 산학협력단]<br>[ICP 备案号]<br>© 2026 鹰眼 AI</p>
+      </div>
+      <div>
+        <h4>产品入口</h4>
+        <p><a href="#console" style="color:var(--hl)">桌面版监管驾驶舱</a><br><a href="eagleeye-app.html" style="color:var(--hl)">📱 手机版 App</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 鹰眼 AI · 工地安全监管驾驶舱</span>
+      <span>页面演示数据均为模拟 · 产品指标以真实测试为准</span>
+    </div>
+  </div>
+</footer>
+
+<!-- 手机访问推荐 App 版 -->
+<div class="m-gate" id="mGate" hidden>
+  <div class="m-gate-card">
+    <div class="gl">🦅</div>
+    <h3>📱 检测到手机访问</h3>
+    <p>推荐使用手机 App 版：底部导航 · 告警推送 · 一键安装到桌面 · 离线可用</p>
+    <a class="btn btn-primary" href="eagleeye-app.html">进入手机 App 版</a>
+    <button class="btn btn-ghost" id="mGateSkip">继续浏览网页版</button>
+  </div>
 </div>
+
+<div class="modal" id="modal"><div class="modal-card" id="modalCard"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pad=n=>String(n).padStart(2,'0');
+const rnd=(a,b)=>a+Math.random()*(b-a);
+/* ★★★ 真实数据一处配置（有实测再填，勿编造）★★★ */
+const REAL_DATA={accuracy:null,response:null,cameras:null,sites:null};
+/* ★★★ 接入真实现场视频流：填入 RTSP/HLS 地址（需配套转码网关），模拟画面即替换为实况 ★★★ */
+const LIVE_STREAM_URL='';
+
+/* ===== 进度条 / 导航 ===== */
+const prog=$('#prog'),nav=$('#nav');
+addEventListener('scroll',()=>{
+  const h=document.documentElement,max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max?(h.scrollTop/max)*100:0)+'%';
+  nav.classList.toggle('solid',h.scrollTop>40);
+},{passive:true});
+
+/* ===== 昼夜切换 ===== */
+const modeBtn=$('#modeBtn');
+let night=false;
+modeBtn.addEventListener('click',()=>{
+  night=!night;
+  document.body.classList.toggle('night',night);
+  $('#modeIcon').textContent=night?'☾':'☀';
+  $('#modeTxt').textContent=night?'夜班模式':'白班模式';
+});
+
+/* ===== Hero 视差 + 粒子 ===== */
+const pls=[$('#pl1'),$('#pl2'),$('#pl3')],hero=$('.hero');
+let tx=0,ty=0,cx=0,cy=0,cs=0;
+if(!REDUCE&&matchMedia('(pointer:fine)').matches){
+  hero.addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2;});
+}
+(function loop(){
+  cx+=(tx-cx)*.05;cy+=(ty-cy)*.05;cs+=(scrollY-cs)*.09;
+  if(!REDUCE){
+    pls[0].style.transform=`translate(${cx*-10}px,${cs*.06+cy*-6}px)`;
+    pls[1].style.transform=`translate(${cx*-22}px,${cs*.14+cy*-12}px)`;
+    pls[2].style.transform=`translate(${cx*-38}px,${cs*.26+cy*-20}px)`;
+  }
+  requestAnimationFrame(loop);
+})();
+const dust=$('#dust'),dctx=dust.getContext('2d');
+let DW=0,DH=0,motes=[];
+function sizeDust(){
+  DW=dust.width=hero.clientWidth;DH=dust.height=hero.clientHeight;
+  motes=Array.from({length:42},()=>({x:Math.random()*DW,y:Math.random()*DH,r:.8+Math.random()*2,s:.25+Math.random()*.6,sw:Math.random()*6.28}));
+}
+sizeDust();addEventListener('resize',sizeDust);
+let heroOn=true;
+new IntersectionObserver(e=>heroOn=e[0].isIntersecting).observe(hero);
+(function dustLoop(){
+  if(heroOn&&!REDUCE){
+    dctx.clearRect(0,0,DW,DH);
+    const c=getComputedStyle(document.body).getPropertyValue('--dust').trim();
+    motes.forEach(m=>{
+      m.y-=m.s;m.x+=Math.sin(m.sw+=.01)*.3;
+      if(m.y<-6){m.y=DH+6;m.x=Math.random()*DW;}
+      dctx.globalAlpha=.35+.3*Math.sin(m.sw);dctx.fillStyle=c;
+      dctx.beginPath();dctx.arc(m.x,m.y,m.r,0,6.283);dctx.fill();
+    });
+  }
+  requestAnimationFrame(dustLoop);
+})();
+
+/* ===== Hero 实时告警流 ===== */
+const feedPool=[
+  ['未佩戴安全帽','C-03 塔吊东侧','高'],
+  ['进入吊装警戒区','B-01 吊装区','中'],
+  ['高处作业未系安全带','A-02 3号楼','高'],
+  ['未穿反光背心','C-07 夜间出入口','中'],
+  ['临边越界预警','D-05 基坑西侧','低'],
+  ['扬尘超标 · 喷淋已联动','E-01 环境站','低']
+];
+const feedList=$('#feedList');
+let feedSeq=0;
+function pushFeed(){
+  const e=feedPool[feedSeq++%feedPool.length];
+  const d=new Date();
+  const item=document.createElement('div');
+  item.className='feed-item';
+  item.innerHTML=`<span class="t">${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</span>&nbsp; ${e[1]} &nbsp;<b>${e[0]}</b>&nbsp; · 已联动报警`;
+  feedList.appendChild(item);
+  while(feedList.children.length>4)feedList.firstChild.remove();
+  setTimeout(()=>item.remove(),14500);
+}
+setInterval(pushFeed,3200);pushFeed();
+
+/* ===== 滚动渐入 ===== */
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+}),{threshold:.15,rootMargin:'0px 0px -30px 0px'});
+$$('.rv').forEach((el,i)=>{el.style.setProperty('--d',(i%4*90)+'ms');io.observe(el);});
+
+/* ============================================================
+   三语系统 i18n（中 / EN / 한국어）· 字符串键字典 + 自动翻译
+   ============================================================ */
+const I18N={
+'白班模式':{en:'Day Mode',ko:'주간 모드'},'夜班模式':{en:'Night Mode',ko:'야간 모드'},
+'手机版 App':{en:'Mobile App',ko:'모바일 앱'},'进入监管驾驶舱':{en:'Enter Console',ko:'관제센터 입장'},
+'施工现场安全监管平台 · 全模块演示':{en:'Site Safety Platform · Full Module Demo',ko:'현장안전 플랫폼 · 전체 모듈 데모'},
+'工地的每一个风险':{en:'Every Risk on Site',ko:'현장의 모든 위험을'},
+'AI 都看得见':{en:'AI Sees It All',ko:'AI가 모두 감시합니다'},
+'视频 AI 识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环':{en:'AI Video · Alarm Center · Tracking · Equipment · Environment · Hazard Loop',ko:'AI 영상 · 알람센터 · 위치 · 장비 · 환경 · 위험관리'},
+'AI 识别能力':{en:'AI Recognition',ko:'AI 인식 능력'},
+'安全帽 / 反光衣识别':{en:'Helmet / Vest Detection',ko:'안전모 / 조끼 인식'},
+'行为与越界检测':{en:'Behavior & Intrusion',ko:'행동·경계침입 감지'},
+'塔吊 / 升降机 / 基坑监测':{en:'Crane / Hoist / Pit Monitoring',ko:'크레인·호이스트·굴토 모니터링'},
+'扬尘噪声联动喷淋':{en:'Dust-linked Sprinkler',ko:'먼지·소음 연동 살수'},
+'隐患闭环治理':{en:'Hazard Closed-loop',ko:'위험 폐회로 관리'},
+'实时告警流':{en:'Live Alarm Feed',ko:'실시간 알람'},
+'未佩戴安全帽':{en:'No Helmet',ko:'안전모 미착용'},
+'进入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중 경계구역 진입'},
+'高处作业未系安全带':{en:'No Harness at Height',ko:'고소작업 안전벨트 미착용'},
+'未穿反光背心':{en:'No Reflective Vest',ko:'반사조끼 미착용'},
+'临边越界预警':{en:'Edge Crossing Alert',ko:'가장자리 접근 경고'},
+'扬尘超标 · 喷淋已联动':{en:'Dust Exceeded · Sprinkler ON',ko:'먼지 초과 · 살수 가동'},
+'吸烟行为':{en:'Smoking Detected',ko:'흡연 행위'},
+'C-03 塔吊东侧':{en:'C-03 Crane East',ko:'C-03 크레인 동측'},
+'B-01 吊装区':{en:'B-01 Lifting Zone',ko:'B-01 양중구역'},
+'A-02 3号楼':{en:'A-02 Building 3',ko:'A-02 3동'},
+'D-05 基坑西侧':{en:'D-05 Pit West',ko:'D-05 굴토 서측'},
+'C-07 夜间出入口':{en:'C-07 Night Gate',ko:'C-07 야간 출입구'},
+'E-01 环境站':{en:'E-01 Env Station',ko:'E-01 환경센서'},
+'E-03 材料加工区':{en:'E-03 Material Yard',ko:'E-03 자재가공장'},
+'已联动报警':{en:'Alarm Linked',ko:'알람 연동'},
+'监管驾驶舱 · 这就是系统本身':{en:'Supervision Console · The System Itself',ko:'관제센터 · 시스템 그 자체'},
+'左侧切换 10 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解':{en:'10 modules, all hands-on · click Tour for auto guide',ko:'좌측 10개 모듈 직접 조작 · 우측 상단 투어로 자동 안내'},
+'驾驶舱总览':{en:'Overview',ko:'대시보드'},
+'视频 AI 识别':{en:'Video AI',ko:'영상 AI'},
+'告警中心':{en:'Alarm Center',ko:'알람센터'},
+'人员定位':{en:'Tracking',ko:'인원 위치'},
+'机械设备':{en:'Equipment',ko:'장비'},
+'环境监测':{en:'Environment',ko:'환경'},
+'隐患排查':{en:'Hazard Control',ko:'위험점검'},
+'数据报表':{en:'Reports',ko:'보고서'},
+'庆云大学':{en:'Kyungwoon Univ.',ko:'경운대학교'},
+'PPE 防护检测':{en:'PPE Check',ko:'보호구 검측'},
+'产品导览':{en:'Product Tour',ko:'제품 투어'},
+'智慧工地监管平台 v3.2':{en:'Smart Site Safety v3.2',ko:'스마트 현장안전 v3.2'},
+'高新区城市更新项目 · 二标段':{en:'High-tech Zone Renewal · Lot 2',ko:'첨단지구 재개발 · 2공구'},
+'系统运行中':{en:'Running',ko:'가동 중'},
+'时间':{en:'Time',ko:'시간'},'天气':{en:'Weather',ko:'날씨'},
+'晴 26℃':{en:'Sunny 26℃',ko:'맑음 26℃'},'在线设备':{en:'Devices',ko:'가동장비'},
+'待处置告警':{en:'Pending Alarms',ko:'미처리 알람'},
+'在册劳务人员':{en:'Registered Workers',ko:'등록 근로자'},
+'今日在场':{en:'On Site Today',ko:'오늘 현장'},
+'今日告警':{en:'Alarms Today',ko:'오늘 알람'},
+'高风险':{en:'High-risk',ko:'고위험'},'已处置':{en:'Resolved',ko:'처리 완료'},
+'待处置隐患':{en:'Pending Hazards',ko:'미처리 위험'},
+'超 24h 未闭环':{en:'>24h unclosed',ko:'24h 초과 미해결'},
+'设备在线率':{en:'Device Online Rate',ko:'장비 가동률'},
+'今日告警趋势（小时）':{en:'Alarm Trend (hourly)',ko:'시간별 알람 추이'},
+'单位：起':{en:'Unit: count',ko:'단위: 건'},
+'告警类型分布':{en:'Type Distribution',ko:'유형 분포'},
+'今日':{en:'Today',ko:'오늘'},
+'实时快讯':{en:'Live Brief',ko:'실시간 브리핑'},
+'滚动更新':{en:'Auto Update',ko:'자동 갱신'},
+'区域风险热力':{en:'Zone Risk Heatmap',ko:'구역 위험 히트맵'},
+'红>橙>黄>蓝':{en:'Red>Orange>Yellow>Blue',ko:'빨강>주황>노랑>파랑'},
+'基坑区 · 高':{en:'Pit · High',ko:'굴토 · 높음'},
+'吊装区 · 较高':{en:'Lifting · Elevated',ko:'양중 · 다소 높음'},
+'加工区 · 中':{en:'Yard · Mid',ko:'가공장 · 중간'},
+'生活区 · 低':{en:'Living · Low',ko:'생활구역 · 낮음'},
+'出入口 · 正常':{en:'Gate · Normal',ko:'출입구 · 정상'},
+'工地出入口':{en:'Site Entrance',ko:'현장 출입구'},
+'吊装区':{en:'Lifting Zone',ko:'양중구역'},
+'基坑临边':{en:'Pit Edge',ko:'굴토 가장자리'},
+'材料加工区':{en:'Material Yard',ko:'자재가공장'},
+'识别类型开关：':{en:'Detection types:',ko:'인식 유형:'},
+'安全帽':{en:'Helmet',ko:'안전모'},'反光衣':{en:'Reflective Vest',ko:'반사조끼'},
+'吸烟':{en:'Smoking',ko:'흡연'},'越界':{en:'Intrusion',ko:'경계침입'},
+'临边':{en:'Edge',ko:'가장자리'},'人员':{en:'Person',ko:'사람'},
+'回放时间轴':{en:'Playback Timeline',ko:'재생 타임라인'},
+'实时':{en:'Live',ko:'실시간'},
+'筛选：':{en:'Filter:',ko:'필터:'},
+'全部':{en:'All',ko:'전체'},'警戒':{en:'Warning',ko:'경계'},
+'低风险':{en:'Low-risk',ko:'저위험'},'全部类型':{en:'All Types',ko:'전체 유형'},
+'告警事件列表':{en:'Alarm Events',ko:'알람 이벤트'},
+'点击「处理」完成闭环':{en:'Click Resolve to close loop',ko:'「처리」클릭 시 폐회로 완료'},
+'机位':{en:'Camera',ko:'카메라'},'类型':{en:'Type',ko:'유형'},
+'等级':{en:'Level',ko:'등급'},'状态':{en:'Status',ko:'상태'},
+'待处理':{en:'Pending',ko:'미처리'},'处理':{en:'Resolve',ko:'처리'},
+'已处置 ✓':{en:'Resolved ✓',ko:'처리완료 ✓'},
+'本周告警分布':{en:'Weekly Mix',ko:'주간 분포'},
+'按类型':{en:'By type',ko:'유형별'},
+'处置率':{en:'Resolution Rate',ko:'처리율'},
+'本周':{en:'This Week',ko:'이번 주'},
+'平均处置时长':{en:'Avg. Resolution',ko:'평균 처리시간'},
+'推送触达率':{en:'Push Delivery',ko:'푸시 도달률'},
+'基坑电子围栏：':{en:'Pit E-fence:',ko:'굴토 전자울타리:'},
+'围栏开启中 · 点击关闭':{en:'Fence ON · tap to close',ko:'울타리 가동 중 · 닫기'},
+'点击开启电子围栏':{en:'Tap to enable E-fence',ko:'전자울타리 켜기'},
+'点地图上的绿点查看人员档案':{en:'Tap green dots for profiles',ko:'지도의 녹색 점으로 인원정보 확인'},
+'办公区':{en:'Office',ko:'사무구역'},'生活区':{en:'Living Area',ko:'생활구역'},
+'加工区':{en:'Fabrication Yard',ko:'가공구역'},
+'基坑危险区':{en:'Pit Danger Zone',ko:'굴토 위험구역'},
+'围栏布防中':{en:'Fence Armed',ko:'울타리 방어 중'},
+'围栏未开启':{en:'Fence Off',ko:'울타리 미가동'},
+'在线 9 人':{en:'9 Online',ko:'9명 온라인'},
+'1# 塔吊':{en:'Crane #1',ko:'1번 크레인'},
+'进场时间':{en:'Onboard Since',ko:'입장일'},
+'今日工时':{en:'Hours Today',ko:'오늘 근무시간'},
+'培训状态':{en:'Training',ko:'교육 상태'},
+'已通过 · 2026-08':{en:'Passed · 2026-08',ko:'합격 · 2026-08'},
+'钢筋工':{en:'Rebar Worker',ko:'철근공'},'塔吊司机':{en:'Crane Operator',ko:'크레인 기사'},
+'信号工':{en:'Rigger',ko:'신호수'},'木工':{en:'Carpenter',ko:'목수'},
+'安全员':{en:'Safety Officer',ko:'안전관리자'},'电工':{en:'Electrician',ko:'전기공'},
+'架子工':{en:'Scaffolder',ko:'비계공'},'资料员':{en:'Clerk',ko:'서류담당'},
+'焊工':{en:'Welder',ko:'용접공'},
+'1# 塔吊 · 运行中':{en:'Crane #1 · Running',ko:'1번 크레인 · 가동 중'},
+'吊重（额定 5t）':{en:'Load (rated 5t)',ko:'하중 (정격 5t)'},
+'力矩比':{en:'Torque Ratio',ko:'토크 비율'},
+'风速':{en:'Wind Speed',ko:'풍속'},
+'回转角':{en:'Slewing Angle',ko:'선회각'},
+'高度':{en:'Height',ko:'높이'},
+'2# 施工升降机 · 运行中':{en:'Hoist #2 · Running',ko:'2번 호이스트 · 가동 중'},
+'载重（额定 2t）':{en:'Load (rated 2t)',ko:'하중 (정격 2t)'},
+'轿厢人数（限 9 人）':{en:'Occupants (max 9)',ko:'탑승인원 (최대 9)'},
+'当前高度':{en:'Current Height',ko:'현재 높이'},
+'门联锁':{en:'Door Interlock',ko:'도어 인터록'},
+'正常':{en:'Normal',ko:'정상'},
+'基坑监测 · 位移曲线':{en:'Pit Monitoring · Displacement',ko:'굴토 모니터링 · 변위'},
+'深层水平位移 mm':{en:'Horizontal Displacement mm',ko:'수평변위 mm'},
+'累计位移':{en:'Cumulative Disp.',ko:'누적 변위'},
+'速率':{en:'Rate',ko:'속도'},'水位':{en:'Water Level',ko:'수위'},
+'运行中':{en:'Running',ko:'가동 중'},
+'扬尘超标联动：':{en:'Dust Auto-link:',ko:'먼지 연동:'},
+'手动触发喷淋':{en:'Trigger Sprinkler',ko:'살수 수동'},
+'喷淋开启中（模拟）':{en:'Sprinkler ON (sim)',ko:'살수 가동 중 (모의)'},
+'PM2.5 > 75μg/m³ 自动联动':{en:'PM2.5 > 75 auto trigger',ko:'PM2.5 75 초과 자동'},
+'噪声':{en:'Noise',ko:'소음'},'温度':{en:'Temp',ko:'온도'},
+'今日扬尘走势':{en:'Dust Trend Today',ko:'오늘 먼지 추이'},
+'联动记录':{en:'Linkage Log',ko:'연동 기록'},
+'自动触发':{en:'Auto',ko:'자동'},
+'待整改':{en:'To Rectify',ko:'시정 대기'},'整改中':{en:'Rectifying',ko:'시정 중'},
+'已闭环':{en:'Closed',ko:'해결 완료'},
+'闭环流程：':{en:'Loop Flow:',ko:'폐회로 흐름:'},
+'上报':{en:'Report',ko:'신고'},'整改':{en:'Rectify',ko:'시정'},
+'复查':{en:'Recheck',ko:'재점검'},'销项':{en:'Close',ko:'해소'},
+'隐患台账':{en:'Hazard Ledger',ko:'위험 대장'},
+'模拟演示 · 数据保存在浏览器本地':{en:'Demo · saved locally',ko:'데모 · 로컬 저장'},
+'编号':{en:'No.',ko:'번호'},'位置':{en:'Location',ko:'위치'},
+'上报人':{en:'Reporter',ko:'신고자'},'操作':{en:'Action',ko:'조치'},
+'＋ 新增隐患（模拟上报）':{en:'+ New Hazard (sim)',ko:'+ 신규 위험 (모의)'},
+'开始整改':{en:'Start Rectify',ko:'시정 시작'},
+'复查销项':{en:'Recheck & Close',ko:'재점검·해소'},
+'已归档':{en:'Archived',ko:'보관됨'},
+'新增隐患上报':{en:'New Hazard Report',ko:'신규 위험 신고'},
+'如：2号楼 5F 电梯井':{en:'e.g. Bldg 2, 5F shaft',ko:'예: 2동 5F 샤프트'},
+'临边防护缺失':{en:'Missing Edge Guard',ko:'방호 미설치'},
+'用电安全':{en:'Electrical Safety',ko:'전기 안전'},
+'消防设施':{en:'Fire Facility',ko:'소방시설'},
+'机械防护':{en:'Machine Guarding',ko:'기계 방호'},
+'文明施工':{en:'Housekeeping',ko:'정리정돈'},
+'描述':{en:'Description',ko:'설명'},
+'简要描述隐患情况':{en:'Brief description',ko:'상황 간단 설명'},
+'提交上报':{en:'Submit',ko:'제출'},
+'近 7 日告警趋势':{en:'7-day Alarm Trend',ko:'7일 알람 추이'},
+'识别类型占比':{en:'Type Mix',ko:'인식 유형 비중'},
+'月度统计':{en:'Monthly Stats',ko:'월간 통계'},
+'月份':{en:'Month',ko:'월'},
+'告警总数':{en:'Total Alarms',ko:'알람 합계'},
+'隐患闭环率':{en:'Closure Rate',ko:'해결률'},
+'导出报表（演示）':{en:'Export Report (demo)',ko:'보고서 내보내기 (데모)'},
+'生成今日 AI 巡检日报':{en:'Generate AI Inspection Report',ko:'AI 점검일지 생성'},
+'演示数据':{en:'Demo Data',ko:'데모 데이터'},
+'今日入校人员':{en:'On-campus Today',ko:'오늘 교내 인원'},
+'学生':{en:'Students',ko:'학생'},'教职工':{en:'Faculty',ko:'교직원'},
+'访客':{en:'Visitors',ko:'방문객'},
+'实验室安全点检率':{en:'Lab Inspection Rate',ko:'실험실 점검률'},
+'本周完成':{en:'Done This Week',ko:'이번 주 완료'},
+'消防设施在线':{en:'Fire Devices Online',ko:'소방시설 가동'},
+'烟感':{en:'Smoke Det.',ko:'연기감지기'},
+'消火栓':{en:'Hydrants',ko:'소화전'},
+'今日校园安全事件':{en:'Campus Safety Events',ko:'오늘 교내 안전사건'},
+'处置中':{en:'In Progress',ko:'처리 중'},
+'경운대학교 캠퍼스 · 实时人流量热力':{en:'Kyungwoon Campus · Live Heatmap',ko:'경운대학교 캠퍼스 · 실시간 유동'},
+'演示数据 · 可替换为真实校园地图':{en:'Demo · replace with real map',ko:'데모 · 실제 지도로 교체'},
+'实时联动':{en:'Live Linked',ko:'실시간 연동'},
+'安全管理课程 · 产学研联动':{en:'Safety Courses · Industry-Academia',ko:'안전교육 · 산학협력'},
+'示例数据 · 请替换为真实课程':{en:'Sample · replace with real courses',ko:'샘플 · 실제 과정으로 교체'},
+'课程 / 项目':{en:'Course / Program',ko:'과정 / 프로그램'},
+'对象':{en:'Audience',ko:'대상'},
+'AI 安全监测实训（鹰眼 AI 平台）':{en:'AI Safety Training (EagleEye)',ko:'AI 안전실습 (EagleEye)'},
+'[安全管理相关专业]':{en:'[Safety-related Major]',ko:'[안전관리 관련 학과]'},
+'本周五 14:00':{en:'Fri 14:00',ko:'금요일 14:00'},
+'报名中':{en:'Open',ko:'접수 중'},
+'消防安全实务演练':{en:'Fire Drill',ko:'소방 실습'},
+'全校新生':{en:'All Freshmen',ko:'전체 신입생'},
+'下周二':{en:'Next Tue',ko:'다음 주 화'},
+'已排期':{en:'Scheduled',ko:'예정됨'},
+'应急救护（CPR / AED）培训':{en:'CPR/AED Training',ko:'응급처치 교육'},
+'每月第 2 周':{en:'2nd week monthly',ko:'매월 둘째 주'},
+'常态开展':{en:'Ongoing',ko:'상시 운영'},
+'施工现场安全见习（产学研基地）':{en:'Site Internship (Co-op Base)',ko:'현장실습 (산학기지)'},
+'高年级':{en:'Senior Students',ko:'고학년'},
+'学期内':{en:'In Semester',ko:'학기 중'},
+'对接中':{en:'Arranging',ko:'협의 중'},
+'AI 识别能力 · 4 类典型风险':{en:'AI Recognition · 4 Typical Risks',ko:'AI 인식 · 4대 전형 위험'},
+'每个场景 = 识别 → 判定 → 报警 → 闭环':{en:'Each scene = Detect→Judge→Alarm→Close',ko:'인식→판정→알람→폐회로'},
+'闯入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중 경계구역 침입'},
+'夜班未穿反光背心':{en:'No Vest at Night',ko:'야간 반사조끼 미착용'},
+'夜间模式':{en:'Night Mode',ko:'야간 모드'},
+'识别':{en:'Detect',ko:'인식'},'判定':{en:'Judge',ko:'판정'},
+'报警':{en:'Alarm',ko:'알람'},'闭环':{en:'Close',ko:'폐회로'},
+'一道题 · 谁来盯工地':{en:'One Question · Who Watches the Site',ko:'한 가지 질문 · 누가 지킬까'},
+'拖动中间滑块对比':{en:'Drag the slider to compare',ko:'슬라이더를 끌어 비교'},
+'人工巡检':{en:'Manual Patrol',ko:'인력 순찰'},
+'1 天 3 次 · 靠经验 · 会疲劳':{en:'3×/day · tired',ko:'하루 3회 · 피로'},
+'AI 监督':{en:'AI Supervision',ko:'AI 감시'},
+'7×24 · 秒级告警 · 不眨眼':{en:'24/7 · real-time alarms',ko:'연중무휴 · 실시간 알람'},
+'◀ 拖动对比':{en:'◀ Drag',ko:'◀ 드래그'},
+'从「发现靠运气」到「识别常态化」':{en:'From luck to always-on detection',ko:'운에서 상시 인식으로'},
+'拖动对比 ▶':{en:'Drag ▶',ko:'드래그 ▶'},
+'现场事实监控 · LIVE':{en:'Live Site Monitoring',ko:'현장 실시간 · LIVE'},
+'四路实时画面 · 实时告警流 · 环境读数 · 可接入真实现场视频流':{en:'4 live feeds · alarm stream · sensors · real stream ready',ko:'4채널 실시간 · 알람 · 센서 · 실영상 연동'},
+'自动推送':{en:'Auto Push',ko:'자동 푸시'},
+'环境实时读数':{en:'Live Environment',ko:'실시간 환경'},
+'设备在线状态':{en:'Device Status',ko:'장비 상태'},
+'2# 施工升降机':{en:'Hoist #2',ko:'2번 호이스트'},
+'雾炮喷淋':{en:'Mist Cannon',ko:'미스트 살수'},
+'闸机通道':{en:'Turnstile',ko:'개찰구'},
+'环境监测站':{en:'Env Station',ko:'환경센서'},
+'应急广播':{en:'Broadcast',ko:'비상방송'},
+'2# 塔吊':{en:'Crane #2',ko:'2번 크레인'},
+'● 直播中（模拟流）':{en:'● Live (sim)',ko:'● 생방송 (모의)'},
+'● 在线':{en:'● Online',ko:'● 온라인'},
+'○ 检修':{en:'○ Maintenance',ko:'○ 점검 중'},
+'接入真实现场画面':{en:'Connect Real Feeds',ko:'실제 영상 연결'},
+'：在文件顶部 ':{en:': set ',ko:': 상단 '},
+' 填入现场 RTSP/HLS 视频流地址，四路模拟画面即替换为实况监控；当前为演示流，指标以真实测试为准。':{en:' to a live RTSP/HLS stream to replace sim feeds; currently demo.',ko:'에 실시간 RTSP/HLS 주소를 넣으면 실영상으로 교체; 현재 데모.'},
+'联系方式':{en:'Contact',ko:'연락처'},
+'公司信息':{en:'Company',ko:'회사 정보'},
+'产学研合作：[韩国庆云大学 산학협력단]':{en:'Co-op: [Kyungwoon Univ. IACF]',ko:'산학협력: [경운대학교 산학협력단]'},
+'产品入口':{en:'Product Links',ko:'제품 바로가기'},
+'桌面版监管驾驶舱':{en:'Desktop Console',ko:'데스크톱 관제센터'},
+'📱 手机版 App':{en:'📱 Mobile App',ko:'📱 모바일 앱'},
+'© 2026 鹰眼 AI · 工地安全监管驾驶舱':{en:'© 2026 EagleEye AI · Site Safety Console',ko:'© 2026 EagleEye AI · 현장안전 관제센터'},
+'页面演示数据均为模拟 · 产品指标以真实测试为准':{en:'Demo data simulated · specs subject to real testing',ko:'데모 데이터는 모의 · 지표는 실제 시험 기준'},
+'鹰眼 AI · 工地安全监管驾驶舱':{en:'EagleEye AI · Site Safety Console',ko:'EagleEye AI · 현장안전 관제센터'},
+'下一步 →':{en:'Next →',ko:'다음 →'},
+'← 上一步':{en:'← Back',ko:'← 이전'},
+'跳过导览':{en:'Skip Tour',ko:'투어 건너뛰기'},
+'完成 ✓':{en:'Done ✓',ko:'완료 ✓'},
+'产品导览 ':{en:'Product Tour ',ko:'제품 투어 '},
+'① 驾驶舱总览':{en:'① Overview',ko:'① 대시보드'},
+'② 视频 AI 识别':{en:'② Video AI',ko:'② 영상 AI'},
+'③ 告警中心':{en:'③ Alarm Center',ko:'③ 알람센터'},
+'④ 人员定位':{en:'④ Tracking',ko:'④ 인원 위치'},
+'⑤ 机械设备监测':{en:'⑤ Equipment',ko:'⑤ 장비 모니터링'},
+'⑥ 环境监测联动':{en:'⑥ Environment',ko:'⑥ 환경 연동'},
+'⑦ 隐患闭环治理':{en:'⑦ Hazard Loop',ko:'⑦ 위험 폐회로'},
+'⑧ 数据报表':{en:'⑧ Reports',ko:'⑧ 보고서'},
+'⑨ 庆云大学 · 校园管理':{en:'⑨ Kyungwoon Campus',ko:'⑨ 경운대 캠퍼스'},
+'⑩ PPE 防护检测':{en:'⑩ PPE Check',ko:'⑩ 보호구 검측'},
+'一屏掌握全场态势：在册人员、今日告警、待处置隐患、设备在线率，还有小时告警趋势与区域风险热力图。':{en:'One screen, full status: workers, alarms, hazards, devices, trend & heatmap.',ko:'한 화면으로 전체 현황: 인원·알람·위험·장비·추이·히트맵.'},
+'真实监控画面形态：点下方机位切换场景；用识别类型开关控制安全帽 / 反光衣 / 吸烟 / 越界检测，还能拖时间轴回放。':{en:'Real VMS view: switch cameras below; toggle detection types; drag timeline to replay.',ko:'실제 관제 화면: 카메라 전환, 인식 유형 토글, 타임라인 재생.'},
+'告警按等级分类、可筛选；点「处理」完成闭环，处置率与推送触达率实时统计。':{en:'Alarms graded & filterable; click Resolve to close loop; live stats.',ko:'등급별 알람 필터, 「처리」로 폐회로, 실시간 통계.'},
+'点地图上的绿点查看工人档案；开启基坑电子围栏后，人员闯入危险区立即触发越界告警。':{en:'Tap green dots for profiles; the E-fence alarms on pit intrusion.',ko:'녹색 점으로 인원정보, 전자울타리로 침입 경보.'},
+'塔吊吊重与力矩、升降机载重与人数、基坑位移——数值实时波动，超限即报警。':{en:'Crane load/torque, hoist load/people, pit displacement — live & alarmed.',ko:'크레인·호이스트·굴토 실시간 계측, 초과 시 경보.'},
+'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。':{en:'5 env parameters online; dust auto-triggers sprinkler with logs.',ko:'5개 환경항목, 먼지 초과 시 살수 자동, 기록 유지.'},
+'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。':{en:'Full loop: report → rectify → recheck & close, all logged.',ko:'신고→시정→재점검·해소, 전 과정 기록.'},
+'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。':{en:'Weekly trend, type mix, monthly stats, export & AI report.',ko:'주간 추이·유형 비중·월간 통계, 내보내기·AI 일지.'},
+'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。':{en:'Same platform for campus: flow, lab checks, fire devices, events, co-op training.',ko:'캠퍼스 확장: 유동인구·실험실 점검·소방·사건 연동, 산학 실습.'},
+'脱掉某件防护装备再点检测——系统会真实播放警报声、震动并推送告警到告警中心。':{en:'Remove any PPE and run detection — real siren, vibration & alarm push.',ko:'보호구 미착용 후 검측 — 실제 사이렌·진동·알람 푸시.'},
+'防护装备：':{en:'PPE Gear:',ko:'보호구:'},
+'护目镜':{en:'Goggles',ko:'보안경'},
+'手套':{en:'Gloves',ko:'장갑'},
+'安全带':{en:'Safety Belt',ko:'안전벨트'},
+'点击装备 = 模拟脱下（反光衣由摄像头真实识别）':{en:'Tap = simulate removal (vest really detected by camera)',ko:'클릭 = 미착용 모의 (반사조끼는 카메라 실제 판정)'},
+'📷 检测站 C-03 · 实时画面':{en:'📷 Station C-03 · Live Feed',ko:'📷 검측소 C-03 · 실시간'},
+'摄像头未开启':{en:'Camera Off',ko:'카메라 꺼짐'},
+'检测结果':{en:'Detection Result',ko:'판정 결과'},
+'AI 判定':{en:'AI Verdict',ko:'AI 판정'},
+'触发动作':{en:'Triggered Actions',ko:'연동 조치'},
+'现场声光报警器':{en:'On-site Siren',ko:'현장 사이렌'},
+'推送安全员 / 负责人':{en:'Push to Safety Officer',ko:'안전관리자 푸시'},
+'写入告警中心':{en:'Logged to Alarm Center',ko:'알람센터 기록'},
+'▶ 开始检测':{en:'▶ Start Detection',ko:'▶ 검측 시작'},
+'📷 开启摄像头':{en:'📷 Enable Camera',ko:'📷 카메라 켜기'},
+'尚未开始检测':{en:'Not started yet',ko:'아직 검측 전'},
+'检测通过':{en:'Passed',ko:'통과'},
+'未检测到反光衣':{en:'Vest NOT detected',ko:'반사조끼 미검출'},
+'反光衣检测（真实图像判定）':{en:'Vest (real image check)',ko:'반사조끼 (실제 영상판정)'},
+'请点击「开启摄像头」或保持全部装备穿戴':{en:'Enable camera or keep all gear on',ko:'카메라를 켜거나 보호구를 모두 착용하세요'},
+'声光报警器已触发':{en:'Siren triggered',ko:'사이렌 가동'},
+'未检测到 ':{en:'Missing: ',ko:'미착용: '},
+'📷 本模板接入真实摄像头':{en:'📷 This template uses your real camera',ko:'📷 이 템플릿은 실제 카메라 사용'},
+'（画面中心区域亮度/颜色分析）':{en:'(brightness/color analysis of center region)',ko:'(화면 중앙 밝기·색상 분석)'},
+'，其余装备为模拟开关；检测不通过将':{en:'; other gear is simulated. Failure will ',ko:'; 나머지는 모의. 불합격 시 '},
+'真实触发警报':{en:'really trigger the alarm',ko:'실제 알람 발생'},
+'（警笛声 + 震动 + 系统通知 + 告警中心记录）。':{en:' (siren + vibration + notification + alarm log).',ko:' (사이렌+진동+알림+기록).'},
+'反光衣检测为真实图像判定':{en:'Vest detection is real image analysis',ko:'반사조끼는 실제 영상판정'},
+'摄像头已开启':{en:'Camera On',ko:'카메라 켜짐'},
+'检测中……':{en:'Scanning…',ko:'검측 중…'},
+'🔊 ':': ',/* fallback */
+'📷 ':': ',
+'高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
+};
+let lang='zh';
+try{lang=localStorage.getItem('eagleeye_lang')||'zh';}catch(e){}
+const I18N_DONE=new WeakSet();
+const I18N_SKIP=new Set(['SCRIPT','STYLE']);
+function trText(node){
+  if(node.nodeType!==3)return;
+  const s=node.textContent.trim();
+  if(!s||I18N_DONE.has(node))return;
+  const m=I18N[s];
+  if(m&&m[lang]){node.textContent=node.textContent.replace(s,m[lang]);I18N_DONE.add(node);}
+}
+function trNode(root){
+  if(!root)return;
+  if(root.nodeType===3){trText(root);return;}
+  if(root.nodeType!==1)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  let n;
+  while(n=w.nextNode()){
+    const p=n.parentElement;
+    if(p&&I18N_SKIP.has(p.tagName))continue;
+    trText(n);
+  }
+  const attrs=['placeholder','title','aria-label','data-tag'];
+  const walk=e=>{
+    if(!e||e.nodeType!==1)return;
+    attrs.forEach(a=>{
+      const v=e.getAttribute(a);
+      if(v){const m=I18N[v];if(m&&m[lang])e.setAttribute(a,m[lang]);}
+    });
+    Array.from(e.children||[]).forEach(walk);
+  };
+  walk(root);
+}
+function setLang(l){
+  lang=l;
+  try{localStorage.setItem('eagleeye_lang',l);}catch(e){}
+  $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  trNode(document.body);
+  document.title=I18N['鹰眼 AI · 工地安全监管驾驶舱'][lang]||'EagleEye AI';
+}
+new MutationObserver(muts=>{
+  muts.forEach(mu=>{
+    if(mu.type==='childList')mu.addedNodes.forEach(n=>trNode(n));
+    else if(mu.type==='characterData')trText(mu.target);
+  });
+}).observe(document.body,{childList:true,subtree:true,characterData:true});
+
+/* ===== toast ===== */
+let toastTimer=null;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ============================================================
+   监管驾驶舱
+   ============================================================ */
+const cBody=$('#cBody');
+const nowStr=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());};
+setInterval(()=>{const c=$('#sysClock');if(c)c.textContent=nowStr();},1000);
+
+/* ---- 通用小工具 ---- */
+function panel(title,tag,inner,extra){
+  return `<div class="panel" ${extra||''}><div class="pt"><b>${title}</b>${tag?`<span>${tag}</span>`:''}</div>${inner}</div>`;
+}
+function gaugeSVG(pct,color){
+  const R=54,C=2*Math.PI*R;
+  const a=Math.max(0.001,Math.min(1,pct))*C;
+  return `<svg viewBox="0 0 140 82"><path d="M16 70 A54 54 0 0 1 124 70" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11" stroke-linecap="round"/><path d="M16 70 A54 54 0 0 1 124 70" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${a.toFixed(1)} ${C.toFixed(1)}" style="transition:stroke-dasharray 1s ease;filter:drop-shadow(0 0 6px ${color})"/></svg>`;
+}
+function drawLine(cv,data,color,fill){
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+  cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+  ctx.clearRect(0,0,W,H);
+  const max=Math.max(...data)*1.15||1,n=data.length;
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+  for(let i=1;i<=3;i++){const y=H*i/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  if(fill){
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,color+'55');g.addColorStop(1,color+'00');
+    ctx.beginPath();ctx.moveTo(0,H);
+    data.forEach((v,i)=>{const x=i/(n-1)*W,y=H-v/max*H;ctx.lineTo(x,y);});
+    ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle=g;ctx.fill();
+  }
+  ctx.beginPath();
+  data.forEach((v,i)=>{const x=i/(n-1)*W,y=H-v/max*H;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.shadowColor=color;ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;
+  const lx=W,ly=H-data[n-1]/max*H;
+  ctx.beginPath();ctx.arc(lx,ly,3.5,0,6.283);ctx.fillStyle=color;ctx.fill();
+}
+function drawBars(cv,data,color){
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+  cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+  ctx.clearRect(0,0,W,H);
+  const max=Math.max(...data)*1.2||1,bw=W/data.length*.55;
+  data.forEach((v,i)=>{
+    const h=v/max*H,x=i*W/data.length+(W/data.length-bw)/2;
+    const g=ctx.createLinearGradient(0,H-h,0,H);
+    g.addColorStop(0,color);g.addColorStop(1,color+'22');
+    ctx.fillStyle=g;ctx.fillRect(x,H-h,bw,h);
+  });
+}
+
+/* ---- 模块内容 ---- */
+const MODULES={};
+
+/* ① 总览 */
+MODULES.overview=function(){
+  const trend=[8,12,9,15,11,18,14,23,17,13,10,16];
+  const types=[['安全帽',14,'#FF4D4F'],['反光衣',5,'#3DDC84'],['越界',9,'#FFD54A'],['行为',6,'#4DA6FF'],['其他',3,'#8B93A7']];
+  const maxT=14;
+  return `
+  <div class="kpis">
+    <div class="kpi" style="--kc:rgba(255,167,38,.12)"><div class="v" style="color:var(--hl)" id="kpiWorkers">1286</div><div class="l">在册劳务人员</div><div class="d">今日在场 <b style="color:var(--grn)">863</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)" id="kpiAlarm">23</div><div class="l">今日告警</div><div class="d">高风险 <b style="color:var(--red)" id="kpiHigh">4</b> · 已处置 <b style="color:var(--grn)" id="kpiDisposed">19</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,213,74,.12)"><div class="v" style="color:var(--yel)" id="kpiPending">3</div><div class="l">待处置隐患</div><div class="d">超 24h 未闭环 <b style="color:var(--red)">1</b></div></div>
+    <div class="kpi" style="--kc:rgba(61,220,132,.12)"><div class="v" style="color:var(--grn)">96%</div><div class="l">设备在线率</div><div class="d">142 / 148 台在线</div></div>
+  </div>
+  <div class="grid-2">
+    ${panel('今日告警趋势（小时）','单位：起',`<canvas class="chart" id="cvTrend" style="height:190px"></canvas>`)}
+    ${panel('告警类型分布','今日',types.map(t=>`
+      <div class="rl-item"><span class="dot" style="background:${t[2]}"></span><span style="width:70px">${t[0]}</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><i style="display:block;height:100%;width:${t[1]/maxT*100}%;background:${t[2]};border-radius:4px"></i></div>
+      <b style="font-variant-numeric:tabular-nums">${t[1]}</b></div>`).join(''))}
+  </div>
+  <div class="grid-2">
+    ${panel('实时快讯','滚动更新',`<div class="row-list" id="kvList"></div>`)}
+    ${panel('区域风险热力','红>橙>黄>蓝',`
+      <svg viewBox="0 0 420 220" style="width:100%;height:190px" aria-hidden="true">
+        <rect width="420" height="220" fill="#0E131D"/>
+        <rect x="20" y="30" width="120" height="80" rx="8" fill="rgba(255,77,79,.22)" stroke="#FF4D4F"/><text x="80" y="76" fill="#FF4D4F" font-size="14" text-anchor="middle">基坑区 · 高</text>
+        <rect x="160" y="30" width="120" height="80" rx="8" fill="rgba(255,167,38,.2)" stroke="#FFA726"/><text x="220" y="76" fill="#FFA726" font-size="14" text-anchor="middle">吊装区 · 较高</text>
+        <rect x="300" y="30" width="100" height="80" rx="8" fill="rgba(255,213,74,.16)" stroke="#FFD54A"/><text x="350" y="76" fill="#FFD54A" font-size="14" text-anchor="middle">加工区 · 中</text>
+        <rect x="20" y="130" width="180" height="70" rx="8" fill="rgba(77,166,255,.14)" stroke="#4DA6FF"/><text x="110" y="170" fill="#4DA6FF" font-size="14" text-anchor="middle">生活区 · 低</text>
+        <rect x="220" y="130" width="180" height="70" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="310" y="170" fill="#3DDC84" font-size="14" text-anchor="middle">出入口 · 正常</text>
+      </svg>`)}
+  </div>`;
+};
+
+/* ② 视频AI */
+const CAM_POOL=[
+  {id:'C-01',name:'工地出入口',scene:'gate'},
+  {id:'B-01',name:'吊装区',scene:'crane'},
+  {id:'D-05',name:'基坑临边',scene:'pit'},
+  {id:'E-03',name:'材料加工区',scene:'yard'}
+];
+function siteScene(kind){
+  const G='<rect width="960" height="540" fill="var(--sky2)"/>';
+  if(kind==='gate')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><rect x="0" y="330" width="960" height="14" fill="#2A3548"/><g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g><rect x="430" y="330" width="90" height="90" fill="#171C28" stroke="#3A4A63" stroke-width="4"/><text x="460" y="382" fill="#8B93A7" font-size="20" text-anchor="middle">入口</text><g stroke="#FFA726" stroke-width="5" opacity=".7"><path d="M380 420 V360 M520 420 V360"/></g><g fill="#1A2434"><rect x="40" y="150" width="200" height="140"/><rect x="60" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="140" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>`;
+  if(kind==='crane')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><path d="M0 420 L120 420 L240 330 L840 330 L960 420 Z" fill="none" stroke="#FFD54A" stroke-width="4" stroke-dasharray="18 12" opacity=".8"/><g stroke="#3A4A63" stroke-width="12" fill="none"><path d="M700 420 V100"/><path d="M700 100 H880" stroke-width="10"/><path d="M880 100 V140 M880 140 H930 M930 140 V160" stroke-width="8"/></g><path d="M694 160 h12 l-6 18 z" fill="#FFD54A"/><text x="330" y="300" fill="#FFD54A" font-size="18" letter-spacing="3">警戒区</text><g fill="#1A2434"><rect x="60" y="200" width="180" height="220"/></g>`;
+  if(kind==='pit')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><path d="M0 420 H960" stroke="#2A3548" stroke-width="8"/><path d="M180 420 L320 540 L640 540 L780 420" fill="#0A0E15" stroke="#3A4A63" stroke-width="5"/><path d="M200 420 L340 520 M760 420 L620 520" stroke="#3A4A63" stroke-width="4" opacity=".6"/><g stroke="#FFA726" stroke-width="5"><path d="M60 420 V360 M120 420 V360 M840 420 V360 M900 420 V360"/><path d="M60 370 H120 M840 370 H900"/></g><text x="480" y="290" fill="#FFA726" font-size="18" letter-spacing="3">临边危险</text>`;
+  return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><g fill="#1A2434"><rect x="80" y="260" width="260" height="160"/><rect x="500" y="280" width="200" height="140"/></g><g fill="#8B93A7" opacity=".5"><rect x="120" y="200" width="90" height="60"/><rect x="260" y="220" width="70" height="40"/><rect x="540" y="220" width="80" height="60"/><rect x="660" y="240" width="50" height="30"/></g><g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g>`;
+}
+function workerSVG(x,y,s,opts){
+  opts=opts||{};
+  const skin=opts.dark?'#6E7A8F':'#E8C39A';
+  const pants='#2A3140',shirt=opts.vest===false?'#4A5568':'#FFA726';
+  const sc=s||1;
+  let svg=`<rect x="${x-13*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x+2*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x-15*sc}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x-15*sc}" y="${y+16*sc}" width="${30*sc}" height="${24*sc}" rx="${6*sc}" fill="${shirt}"/><rect x="${x-22*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x+14*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x-15*sc}" y="${y+22*sc}" width="${30*sc}" height="${3*sc}" fill="#FFD9A0" opacity=".9"/><circle cx="${x}" cy="${y+8*sc}" r="${11*sc}" fill="${skin}"/><circle cx="${x-16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/><circle cx="${x+16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/>`;
+  if(opts.helmet===false){svg+=`<path d="M${x-11*sc} ${y+2*sc} a11 11 0 0 1 ${22*sc} 0 z" fill="#3A2A1A"/>`;}
+  else{svg+=`<path d="M${x-13*sc} ${y+3*sc} a13 13 0 0 1 ${26*sc} 0 l-2 -2 l${-22*sc} 0 z" fill="#FFA726" stroke="#D97F00" stroke-width="1.2"/><rect x="${x-4*sc}" y="${y-14*sc}" width="${8*sc}" height="${3*sc}" rx="1.5" fill="#FFD9A0"/>`;}
+  if(opts.goggles){svg+=`<rect x="${x-11*sc}" y="${y-1*sc}" width="${22*sc}" height="${6*sc}" rx="2.5" fill="#1F2937"/><circle cx="${x-5*sc}" cy="${y+2*sc}" r="${3.2*sc}" fill="#4DA6FF"/><circle cx="${x+5*sc}" cy="${y+2*sc}" r="${3.2*sc}" fill="#4DA6FF"/>`;}
+  if(opts.gloves){svg+=`<circle cx="${x-20*sc}" cy="${y+37*sc}" r="${5*sc}" fill="#7A5A30"/><circle cx="${x+20*sc}" cy="${y+37*sc}" r="${5*sc}" fill="#7A5A30"/>`;}
+  if(opts.belt){svg+=`<rect x="${x-13*sc}" y="${y+28*sc}" width="${26*sc}" height="${5*sc}" fill="#22303C"/><rect x="${x-4*sc}" y="${y+27*sc}" width="${8*sc}" height="${7*sc}" rx="1.5" fill="#FFD54A"/>`;}
+  else if(opts.belt===false){svg+=`<path d="M${x-10*sc} ${y+30*sc} q10 8 20 0" stroke="#FF4D4F" stroke-width="3" fill="none" stroke-dasharray="4 3"/>`;}
+  return svg;
+}
+const DBOXES={
+  gate:[{t:'helmet',cls:'red',tag:'未佩戴安全帽',x:'18%',y:'36%',w:'9%',h:'25%'},{t:'person',cls:'',tag:'人员',x:'40%',y:'38%',w:'9%',h:'24%'},{t:'person',cls:'',tag:'人员',x:'58%',y:'42%',w:'9%',h:'22%'}],
+  crane:[{t:'fence',cls:'yel',tag:'进入吊装警戒区',x:'30%',y:'32%',w:'14%',h:'34%'},{t:'person',cls:'',tag:'人员',x:'64%',y:'42%',w:'9%',h:'24%'}],
+  pit:[{t:'edge',cls:'org',tag:'临边越界预警',x:'44%',y:'32%',w:'13%',h:'32%'},{t:'person',cls:'',tag:'人员',x:'12%',y:'44%',w:'9%',h:'24%'}],
+  yard:[{t:'smoke',cls:'red',tag:'吸烟行为',x:'26%',y:'40%',w:'11%',h:'26%'},{t:'vest',cls:'org',tag:'未穿反光衣',x:'60%',y:'42%',w:'10%',h:'24%'}]
+};
+const AI_TYPES=[['helmet','安全帽'],['vest','反光衣'],['smoke','吸烟'],['fence','越界'],['edge','临边'],['person','人员']];
+let aiOn={helmet:true,vest:true,smoke:true,fence:true,edge:true,person:true};
+function camCellHtml(cam,i){
+  const boxes=DBOXES[cam.scene].map((b,j)=>`<div class="dbox ${b.cls} ${aiOn[b.t]?'':'off'}" data-tag="${b.tag}" data-t="${b.t}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('');
+  return `<div class="camcell" data-c="${i}">
+    <div class="v"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(cam.scene)}</svg>
+      <div class="rec-tag"><i></i>${cam.id} · ${cam.name}</div>
+      ${boxes}
+    </div>
+    <div class="meta"><b>${cam.name}</b><span>AI 在线 · 2K</span></div>
+  </div>`;
+}
+MODULES.video=function(){
+  return `
+  <div class="ai-chips"><span>识别类型开关：</span>${AI_TYPES.map(t=>`<button class="ai-chip ${aiOn[t[0]]?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('')}</div>
+  <div class="bigview" id="bigView">
+    <div class="v" id="bigVideo"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(CAM_POOL[0].scene)}</svg>
+      <div class="rec-tag"><i></i><span id="bigRec">C-01 · 工地出入口</span> · <span id="bigTime">${nowStr()}</span></div>
+      <div id="bigBoxes"></div>
+    </div>
+    <div class="ctrl"><span>回放时间轴</span><input type="range" min="0" max="100" value="100" id="bigAxis"><span id="bigAxisT">实时</span></div>
+  </div>
+  <div class="camgrid" style="margin-top:14px" id="camGrid">${CAM_POOL.map((c,i)=>camCellHtml(c,i)).join('')}</div>`;
+};
+function renderBigCam(i){
+  const cam=CAM_POOL[i];
+  $('#bigVideo').innerHTML=`<svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(cam.scene)}</svg>
+    <div class="rec-tag"><i></i><span id="bigRec">${cam.id} · ${cam.name}</span> · <span id="bigTime">${nowStr()}</span></div>
+    <div id="bigBoxes">${DBOXES[cam.scene].map((b,j)=>`<div class="dbox ${b.cls} ${aiOn[b.t]?'':'off'}" data-tag="${b.tag}" data-t="${b.t}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('')}</div>`;
+  $$('#camGrid .camcell').forEach(el=>el.classList.toggle('sel',+el.dataset.c===i));
+  toast('已切换机位 '+cam.id+' · '+cam.name);
+}
+
+/* ③ 告警中心 */
+let ALARMS=[
+  {t:'09:12:34',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',lvT:'高风险',st:0},
+  {t:'09:05:18',cam:'B-01 吊装区',type:'进入吊装警戒区',lv:'m',lvT:'警戒',st:0},
+  {t:'08:47:02',cam:'A-02 3号楼',type:'高处作业未系安全带',lv:'h',lvT:'高风险',st:0},
+  {t:'08:21:44',cam:'E-03 材料加工区',type:'吸烟行为',lv:'m',lvT:'警戒',st:1},
+  {t:'07:58:11',cam:'D-05 基坑西侧',type:'临边越界',lv:'l',lvT:'低',st:1},
+  {t:'07:33:26',cam:'C-07 夜间出入口',type:'未穿反光背心',lv:'m',lvT:'警戒',st:1},
+  {t:'07:12:09',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',lvT:'高风险',st:1},
+  {t:'06:44:51',cam:'E-01 环境站',type:'扬尘超标联动喷淋',lv:'l',lvT:'低',st:1}
+];
+let alarmFilter='all';
+let tickN=0;
+
+/* ===== 持久化（刷新不丢，演示更可信） ===== */
+const LS_KEY='eagleeye_v4';
+let saved={};
+try{saved=JSON.parse(localStorage.getItem(LS_KEY)||'{}');}catch(e){saved={};}
+if(saved.alarmSt&&Array.isArray(saved.alarmSt))ALARMS.forEach((a,i)=>{if(saved.alarmSt[i]!=null)a.st=saved.alarmSt[i];});
+function persist(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({alarmSt:ALARMS.map(a=>a.st),hazards,aiOn,fenceOn}));}catch(e){}
+}
+
+/* ===== 全局告警联动总线 ===== */
+function raiseAlarm(cam,type,lv,lvT){
+  const d=new Date();
+  ALARMS.unshift({t:pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()),cam,type,lv,lvT,st:0});
+  if(ALARMS.length>12)ALARMS.pop();
+  document.body.classList.remove('alarming');
+  void document.body.offsetWidth;
+  document.body.classList.add('alarming');
+  clearTimeout(raiseAlarm._t);
+  raiseAlarm._t=setTimeout(()=>document.body.classList.remove('alarming'),2600);
+  toast('🚨 新告警：'+cam+' · '+type+' · 已推送安全员');
+  updateBell();updateKPIs();
+  if(curMod==='alarm')renderAlarmTable();
+  persist();
+}
+function updateBell(){
+  const b=$('#bellCount');
+  if(b){const n=ALARMS.filter(a=>!a.st).length;b.textContent=n;b.className=n?'':'zero';}
+}
+function updateKPIs(){
+  const kAlarm=$('#kpiAlarm');if(kAlarm)kAlarm.textContent=ALARMS.length;
+  const kHigh=$('#kpiHigh');if(kHigh)kHigh.textContent=ALARMS.filter(a=>a.lv==='h'&&!a.st).length;
+  const kDis=$('#kpiDisposed');if(kDis)kDis.textContent=ALARMS.filter(a=>a.st).length;
+  const pend=$('#kpiPending');if(pend)pend.textContent=hazards.filter(h=>h.st===0).length;
+}
+MODULES.alarm=function(){
+  return `
+  <div class="filter-row">
+    <span style="font-size:13px;color:var(--dim)">筛选：</span>
+    <button class="ai-chip ${alarmFilter==='all'?'on':''}" data-f="all">全部</button>
+    <button class="ai-chip ${alarmFilter==='h'?'on':''}" data-f="h">高风险</button>
+    <button class="ai-chip ${alarmFilter==='m'?'on':''}" data-f="m">警戒</button>
+    <button class="ai-chip ${alarmFilter==='l'?'on':''}" data-f="l">低风险</button>
+    <select id="alarmTypeSel"><option value="">全部类型</option><option>未佩戴安全帽</option><option>进入吊装警戒区</option><option>高处作业未系安全带</option><option>吸烟行为</option><option>临边越界</option><option>未穿反光背心</option><option>扬尘超标联动喷淋</option></select>
+  </div>
+  <div class="grid-2" style="grid-template-columns:1.6fr 1fr">
+    ${panel('告警事件列表','点击「处理」完成闭环',`<table class="alarm-table"><thead><tr><th>时间</th><th>机位</th><th>类型</th><th>等级</th><th>状态</th><th></th></tr></thead><tbody id="alarmTbody"></tbody></table>`,)`id="alarmPanel"`}
+    <div>
+      ${panel('本周告警分布','按类型',`<canvas class="chart" id="cvDonut" style="height:170px"></canvas>`)}
+      ${panel('处置率','本周',`
+        <div class="rl-item"><span style="color:var(--grn)">已处置</span><b style="margin-left:auto">${Math.round((ALARMS.filter(a=>a.st).length/ALARMS.length)*100)}%</b></div>
+        <div class="rl-item"><span style="color:var(--dim)">平均处置时长</span><b style="margin-left:auto">x.x 分钟</b></div>
+        <div class="rl-item"><span style="color:var(--dim)">推送触达率</span><b style="margin-left:auto">xx.x%</b></div>`)}
+    </div>
+  </div>`;
+};
+function renderAlarmTable(){
+  const tSel=$('#alarmTypeSel')?$('#alarmTypeSel').value:'';
+  const rows=ALARMS.filter(a=>{
+    if(alarmFilter==='h'&&a.lv!=='h')return false;
+    if(alarmFilter==='m'&&a.lv!=='m')return false;
+    if(alarmFilter==='l'&&a.lv!=='l')return false;
+    if(tSel&&a.type!==tSel)return false;
+    return true;
+  });
+  $('#alarmTbody').innerHTML=rows.map((a,i)=>`
+    <tr><td style="color:var(--dim2)">${a.t}</td><td>${a.cam}</td><td>${a.type}</td>
+    <td><span class="lv ${a.lv}">${a.lvT}</span></td>
+    <td>${a.st?'<span class="lv l">已处置</span>':'<span class="lv b">待处理</span>'}</td>
+    <td>${a.st?'<button class="mini-btn done">已闭环 ✓</button>':`<button class="mini-btn" data-i="${ALARMS.indexOf(a)}">处理</button>`}</td></tr>`).join('');
+}
+
+/* ④ 人员定位 */
+const WORKERS=[
+  {n:'张伟',r:'钢筋工',x:62,y:30},{n:'李强',r:'塔吊司机',x:30,y:22},{n:'王芳',r:'信号工',x:38,y:44},
+  {n:'赵磊',r:'木工',x:70,y:52},{n:'陈静',r:'安全员',x:50,y:38},{n:'刘洋',r:'电工',x:22,y:58},
+  {n:'孙浩',r:'架子工',x:58,y:64},{n:'周敏',r:'资料员',x:82,y:30},{n:'吴刚',r:'焊工',x:44,y:66}
+];
+let fenceOn=false;
+MODULES.people=function(){
+  return `
+  <div class="filter-row">
+    <span style="font-size:13px;color:var(--dim)">基坑电子围栏：</span>
+    <button class="ai-chip ${fenceOn?'on':''}" id="fenceBtn">${fenceOn?'围栏开启中 · 点击关闭':'点击开启电子围栏'}</button>
+    <span style="font-size:13px;color:var(--dim)">点地图上的绿点查看人员档案</span>
+  </div>
+  <div class="sitemap" id="sitemap">
+    <svg viewBox="0 0 1000 540" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="1000" height="540" fill="#0E131D"/>
+      <g stroke="rgba(255,255,255,.06)"><path d="M0 90 H1000 M0 180 H1000 M0 270 H1000 M0 360 H1000 M0 450 H1000 M125 0 V540 M250 0 V540 M375 0 V540 M500 0 V540 M625 0 V540 M750 0 V540 M875 0 V540"/></g>
+      <path d="M600 0 V540 M0 80 H1000" stroke="#2A3548" stroke-width="8" fill="none"/>
+      <rect x="40" y="120" width="180" height="140" rx="8" fill="#1A2434"/><text x="130" y="195" fill="#8B93A7" font-size="16" text-anchor="middle">办公区</text>
+      <rect x="40" y="300" width="180" height="120" rx="8" fill="#1A2434"/><text x="130" y="365" fill="#8B93A7" font-size="16" text-anchor="middle">生活区</text>
+      <rect x="700" y="120" width="220" height="160" rx="8" fill="#1A2434"/><text x="810" y="205" fill="#8B93A7" font-size="16" text-anchor="middle">加工区</text>
+      <rect x="320" y="300" width="260" height="180" rx="8" fill="${fenceOn?'rgba(255,77,79,.16)':'rgba(255,167,38,.1)'}" stroke="${fenceOn?'#FF4D4F':'#FFA726'}" stroke-width="3" stroke-dasharray="14 8"/>
+      <text x="450" y="395" fill="${fenceOn?'#FF4D4F':'#FFA726'}" font-size="16" text-anchor="middle">基坑危险区 ${fenceOn?'· 电子围栏已布防':'· 未布防'}</text>
+      <g stroke="#3A4A63" stroke-width="14" stroke-linecap="round" fill="none"><path d="M560 540 V240"/><path d="M560 240 H800"/><path d="M740 240 V300 M740 300 H800 M800 300 V320" stroke-width="9"/></g>
+      <text x="640" y="180" fill="#8B93A7" font-size="15" text-anchor="middle">1# 塔吊</text>
+    </svg>
+    ${WORKERS.map((w,i)=>`<div class="pdot" data-i="${i}" data-n="${w.n}" style="left:${w.x}%;top:${w.y}%"></div>`).join('')}
+    <div class="fence-note"><span style="color:var(--grn)">● 在线 9 人</span><span>▲ 塔吊 1 台运行</span><span>${fenceOn?'<b style="color:var(--red)">围栏布防中</b>':'围栏未开启'}</span></div>
+  </div>`;
+};
+function moveWorkers(){
+  $$('.pdot').forEach(dot=>{
+    const i=+dot.dataset.i,w=WORKERS[i];
+    let nx=w.x+rnd(-3,3),ny=w.y+rnd(-3,3);
+    /* 基坑区 32%-58% x, 55%-88% y：围栏开启时驱逐 */
+    const inPit=nx>32&&nx<58&&ny>55&&ny<88;
+    if(fenceOn&&inPit){
+      nx=w.x+(w.x>45?6:-6);ny=w.y-6;
+      dot.classList.add('warn');
+      if(Math.random()<.4)toast('⚠ 越界告警：'+w.n+' 闯入基坑危险区');
+    }else dot.classList.remove('warn');
+    w.x=Math.max(6,Math.min(94,nx));w.y=Math.max(14,Math.min(92,ny));
+    dot.style.left=w.x+'%';dot.style.top=w.y+'%';
+  });
+}
+
+/* ⑤ 机械设备 */
+let tower={load:2.4,torque:78,wind:5.2,angle:126};
+let lift={load:0.9,people:6,height:24};
+let pitData=[2.1,2.3,2.2,2.5,2.4,2.7,2.6,2.8,2.7,2.9,2.8,3.0];
+MODULES.machine=function(){
+  return `
+  <div class="grid-3">
+    ${panel('1# 塔吊 · 运行中','TC-5010',`
+      <div class="gauge-grid" style="grid-template-columns:1fr 1fr">
+        <div class="gauge"><div id="gLoad">${gaugeSVG(tower.load/5,'#FFA726')}</div><div class="gv">${tower.load.toFixed(1)}<span style="font-size:12px;color:var(--dim)"> t</span></div><div class="gl">吊重（额定 5t）</div></div>
+        <div class="gauge"><div id="gTorque">${gaugeSVG(tower.torque/100,'#4DA6FF')}</div><div class="gv">${Math.round(tower.torque)}<span style="font-size:12px;color:var(--dim)"> %</span></div><div class="gl">力矩比</div></div>
+      </div>
+      <div class="tower-strip" style="margin-top:10px"><span>风速 <b id="tWind">${tower.wind.toFixed(1)} m/s</b></span><span>回转角 <b id="tAngle">${tower.angle}°</b></span><span>高度 <b>38.5 m</b></span></div>`)}
+    ${panel('2# 施工升降机 · 运行中','SC200',`
+      <div class="gauge-grid" style="grid-template-columns:1fr 1fr">
+        <div class="gauge"><div id="gLiftLoad">${gaugeSVG(lift.load/2,'#3DDC84')}</div><div class="gv">${lift.load.toFixed(1)}<span style="font-size:12px;color:var(--dim)"> t</span></div><div class="gl">载重（额定 2t）</div></div>
+        <div class="gauge"><div id="gLiftP">${gaugeSVG(lift.people/9,'#FFD54A')}</div><div class="gv">${lift.people}<span style="font-size:12px;color:var(--dim)"> 人</span></div><div class="gl">轿厢人数（限 9 人）</div></div>
+      </div>
+      <div class="tower-strip" style="margin-top:10px"><span>当前高度 <b id="lHeight">${lift.height.toFixed(0)} m</b></span><span>门联锁 <b style="color:var(--grn)">正常</b></span></div>`)}
+    ${panel('基坑监测 · 位移曲线','深层水平位移 mm',`<canvas class="chart" id="cvPit" style="height:150px"></canvas>
+      <div class="tower-strip"><span>累计位移 <b style="color:var(--yel)">3.0 mm</b></span><span>速率 <b>0.02 mm/d</b></span><span>水位 <b>2.4 m</b></span></div>`)}
+  </div>`;
+};
+
+/* ⑥ 环境监测 */
+let env={pm25:58,pm10:92,noise:64,wind:4.2,temp:26};
+let sprayOn=false;
+MODULES.env=function(){
+  const g=(v,max,c)=>gaugeSVG(v/max,c);
+  return `
+  <div class="filter-row"><span style="font-size:13px;color:var(--dim)">扬尘超标联动：</span>
+    <button class="ai-chip ${sprayOn?'on':''}" id="sprayBtn">${sprayOn?'喷淋开启中（模拟）':'手动触发喷淋'}</button>
+    <span style="font-size:13px;color:var(--dim)">PM2.5 > 75μg/m³ 自动联动</span></div>
+  <div class="gauge-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="gauge ${env.pm25>75?'over':''}" id="gPm25"><div>${g(env.pm25,150,'#FF4D4F')}</div><div class="gv">${Math.round(env.pm25)}</div><div class="gl">PM2.5 μg/m³</div></div>
+    <div class="gauge ${env.pm10>150?'over':''}" id="gPm10"><div>${g(env.pm10,250,'#FFA726')}</div><div class="gv">${Math.round(env.pm10)}</div><div class="gl">PM10 μg/m³</div></div>
+    <div class="gauge ${env.noise>70?'over':''}" id="gNoise"><div>${g(env.noise,120,'#FFD54A')}</div><div class="gv">${Math.round(env.noise)}</div><div class="gl">噪声 dB(A)</div></div>
+    <div class="gauge" id="gWind"><div>${g(env.wind,12,'#4DA6FF')}</div><div class="gv">${env.wind.toFixed(1)}</div><div class="gl">风速 m/s</div></div>
+    <div class="gauge" id="gTemp"><div>${g(env.temp,50,'#3DDC84')}</div><div class="gv">${Math.round(env.temp)}</div><div class="gl">温度 ℃</div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    ${panel('今日扬尘走势','μg/m³',`<canvas class="chart" id="cvEnv" style="height:160px"></canvas>`)}
+    ${panel('联动记录','自动触发',`<div class="row-list" id="envLog"></div>`)}
+  </div>`;
+};
+const envHistory=[46,52,49,58,64,61,72,68,77,71,66,63,58,55,52];
+function envTick(){
+  env.pm25=Math.max(28,Math.min(120,env.pm25+rnd(-4,4)+(sprayOn?-7:0)));
+  env.pm10=Math.max(45,Math.min(200,env.pm10+rnd(-6,6)+(sprayOn?-9:0)));
+  env.noise=Math.max(45,Math.min(95,env.noise+rnd(-3,3)));
+  env.wind=Math.max(1,Math.min(11,env.wind+rnd(-.4,.4)));
+  env.temp=Math.max(20,Math.min(36,env.temp+rnd(-.3,.3)));
+  if(!sprayOn&&env.pm25>75){sprayOn=true;raiseAlarm('E-01 环境站','扬尘超标 · 喷淋已联动','l','低');}
+  if(sprayOn&&env.pm25<45)sprayOn=false;
+  /* 仅当模块可见时刷新 DOM */
+  const gP=$('#gPm25');if(!gP)return;
+  const upd=(id,v,max,c,cls)=>{const el=$(id);el.querySelector('div').innerHTML=gaugeSVG(v/max,c);el.querySelector('.gv').textContent=Math.round(v*10)/10;el.classList.toggle('over',v>max*(id==='#gPm25'?.5:.6));};
+  upd('#gPm25',env.pm25,150,'#FF4D4F');upd('#gPm10',env.pm10,250,'#FFA726');upd('#gNoise',env.noise,120,'#FFD54A');
+  upd('#gWind',env.wind,12,'#4DA6FF');upd('#gTemp',env.temp,50,'#3DDC84');
+  $('#sprayBtn').textContent=sprayOn?'喷淋开启中（模拟）':'手动触发喷淋';
+  $('#sprayBtn').classList.toggle('on',sprayOn);
+}
+
+/* ⑦ 隐患排查 */
+let hazards=[
+  {id:1,loc:'3号楼 12F 临边',type:'临边防护缺失',st:0,who:'陈静'},
+  {id:2,loc:'基坑西侧',type:'边坡局部渗水',st:1,who:'张伟'},
+  {id:3,loc:'材料加工区',type:'配电箱未上锁',st:0,who:'刘洋'},
+  {id:4,loc:'1#塔吊基础',type:'接地电阻偏高',st:2,who:'王芳'}
+];
+/* 恢复本地保存的演示状态 */
+if(Array.isArray(saved.hazards)&&saved.hazards.length)hazards=saved.hazards;
+if(saved.aiOn)Object.assign(aiOn,saved.aiOn);
+if(saved.fenceOn!=null)fenceOn=saved.fenceOn;
+MODULES.hazard=function(){
+  const c=hazards.filter(h=>h.st===0).length,p=hazards.filter(h=>h.st===1).length,d=hazards.filter(h=>h.st===2).length;
+  return `
+  <div class="hz-stats">
+    <div class="hz-stat"><b style="color:var(--red)">${c}</b><span>待整改</span></div>
+    <div class="hz-stat"><b style="color:var(--yel)">${p}</b><span>整改中</span></div>
+    <div class="hz-stat"><b style="color:var(--grn)">${d}</b><span>已闭环</span></div>
+  </div>
+  <div class="hz-flow"><span>闭环流程：</span><i class="passed">① 上报</i>→<i class="${hazards.some(h=>h.st>0)?'passed':''}">② 整改</i>→<i class="${hazards.some(h=>h.st>1)?'passed':''}">③ 复查</i>→<i class="${hazards.some(h=>h.st===2)?'passed':''}">④ 销项</i></div>
+  ${panel('隐患台账','模拟演示 · 数据保存在浏览器本地',`<table class="alarm-table"><thead><tr><th>编号</th><th>位置</th><th>类型</th><th>上报人</th><th>状态</th><th>操作</th></tr></thead><tbody id="hzTbody"></tbody></table>`)}
+  <div style="margin-top:14px"><button class="btn btn-primary" id="hzAdd" style="padding:10px 24px;font-size:14px">＋ 新增隐患（模拟上报）</button></div>`;
+};
+function renderHz(){
+  $('#hzTbody').innerHTML=hazards.map(h=>`
+    <tr><td style="color:var(--dim2)">YZ-${String(h.id).padStart(4,'0')}</td><td>${h.loc}</td><td>${h.type}</td><td>${h.who}</td>
+    <td>${h.st===0?'<span class="lv b">待整改</span>':h.st===1?'<span class="lv m">整改中</span>':'<span class="lv l">已闭环 ✓</span>'}</td>
+    <td>${h.st===0?`<button class="mini-btn" data-hz="${h.id}" data-act="1">开始整改</button>`:h.st===1?`<button class="mini-btn" data-hz="${h.id}" data-act="2">复查销项</button>`:'<button class="mini-btn done">已归档</button>'}</td></tr>`).join('');
+}
+
+/* ⑧ 数据报表 */
+MODULES.report=function(){
+  return `
+  <div class="grid-2">
+    ${panel('近 7 日告警趋势','单位：起',`<canvas class="chart" id="cvWeek" style="height:190px"></canvas>`)}
+    ${panel('识别类型占比','近 7 日',`<canvas class="chart" id="cvPie" style="height:190px"></canvas>`)}
+  </div>
+  ${panel('月度统计','演示数据',`<table class="alarm-table"><thead><tr><th>月份</th><th>告警总数</th><th>高风险</th><th>隐患闭环率</th><th>平均处置时长</th></tr></thead>
+  <tbody><tr><td>2026-01</td><td>286</td><td>12</td><td style="color:var(--grn)">96.2%</td><td>x.x 分钟</td></tr>
+  <tr><td>2026-02</td><td>241</td><td>9</td><td style="color:var(--grn)">97.5%</td><td>x.x 分钟</td></tr>
+  <tr><td>2026-03</td><td>198</td><td>7</td><td style="color:var(--grn)">98.1%</td><td>x.x 分钟</td></tr></tbody></table>
+  <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="exportBtn" style="padding:10px 24px;font-size:14px">⬇ 导出报表（演示）</button>
+    <button class="btn btn-primary" id="dailyBtn" style="padding:10px 24px;font-size:14px">🤖 生成今日 AI 巡检日报</button>
+  </div>`)}
+  <p class="dash-note" style="margin-top:14px">★ 表格内标注 <b style="color:var(--hl)">x.x</b> 的数值需替换为真实数据，其余演示数据均为模拟</p>`;
+};
+
+/* ⑨ 庆云大学 · 校园安全管理 */
+MODULES.campus=function(){
+  return `
+  <div class="kpis">
+    <div class="kpi" style="--kc:rgba(77,166,255,.12)"><div class="v" style="color:var(--blue)">2,846</div><div class="l">今日入校人员</div><div class="d">学生 <b>2,402</b> · 教职工 <b>212</b> · 访客 <b>232</b></div></div>
+    <div class="kpi" style="--kc:rgba(61,220,132,.12)"><div class="v" style="color:var(--grn)">98%</div><div class="l">实验室安全点检率</div><div class="d">本周完成 <b>48 / 49</b> 间</div></div>
+    <div class="kpi" style="--kc:rgba(255,167,38,.12)"><div class="v" style="color:var(--hl)">130</div><div class="l">消防设施在线</div><div class="d">烟感 <b>96</b> · 消火栓 <b>34</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)">2</div><div class="l">今日校园安全事件</div><div class="d">已处置 <b style="color:var(--grn)">1</b> · 处置中 <b style="color:var(--yel)">1</b></div></div>
+  </div>
+  <div class="grid-2">
+    ${panel('경운대학교 캠퍼스 · 实时人流量热力','演示数据 · 可替换为真实校园地图',`
+      <svg viewBox="0 0 640 380" style="width:100%;height:330px" aria-hidden="true">
+        <rect width="640" height="380" fill="#0E131D"/>
+        <g stroke="rgba(255,255,255,.05)"><path d="M0 76 H640 M0 152 H640 M0 228 H640 M0 304 H640 M128 0 V380 M256 0 V380 M384 0 V380 M512 0 V380"/></g>
+        <path d="M320 0 V380" stroke="#2A3548" stroke-width="10"/>
+        <path d="M0 60 H640 M0 320 H640" stroke="#2A3548" stroke-width="6"/>
+        <g font-size="13" text-anchor="middle" font-family="inherit">
+          <rect x="30" y="90" width="110" height="60" rx="8" fill="rgba(255,167,38,.16)" stroke="#FFA726"/><text x="85" y="125" fill="#FFA726">본관 · 主楼</text>
+          <rect x="30" y="190" width="110" height="60" rx="8" fill="rgba(77,166,255,.14)" stroke="#4DA6FF"/><text x="85" y="225" fill="#4DA6FF">도서관 · 图书馆</text>
+          <rect x="30" y="290" width="110" height="50" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="85" y="320" fill="#3DDC84">기숙사 · 宿舍</text>
+          <rect x="200" y="90" width="150" height="70" rx="8" fill="rgba(255,77,79,.14)" stroke="#FF4D4F"/><text x="275" y="120" fill="#FF4D4F">항공실습관</text><text x="275" y="142" fill="#FF4D4F" font-size="11">航空实训楼</text>
+          <rect x="390" y="90" width="120" height="60" rx="8" fill="rgba(255,213,74,.13)" stroke="#FFD54A"/><text x="450" y="125" fill="#FFD54A">체육관 · 体育馆</text>
+          <rect x="540" y="90" width="80" height="60" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="580" y="120" fill="#3DDC84">안전체험관</text><text x="580" y="140" fill="#3DDC84" font-size="11">安全体验馆</text>
+          <rect x="390" y="200" width="120" height="60" rx="8" fill="rgba(77,166,255,.12)" stroke="#4DA6FF"/><text x="450" y="235" fill="#4DA6FF">공학관 · 工学院</text>
+          <rect x="540" y="200" width="80" height="60" rx="8" fill="rgba(255,167,38,.12)" stroke="#FFA726"/><text x="580" y="230" fill="#FFA726">학생식당</text><text x="580" y="250" fill="#FFA726" font-size="11">食堂</text>
+          <rect x="200" y="200" width="150" height="60" rx="8" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.2)"/><text x="275" y="235" fill="#8B93A7">운동장 · 运动场</text>
+          <rect x="30" y="140" width="30" height="30" fill="none" stroke="#FFA726" stroke-dasharray="4 3"/><text x="45" y="160" font-size="11" fill="#FFA726">正门</text>
+        </g>
+        <g fill="#3DDC84">
+          <circle cx="90" cy="108" r="3"><animate attributeName="r" values="2;4;2" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="120" cy="150" r="3"><animate attributeName="r" values="3;5;3" dur="2.6s" repeatCount="indefinite"/></circle>
+          <circle cx="260" cy="112" r="3"><animate attributeName="r" values="2;4;2" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="420" cy="115" r="3"><animate attributeName="r" values="3;5;3" dur="2.2s" repeatCount="indefinite"/></circle>
+          <circle cx="560" cy="112" r="3"><animate attributeName="r" values="2;4;2" dur="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="60" cy="300" r="3"><animate attributeName="r" values="3;5;3" dur="2.8s" repeatCount="indefinite"/></circle>
+        </g>
+      </svg>`)}
+    ${panel('今日校园安全事件','实时联动',`<div class="row-list">
+      <div class="rl-item"><span class="dot" style="background:#FFA726"></span><time>09:26</time><span>航空实训楼</span><b style="margin-left:auto">实验室门禁未关 · 已提醒</b></div>
+      <div class="rl-item"><span class="dot" style="background:#FF4D4F"></span><time>08:52</time><span>学生食堂</span><b style="margin-left:auto">消防通道占用 · 处置中</b></div>
+      <div class="rl-item"><span class="dot" style="background:#3DDC84"></span><time>08:10</time><span>图书馆</span><b style="margin-left:auto">早间巡检正常</b></div>
+      <div class="rl-item"><span class="dot" style="background:#4DA6FF"></span><time>07:45</time><span>正门</span><b style="margin-left:auto">入校高峰 · 闸机运行正常</b></div>
+    </div>`)}
+  </div>
+  ${panel('安全管理课程 · 产学研联动','示例数据 · 请替换为真实课程',`
+    <table class="alarm-table"><thead><tr><th>课程 / 项目</th><th>对象</th><th>时间</th><th>状态</th></tr></thead><tbody>
+    <tr><td>AI 安全监测实训（鹰眼 AI 平台）</td><td>[安全管理相关专业]</td><td>本周五 14:00</td><td><span class="lv b">报名中</span></td></tr>
+    <tr><td>消防安全实务演练</td><td>全校新生</td><td>下周二</td><td><span class="lv l">已排期</span></td></tr>
+    <tr><td>应急救护（CPR / AED）培训</td><td>教职工</td><td>每月第 2 周</td><td><span class="lv l">常态开展</span></td></tr>
+    <tr><td>施工现场安全见习（产学研基地）</td><td>高年级</td><td>学期内</td><td><span class="lv m">对接中</span></td></tr>
+    </tbody></table>
+    <div class="report-tip">🏛 产学研合作：鹰眼 AI × <b style="color:var(--hl)">경운대학교 산학협력단</b>（韩国庆云大学产学研合作团）· 平台数据接入校园安全管理与实训教学（演示）</div>`)}
+  `;
+};
+
+/* ⑩ PPE 防护检测（真实摄像头 + 真实警报） */
+let ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
+let ppeCamOn=false,ppeCamStream=null,ppeCanvas=null;
+MODULES.ppe=function(){
+  return `
+  <div class="filter-row"><span>防护装备：</span>
+    <button class="ai-chip on" data-g="helmet">安全帽</button>
+    <button class="ai-chip on" data-g="goggles">护目镜</button>
+    <button class="ai-chip on" data-g="gloves">手套</button>
+    <button class="ai-chip on" data-g="belt">安全带</button>
+    <button class="ai-chip on" data-g="vest">反光衣</button>
+    <span style="margin-left:auto">点击装备 = 模拟脱下（反光衣由摄像头真实识别）</span>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="pt"><b>📷 检测站 C-03 · 实时画面</b><span id="ppeCamState">摄像头未开启</span></div>
+      <div class="ppe-stage" id="ppeStage">
+        <video id="ppeVideo" autoplay playsinline muted style="width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E131D;display:block"></video>
+        <div id="ppeFallback" hidden style="position:absolute;inset:0"><svg id="ppeSvg" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%"></svg></div>
+        <div class="scan-move"></div>
+        <div class="rec-tag"><i></i>C-03 PPE 检测站 · <span id="ppeClock">--:--:--</span></div>
+        <div class="dbox" data-tag="人员" style="left:38%;top:16%;width:24%;height:64%"></div>
+        <div class="ppe-stamp" id="ppeStamp"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel"><div class="pt"><b>检测结果</b><span>AI 判定</span></div>
+        <div class="row-list" id="ppeResult"><div class="rl-item"><span style="color:var(--dim)">尚未开始检测</span></div></div>
+      </div>
+      <div class="panel"><div class="pt"><b>触发动作</b></div>
+        <div class="row-list">
+          <div class="rl-item"><span>🔊</span>现场声光报警器</div>
+          <div class="rl-item"><span>📲</span>推送安全员 / 负责人</div>
+          <div class="rl-item"><span>🚨</span>写入告警中心</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="ppeStart" style="width:100%">▶ 开始检测</button>
+      <button class="btn btn-ghost" id="ppeCamBtn" style="width:100%;margin-top:10px">📷 开启摄像头</button>
+    </div>
+  </div>
+  <p class="live-note">📷 本模板接入真实摄像头：<b>反光衣检测为真实图像判定</b>（画面中心区域亮度/颜色分析），其余装备为模拟开关；检测不通过将<b>真实触发警报</b>（警笛声 + 震动 + 系统通知 + 告警中心记录）。</p>`;
+};
+
+/* ---- 模块路由 ---- */
+let curMod='overview',consoleVisible=true;
+function showModule(m){
+  if(curMod==='ppe'&&window.ppeStop)window.ppeStop();
+  curMod=m;
+  cBody.classList.add('swap');
+  cBody.innerHTML=MODULES[m]();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>cBody.classList.remove('swap')));
+  $$('#cNav button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  afterRender[m]&&afterRender[m]();
+  if(m==='overview'){updateBell();updateKPIs();}
+  cBody.scrollTop=0;
+}
+const afterRender={
+  ppe(){
+    ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
+    const ppeStage=$('#ppeStage');
+    window.ppeStop=()=>{if(ppeCamStream){ppeCamStream.getTracks().forEach(t=>t.stop());ppeCamStream=null;}ppeCamOn=false;};
+    $('#ppeFallback').hidden=false;
+    renderPpeWorker();
+    $$('#cBody .ai-chip[data-g]').forEach(ch=>ch.addEventListener('click',()=>{
+      const g=ch.dataset.g;
+      ppeGear[g]=!ppeGear[g];
+      ch.classList.toggle('on',ppeGear[g]);
+      renderPpeWorker();
+    }));
+    $('#ppeCamBtn').addEventListener('click',()=>{
+      if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('当前浏览器不支持摄像头（演示环境）');return;}
+      navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false})
+      .then(stream=>{
+        ppeCamStream=stream;ppeCamOn=true;
+        const v=$('#ppeVideo');v.srcObject=stream;
+        $('#ppeCamState').textContent='摄像头已开启';
+        $('#ppeFallback').hidden=true;
+        $('#ppeCamBtn').textContent='📷 摄像头已开启';
+        toast('📷 摄像头已接入 · 反光衣将由真实图像判定');
+      })
+      .catch(()=>{toast('未获得摄像头权限 · 使用示意图模式');$('#ppeFallback').hidden=false;});
+    });
+    $('#ppeStart').addEventListener('click',()=>{
+      if('Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(e){}}
+      ppeStage.classList.remove('alarming','pass');
+      const st=$('#ppeStamp');st.className='ppe-stamp';
+      ppeStage.classList.add('scanning');
+      setTimeout(ppeJudge,1600);
+    });
+  },
+  overview(){
+    drawLine($('#cvTrend'),[8,12,9,15,11,18,14,23,17,13,10,16],'#FFA726',true);
+    const kv=$('#kvList');
+    const news=[['08:12','B-01 吊装区','吊装作业开始 · AI 监护中','#3DDC84'],['08:06','E-01 环境站','PM2.5 达标 · 喷淋待命','#3DDC84'],['07:58','C-03 塔吊东侧','未佩戴安全帽 · 已推送安全员','#FF4D4F'],['07:41','A-02 3号楼','高处作业安全带已确认','#3DDC84'],['07:30','全场','晨会安全交底完成 · 863 人在场','#4DA6FF']];
+    kv.innerHTML=news.map(n=>`<div class="rl-item"><span class="dot" style="background:${n[3]}"></span><time>${n[0]}</time><span>${n[1]}</span><b style="margin-left:auto">${n[2]}</b></div>`).join('');
+  },
+  video(){
+    renderBigCam(0);
+    $('#camGrid').addEventListener('click',e=>{
+      const cell=e.target.closest('.camcell');
+      if(cell)renderBigCam(+cell.dataset.c);
+    });
+    $$('.ai-chip[data-t]').forEach(ch=>ch.addEventListener('click',()=>{
+      const t=ch.dataset.t;
+      aiOn[t]=!aiOn[t];
+      ch.classList.toggle('on',aiOn[t]);
+      $$('#cBody .dbox').forEach(b=>{if(b.dataset.t===t)b.classList.toggle('off',!aiOn[t]);});
+      persist();
+    }));
+    $('#bigAxis').addEventListener('input',()=>{
+      const v=+$('#bigAxis').value;
+      $('#bigAxisT').textContent=v>=100?'实时':'回放 08:'+pad(Math.round(v*0.4+10))+' 片段';
+    });
+  },
+  alarm(){
+    renderAlarmTable();
+    $$('#cBody .ai-chip[data-f]').forEach(ch=>ch.addEventListener('click',()=>{alarmFilter=ch.dataset.f;showModule('alarm');}));
+    $('#alarmTypeSel').addEventListener('change',renderAlarmTable);
+    $('#alarmTbody').addEventListener('click',e=>{
+      const btn=e.target.closest('.mini-btn');
+      if(!btn||btn.dataset.i==null)return;
+      const a=ALARMS[+btn.dataset.i];
+      a.st=1;
+      toast('✓ 告警已处置：'+a.type+' · 已通知复查');
+      renderAlarmTable();
+      updateBell();updateKPIs();persist();
+    });
+    /* donut */
+    const cv=$('#cvDonut'),ctx=cv.getContext('2d');
+    const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+    cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+    const data=[14,9,6,5,3],cols=['#FF4D4F','#FFD54A','#4DA6FF','#3DDC84','#8B93A7'];
+    const total=data.reduce((a,b)=>a+b,0),cx0=W/2,cy0=H/2,r0=Math.min(W,H)/2-12;
+    let start=-Math.PI/2;
+    data.forEach((v,i)=>{
+      const ang=v/total*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx0,cy0);
+      ctx.arc(cx0,cy0,r0,start,start+ang);
+      ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();
+      start+=ang;
+    });
+    ctx.beginPath();ctx.arc(cx0,cy0,r0*.55,0,6.283);ctx.fillStyle='#161B27';ctx.fill();
+    ctx.fillStyle='#F2F4F8';ctx.font='bold 22px sans-serif';ctx.textAlign='center';
+    ctx.fillText(total+' 起',cx0,cy0+2);
+    ctx.fillStyle='#8B93A7';ctx.font='12px sans-serif';ctx.fillText('本周告警',cx0,cy0+22);
+  },
+  people(){
+    $('#fenceBtn').addEventListener('click',()=>{
+      fenceOn=!fenceOn;
+      toast(fenceOn?'🛡 电子围栏已布防 · 越界将实时告警':'电子围栏已关闭');
+      persist();
+      showModule('people');
+    });
+    $$('#sitemap .pdot').forEach(dot=>dot.addEventListener('click',e=>{
+      e.stopPropagation();
+      const w=WORKERS[+dot.dataset.i];
+      const old=$('.worker-card');if(old)old.remove();
+      const card=document.createElement('div');
+      card.className='worker-card';
+      card.innerHTML=`<button class="close">✕</button><b>${w.n}</b><span style="color:var(--dim);margin-left:6px">${w.r}</span>
+        <div class="row"><span>进场时间</span><i>2025-03-12</i></div>
+        <div class="row"><span>今日工时</span><i>${rnd(4,9).toFixed(1)} h</i></div>
+        <div class="row"><span>培训状态</span><i style="color:var(--grn)">已通过 · 2026-08</i></div>
+        <div class="row"><span>今日告警</span><i>${Math.random()<.5?0:1} 次</i></div>`;
+      card.style.left=Math.min(+w.x+6,78)+'%';
+      card.style.top=Math.min(+w.y+4,60)+'%';
+      $('#sitemap').appendChild(card);
+      card.querySelector('.close').addEventListener('click',()=>card.remove());
+    }));
+    $('#sitemap').addEventListener('click',()=>{const old=$('.worker-card');if(old)old.remove();});
+  },
+  machine(){
+    drawLine($('#cvPit'),pitData,'#FFD54A',true);
+  },
+  env(){
+    drawLine($('#cvEnv'),envHistory,'#FFA726',true);
+    const log=$('#envLog');
+    const logs=[['08:14','PM2.5 62 μg/m³ · 喷淋自动开启','#4DA6FF'],['07:52','噪声 68 dB · 临近限值关注','#FFD54A'],['07:30','PM10 88 · 洒水车已调度','#FFA726'],['07:05','全部指标正常 · 监测站自检通过','#3DDC84']];
+    log.innerHTML=logs.map(l=>`<div class="rl-item"><span class="dot" style="background:${l[2]}"></span><time>${l[0]}</time><b>${l[1]}</b></div>`).join('');
+    $('#sprayBtn').addEventListener('click',()=>{
+      sprayOn=!sprayOn;
+      toast(sprayOn?'💦 喷淋联动已开启（模拟）':'喷淋已关闭');
+      $('#sprayBtn').classList.toggle('on',sprayOn);
+      $('#sprayBtn').textContent=sprayOn?'喷淋开启中（模拟）':'手动触发喷淋';
+    });
+  },
+  hazard(){
+    renderHz();
+    $('#hzTbody').addEventListener('click',e=>{
+      const btn=e.target.closest('.mini-btn');
+      if(!btn)return;
+      const h=hazards.find(x=>x.id===+btn.dataset.hz);
+      if(btn.dataset.act==='1'){h.st=1;toast('🛠 隐患进入整改：'+h.type+' · 已指派责任人');}
+      else{h.st=2;toast('✓ 复查通过 · 隐患已闭环归档');}
+      persist();updateKPIs();
+      showModule('hazard');
+    });
+    $('#hzAdd').addEventListener('click',()=>{
+      $('#modalCard').innerHTML=`<h3>新增隐患上报</h3>
+        <div class="mfield"><label>位置</label><input id="mLoc" placeholder="如：2号楼 5F 电梯井"></div>
+        <div class="mfield"><label>类型</label><select id="mType"><option>临边防护缺失</option><option>用电安全</option><option>消防设施</option><option>机械防护</option><option>文明施工</option></select></div>
+        <div class="mfield"><label>描述</label><input id="mDesc" placeholder="简要描述隐患情况"></div>
+        <button class="btn btn-primary" id="mSave">提交上报</button>`;
+      $('#modal').classList.add('show');
+      $('#mSave').addEventListener('click',()=>{
+        const loc=$('#mLoc').value.trim(),desc=$('#mDesc').value.trim();
+        if(!loc){toast('请填写隐患位置');return;}
+        hazards.unshift({id:hazards.length+1,loc,type:$('#mType').value,st:0,who:'我',desc});
+        $('#modal').classList.remove('show');
+        toast('已上报隐患 · 进入待整改');
+        persist();updateKPIs();
+        showModule('hazard');
+      });
+    });
+  },
+  report(){
+    drawBars($('#cvWeek'),[32,28,36,24,30,22,26],'#FFA726');
+    const cv=$('#cvPie'),ctx=cv.getContext('2d');
+    const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+    cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+    const data=[45,22,18,15],cols=['#FF4D4F','#FFD54A','#4DA6FF','#3DDC84'];
+    const total=data.reduce((a,b)=>a+b,0),cx0=W/2,cy0=H/2,r0=Math.min(W,H)/2-12;
+    let start=-Math.PI/2;
+    data.forEach((v,i)=>{
+      const ang=v/total*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx0,cy0);ctx.arc(cx0,cy0,r0,start,start+ang);ctx.closePath();
+      ctx.fillStyle=cols[i];ctx.fill();start+=ang;
+    });
+    ctx.beginPath();ctx.arc(cx0,cy0,r0*.5,0,6.283);ctx.fillStyle='#161B27';ctx.fill();
+    ctx.fillStyle='#F2F4F8';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText(total+'%',cx0,cy0+2);
+    ctx.fillStyle='#8B93A7';ctx.font='11px sans-serif';ctx.fillText('风险类型占比',cx0,cy0+20);
+    $('#exportBtn').addEventListener('click',()=>toast('⬇ 报表导出中……（演示环境，请接入真实系统导出）'));
+    $('#dailyBtn').addEventListener('click',()=>{
+      const d=new Date();
+      const dateStr=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+      $('#modalCard').innerHTML=`<h3>🤖 今日 AI 巡检日报</h3>
+        <div style="margin-bottom:10px;font-size:13px;color:var(--dim)">${dateStr} · 高新区城市更新项目 · 二标段 · 晴 26℃</div>
+        <div class="report-row"><span>视频巡检点位</span><i>148 / 148 完成</i></div>
+        <div class="report-row"><span>AI 识别事件</span><i>${ALARMS.length} 起</i></div>
+        <div class="report-row"><span>已闭环处置</span><i style="color:var(--grn)">${ALARMS.filter(a=>a.st).length} 起</i></div>
+        <div class="report-row"><span>隐患整改进度</span><i style="color:var(--yel)">${hazards.filter(h=>h.st===1).length} 项整改中</i></div>
+        <div class="report-row"><span>环境监测</span><i>PM2.5 ${Math.round(env.pm25)} μg/m³ · ${env.pm25>75?'超标，喷淋已联动':'达标'}</i></div>
+        <div class="report-tip">📌 重点提示：基坑临边为今日高风险区域，建议明日加密巡检频次；塔吊吊装时段请保持警戒区清场。</div>
+        <div class="report-tip" style="color:var(--dim2)">* 本报告由 AI 自动汇总生成（演示）· 真实部署接入巡检与告警数据库后自动生成</div>
+        <div style="margin-top:16px;display:flex;gap:12px">
+          <button class="btn btn-primary" id="mArchive" style="flex:1">打印 / 存档（演示）</button>
+          <button class="btn btn-ghost" id="mClose2" style="flex:1">关闭</button>
+        </div>`;
+      $('#modal').classList.add('show');
+      $('#mArchive').addEventListener('click',()=>{toast('📄 日报已归档（演示）');$('#modal').classList.remove('show');});
+      $('#mClose2').addEventListener('click',()=>$('#modal').classList.remove('show'));
+    });
+  }
+};
+/* ---- PPE 检测核心逻辑 ---- */
+function renderPpeWorker(){
+  const svg=$('#ppeSvg');
+  if(!svg)return;
+  svg.innerHTML=`<rect width="480" height="360" fill="var(--sky2)"/>
+    <rect y="300" width="480" height="60" fill="#0E141F"/>
+    <g stroke="#3A4A63" stroke-width="7"><path d="M40 300 V120 H440 V300"/><path d="M40 160 H440 M40 200 H440 M40 240 H440"/></g>
+    ${workerSVG(240,190,1.15,{helmet:ppeGear.helmet,vest:ppeGear.vest,goggles:ppeGear.goggles,gloves:ppeGear.gloves,belt:ppeGear.belt})}`;
+}
+function detectVest(){
+  const v=$('#ppeVideo');
+  if(!v||!v.videoWidth||!ppeCamOn)return null;
+  if(!ppeCanvas)ppeCanvas=document.createElement('canvas');
+  const vw=v.videoWidth,vh=v.videoHeight;
+  ppeCanvas.width=vw;ppeCanvas.height=vh;
+  const ctx=ppeCanvas.getContext('2d');
+  ctx.drawImage(v,0,0,vw,vh);
+  const x0=Math.floor(vw*0.38),x1=Math.floor(vw*0.62);
+  const y0=Math.floor(vh*0.30),y1=Math.floor(vh*0.62);
+  const img=ctx.getImageData(x0,y0,x1-x0,y1-y0);
+  const d=img.data;
+  let bright=0,orange=0,n=0;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const lum=(r+g+b)/3;
+    bright+=lum;
+    if(lum>110&&r>110&&g>70&&b<130&&r>b+30)orange++;
+    n++;
+  }
+  const avg=bright/n,ratio=orange/n;
+  return {avg,ratio,pass:avg>100&&ratio>0.10};
+}
+function ppeSiren(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    const ctx=ppeSiren.ctx||(ppeSiren.ctx=new AC());
+    ctx.resume();
+    for(let i=0;i<3;i++){
+      const t=ctx.currentTime+i*0.9;
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='square';
+      o.frequency.setValueAtTime(880,t);
+      o.frequency.setValueAtTime(620,t+0.4);
+      g.gain.setValueAtTime(0.001,t);
+      g.gain.exponentialRampToValueAtTime(0.25,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.82);
+      o.connect(g).connect(ctx.destination);
+      o.start(t);o.stop(t+0.85);
+    }
+  }catch(e){}
+}
+function ppeJudge(){
+  const stage=document.getElementById('ppeStage');
+  stage.classList.remove('scanning');
+  const missing=[];
+  [['helmet','安全帽'],['goggles','护目镜'],['gloves','手套'],['belt','安全带']].forEach(g=>{
+    if(!ppeGear[g[0]])missing.push(g[1]);
+  });
+  let vestResult='通过',vestOK=true;
+  if(ppeCamOn){
+    const v=detectVest();
+    if(v===null){vestOK=true;vestResult='—';}
+    else{vestOK=v.pass;vestResult=v.pass?'通过':'未检测到反光衣';}
+  }else if(!ppeGear.vest){vestOK=false;vestResult='未检测到反光衣';}
+  const resultEl=$('#ppeResult');
+  const rows=[['helmet','安全帽',!missing.includes('安全帽')],['goggles','护目镜',!missing.includes('护目镜')],['gloves','手套',!missing.includes('手套')],['belt','安全带',!missing.includes('安全带')],['vest','反光衣',vestOK]];
+  resultEl.innerHTML=rows.map(r=>`
+    <div class="rl-item"><span class="dot" style="background:${r[2]?'var(--grn)':'var(--red)'}"></span><span>${r[1]}</span>
+    <b style="margin-left:auto;color:${r[2]?'var(--grn)':'var(--red)'}">${r[2]?'✓ 通过':(r[0]==='vest'&&ppeCamOn?'✗ 真实图像判定未通过':'✗ 缺失')}</b></div>`).join('');
+  const stamp=$('#ppeStamp');
+  if(!missing.length&&vestOK){
+    stage.classList.add('pass');
+    stamp.textContent='✓ 检测通过';
+    stamp.className='ppe-stamp good show';
+    toast('✅ PPE 检测通过 · 允许进入作业区');
+    if(navigator.vibrate)navigator.vibrate(40);
+  }else{
+    stage.classList.add('alarming');
+    stamp.textContent='⚠ 防护缺失 '+(missing.length+(vestOK?0:1))+' 项';
+    stamp.className='ppe-stamp bad show';
+    ppeSiren();
+    if(navigator.vibrate)navigator.vibrate([200,100,200,100,500]);
+    const all=missing.slice();
+    if(!vestOK)all.push('反光衣');
+    if('Notification' in window&&Notification.permission==='granted'){
+      try{new Notification('鹰眼AI 现场警报',{body:'未检测到 '+all.join('、')+' · C-03 检测站',tag:'ppe'});}catch(e){}
+    }
+    raiseAlarm('C-03 PPE检测站','未检测到 '+all[0]+(all.length>1?' 等'+all.length+'项':''),'h','高风险');
+    toast('🚨 警报已触发：'+all.join('、'));
+  }
+}
+$$('#cNav button').forEach(b=>b.addEventListener('click',()=>showModule(b.dataset.m)));
+new IntersectionObserver(e=>consoleVisible=e[0].isIntersecting).observe($('#consoleBox'));
+
+/* 驾驶舱全局模拟时钟 */
+setInterval(()=>{
+  if(!consoleVisible)return;
+  tickN++;
+  /* 随机新告警：全模块联动演示 */
+  if(tickN%38===0){
+    const p=feedPool[Math.floor(Math.random()*feedPool.length)];
+    const lvMap={'高':'h','中':'m','低':'l'},tMap={'高':'高风险','中':'警戒','低':'低'};
+    raiseAlarm(p[1],p[0],lvMap[p[2]],tMap[p[2]]);
+  }
+  const t=$('#bigTime');if(t)t.textContent=nowStr();
+  if(curMod==='ppe'){const pc=$('#ppeClock');if(pc)pc.textContent=nowStr();}
+  if(curMod==='people')moveWorkers();
+  if(curMod==='machine'){
+    tower.load=Math.max(.8,Math.min(4.8,tower.load+rnd(-.15,.15)));
+    tower.torque=Math.max(30,Math.min(96,tower.torque+rnd(-2,2)));
+    tower.wind=Math.max(1,Math.min(10,tower.wind+rnd(-.3,.3)));
+    tower.angle=(tower.angle+rnd(1,3))%360;
+    lift.load=Math.max(.4,Math.min(1.9,lift.load+rnd(-.08,.08)));
+    lift.people=Math.max(2,Math.min(9,lift.people+(Math.random()<.3?(Math.random()<.5?1:-1):0)));
+    lift.height=Math.max(2,Math.min(60,lift.height+rnd(-1.5,1.5)));
+    const upd=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+    upd('#gLoad',`${gaugeSVG(tower.load/5,'#FFA726')}`);/* 重新注入 svg */
+    const gLoad=$('#gLoad');if(gLoad){gLoad.innerHTML=gaugeSVG(tower.load/5,'#FFA726');gLoad.parentElement.querySelector('.gv').innerHTML=tower.load.toFixed(1)+'<span style="font-size:12px;color:var(--dim)"> t</span>';}
+    const gTorque=$('#gTorque');if(gTorque){gTorque.innerHTML=gaugeSVG(tower.torque/100,'#4DA6FF');gTorque.parentElement.querySelector('.gv').innerHTML=Math.round(tower.torque)+'<span style="font-size:12px;color:var(--dim)"> %</span>';}
+    const gLiftLoad=$('#gLiftLoad');if(gLiftLoad){gLiftLoad.innerHTML=gaugeSVG(lift.load/2,'#3DDC84');gLiftLoad.parentElement.querySelector('.gv').innerHTML=lift.load.toFixed(1)+'<span style="font-size:12px;color:var(--dim)"> t</span>';}
+    const gLiftP=$('#gLiftP');if(gLiftP){gLiftP.innerHTML=gaugeSVG(lift.people/9,'#FFD54A');gLiftP.parentElement.querySelector('.gv').innerHTML=lift.people+'<span style="font-size:12px;color:var(--dim)"> 人</span>';}
+    const tw=$('#tWind');if(tw)tw.textContent=tower.wind.toFixed(1)+' m/s';
+    const ta=$('#tAngle');if(ta)ta.textContent=tower.angle+'°';
+    const lh=$('#lHeight');if(lh)lh.textContent=lift.height.toFixed(0)+' m';
+    pitData.push(pitData[pitData.length-1]+rnd(-.15,.15));pitData.shift();
+    const cvP=$('#cvPit');if(cvP)drawLine(cvP,pitData,'#FFD54A',true);
+  }
+  if(curMod==='env'){
+    envTick();
+    envHistory.push(env.pm25);envHistory.shift();
+    const cvE=$('#cvEnv');if(cvE)drawLine(cvE,envHistory,'#FFA726',true);
+  }
+},1200);
+
+/* ============================================================
+   AI 识别能力卡（四步闭环）
+   ============================================================ */
+function cardScene(type){
+  const G='<rect width="480" height="360" fill="var(--sky2)"/>';
+  if(type==='helmet')return{
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="7"><path d="M40 300 V120 H440 V300"/><path d="M40 160 H440 M40 200 H440 M40 240 H440"/></g>${workerSVG(240,196,1,{helmet:false})}<rect x="150" y="238" width="180" height="62" fill="#1A2434"/><circle cx="190" cy="250" r="6" fill="#FFA726" opacity=".4"/><circle cx="290" cy="250" r="6" fill="#FFA726" opacity=".4"/>`,
+    box:{cls:'',style:'left:44%;top:26%;width:24%;height:34%'},
+    chip:{cls:'red',text:'未佩戴安全帽',style:'left:44%;top:18%'}
+  };
+  if(type==='crane')return{
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><g stroke="#FFD54A" stroke-width="3" opacity=".85"><path d="M60 300 L420 300" stroke-dasharray="14 10"/></g><g stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 300 V60"/><path d="M300 60 H430"/><path d="M430 60 V96 M430 96 H472 M472 96 V110" stroke-width="7"/></g><g style="transform-origin:300px 60px;animation:crane 8s ease-in-out infinite" stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 60 H170"/><path d="M170 60 V92 M170 92 H140 M140 92 V106" stroke-width="7"/></g><path d="M296 110 h8 l-4 12 z" fill="#FFD54A"/>${workerSVG(240,224,1,{})}<text x="320" y="292" fill="#FFD54A" font-size="15" letter-spacing="2">警戒线</text>`,
+    box:{cls:'y',style:'left:38%;top:40%;width:26%;height:34%'},
+    chip:{cls:'yel',text:'进入吊装警戒区 · 3.2m',style:'left:34%;top:30%'}
+  };
+  if(type==='harness')return{
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><rect x="120" y="150" width="240" height="150" fill="#1A2434"/><g stroke="#3A4A63" stroke-width="7"><path d="M120 150 H360 V300 M120 150 V300 M360 150 V300"/><path d="M120 200 H360 M120 250 H360"/></g><rect x="160" y="170" width="60" height="30" fill="#2A3548"/><rect x="160" y="260" width="60" height="30" fill="#2A3548"/>${workerSVG(240,210,1,{})}<path d="M262 216 q18 10 26 26" stroke="#FFA726" stroke-width="4" fill="none" stroke-dasharray="6 5"/>`,
+    box:{cls:'o',style:'left:40%;top:38%;width:22%;height:32%'},
+    chip:{cls:'org',text:'高处作业未系安全带',style:'left:37%;top:30%'}
+  };
+  return{
+    svg:`<rect width="480" height="360" fill="#060910"/><circle cx="70" cy="64" r="22" fill="#C9E4FF" opacity=".9"/><rect y="300" width="480" height="60" fill="#0A0E15"/><g stroke="#1E2A3E" stroke-width="7"><path d="M60 300 V140 H420 V300"/><path d="M60 190 H420 M60 240 H420"/></g>${workerSVG(240,206,1,{vest:false,dark:true})}<text x="60" y="120" fill="#3DDC84" font-size="14" letter-spacing="3">NIGHT MODE</text>`,
+    box:{cls:'g',style:'left:43%;top:36%;width:24%;height:32%'},
+    chip:{cls:'grn',text:'未穿反光背心',style:'left:42%;top:27%'}
+  };
+}
+const SCENES=[
+  {type:'helmet',name:'未佩戴安全帽',lv:'r',lvT:'高风险'},
+  {type:'crane',name:'闯入吊装警戒区',lv:'y',lvT:'警戒'},
+  {type:'harness',name:'高处作业未系安全带',lv:'o',lvT:'高风险'},
+  {type:'vest',name:'夜班未穿反光背心',lv:'g',lvT:'夜间模式'}
+];
+const sceneWrap=$('#sceneWrap');
+SCENES.forEach((s,idx)=>{
+  const sc=cardScene(s.type);
+  const card=document.createElement('div');
+  card.className='card rv';
+  card.innerHTML=`
+    <div class="card-vis">
+      <svg viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice">${sc.svg}</svg>
+      <div class="sbox ${sc.box.cls}" style="${sc.box.style}"></div>
+      <div class="chip ${sc.chip.cls}" style="${sc.chip.style}">${sc.chip.text}</div>
+      <div class="scan-move"></div>
+      <div class="alarm"><span class="bell">🔔</span><span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
+      <div class="done-stamp">✓ 已处置闭环</div>
+    </div>
+    <div class="card-foot">
+      <div class="card-name">${s.name}<span class="lv ${s.lv}">${s.lvT}</span></div>
+      <div class="steps">${[['①','识别'],['②','判定'],['③','报警'],['④','闭环']].map((l,i)=>`<i data-s="${i}"><b>${l[0]}</b>${l[1]}</i>`).join('')}</div>
+    </div>`;
+  sceneWrap.appendChild(card);
+  io.observe(card);
+  const steps=Array.from(card.querySelectorAll('.steps i'));
+  let visible=false,phase=0;
+  new IntersectionObserver(es=>visible=es[0].isIntersecting).observe(card);
+  const run=()=>{
+    if(!visible||REDUCE)return;
+    card.className='card rv in';
+    steps.forEach((st,i)=>{st.classList.toggle('on',i===phase);st.classList.toggle('pass',i<phase);});
+    if(phase===0)card.classList.add('on');
+    if(phase===1){card.classList.remove('on');card.classList.add('judge');}
+    if(phase===2){card.classList.remove('judge');card.classList.add('alarm');}
+    if(phase===3){card.classList.remove('alarm');card.classList.add('done');}
+    phase=(phase+1)%4;
+    setTimeout(run,phase===0?2400:1700);
+  };
+  setTimeout(()=>run(),600+idx*400);
+});
+
+/* ============================================================
+   对比滑块
+   ============================================================ */
+function cmpScene(boxes){
+  return `<rect width="1200" height="600" fill="var(--sky2)"/><rect y="470" width="1200" height="130" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="8"><path d="M100 470 V250 H1100 V470"/><path d="M100 320 H1100 M100 390 H1100"/></g>${workerSVG(350,340,1.9,{helmet:false})}${workerSVG(600,380,1.6,{})}${workerSVG(800,350,1.7,{})}<g fill="#1A2434"><rect x="900" y="330" width="220" height="140"/><rect x="930" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="1020" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>${boxes}<text x="600" y="120" font-size="30" fill="#8B93A7" text-anchor="middle" letter-spacing="8">施工现场</text>`;
+}
+$('#cmpLeft').innerHTML=cmpScene('');
+$('#cmpRight').innerHTML=cmpScene(`
+  <rect x="300" y="300" width="110" height="150" fill="none" stroke="#FF4D4F" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1s" repeatCount="indefinite"/></rect>
+  <text x="305" y="288" fill="#FF4D4F" font-size="22">未佩戴安全帽</text>
+  <rect x="550" y="345" width="105" height="130" fill="none" stroke="#4DA6FF" stroke-width="4" stroke-dasharray="12 8"><animate attributeName="stroke-dashoffset" from="0" to="40" dur="1.2s" repeatCount="indefinite"/></rect>
+  <text x="555" y="333" fill="#4DA6FF" font-size="20">人员</text>
+  <rect x="740" y="310" width="120" height="140" fill="none" stroke="#FFA726" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1.1s" repeatCount="indefinite"/></rect>
+  <text x="745" y="298" fill="#FFA726" font-size="22">未系安全带</text>
+  <text x="600" y="560" font-size="24" fill="#3DDC84" text-anchor="middle" letter-spacing="4">AI 已识别 3 处风险 · 已报警</text>`);
+const cmp=$('#cmp');
+let dragging=false;
+function setCmpP(clientX){
+  const r=cmp.getBoundingClientRect();
+  const p=Math.max(4,Math.min(96,(clientX-r.left)/r.width*100));
+  cmp.style.setProperty('--p',p+'%');
+}
+cmp.addEventListener('pointerdown',e=>{dragging=true;setCmpP(e.clientX);cmp.setPointerCapture(e.pointerId);});
+cmp.addEventListener('pointermove',e=>{if(dragging)setCmpP(e.clientX);});
+cmp.addEventListener('pointerup',()=>dragging=false);
+
+/* ============================================================
+   数据卡（真实数据一处配置）
+   ============================================================ */
+const metricIO=new IntersectionObserver(es=>es.forEach(en=>{
+  if(!en.isIntersecting)return;
+  const m=en.target;m.classList.add('in');
+  const real=[REAL_DATA.accuracy,REAL_DATA.response,REAL_DATA.cameras,REAL_DATA.sites][+m.dataset.i];
+  if(real!=null&&!REDUCE){
+    const numEl=m.querySelector('.num');
+    const unit=numEl.querySelector('.unit').outerHTML;
+    const dur=1600,t0=performance.now();
+    const step=t=>{
+      const p=Math.min(1,(t-t0)/dur),ease=1-Math.pow(1-p,3);
+      numEl.innerHTML=(real*ease).toFixed(real%1?1:0)+unit;
+      if(p<1)requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  metricIO.unobserve(m);
+}),{threshold:.5});
+$$('.metric').forEach(m=>metricIO.observe(m));
+
+/* modal 关闭 */
+$('#modal').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#modal').classList.remove('show');});
+
+/* ============================================================
+   产品导览（评委零门槛看懂全系统）
+   ============================================================ */
+const TOUR=[
+  {mod:'overview',title:'① 驾驶舱总览',desc:'一屏掌握全场态势：在册人员、今日告警、待处置隐患、设备在线率，还有小时告警趋势与区域风险热力图。',sel:'#cBody .kpis'},
+  {mod:'video',title:'② 视频 AI 识别',desc:'真实监控画面形态：点下方机位切换场景；用识别类型开关控制安全帽 / 反光衣 / 吸烟 / 越界检测，还能拖时间轴回放。',sel:'#cBody .bigview'},
+  {mod:'alarm',title:'③ 告警中心',desc:'告警按等级分类、可筛选；点「处理」完成闭环，处置率与推送触达率实时统计。',sel:'#cBody .grid-2'},
+  {mod:'people',title:'④ 人员定位',desc:'点地图上的绿点查看工人档案；开启基坑电子围栏后，人员闯入危险区立即触发越界告警。',sel:'#cBody .sitemap'},
+  {mod:'machine',title:'⑤ 机械设备监测',desc:'塔吊吊重与力矩、升降机载重与人数、基坑位移——数值实时波动，超限即报警。',sel:'#cBody .grid-3'},
+  {mod:'env',title:'⑥ 环境监测联动',desc:'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。',sel:'#cBody .gauge-grid'},
+  {mod:'hazard',title:'⑦ 隐患闭环治理',desc:'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。',sel:'#cBody .hz-stats'},
+  {mod:'report',title:'⑧ 数据报表',desc:'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。',sel:'#cBody .grid-2'},
+  {mod:'campus',title:'⑨ 庆云大学 · 校园管理',desc:'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。',sel:'#cBody .kpis'},
+  {mod:'ppe',title:'⑩ PPE 防护检测',desc:'脱掉某件防护装备再点检测——系统会真实播放警报声、震动并推送告警到告警中心。',sel:'#cBody .grid-2'}
+];
+let tourIdx=-1;
+const hole=document.createElement('div');hole.className='tour-hole';hole.style.display='none';document.body.appendChild(hole);
+const bubble=document.createElement('div');bubble.className='tour-bubble';bubble.style.display='none';document.body.appendChild(bubble);
+function tourPos(){
+  if(tourIdx<0)return;
+  const el=$(TOUR[tourIdx].sel);
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  if(r.bottom<80||r.top>innerHeight-80){el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(tourPos,450);return;}
+  hole.style.display='block';
+  hole.style.left=(r.left-6)+'px';hole.style.top=(r.top-6)+'px';
+  hole.style.width=(r.width+12)+'px';hole.style.height=(r.height+12)+'px';
+  const bw=Math.min(bubble.offsetWidth||380,innerWidth-24),bh=bubble.offsetHeight||200;
+  let bx=Math.min(Math.max(r.left+r.width/2-bw/2,10),innerWidth-bw-10);
+  let by=r.bottom+16;
+  if(by+bh>innerHeight-14)by=r.top-bh-16;
+  bubble.style.left=bx+'px';bubble.style.top=Math.max(10,by)+'px';
+}
+function tourEnd(){
+  tourIdx=-1;
+  hole.style.display='none';bubble.style.display='none';
+}
+function tourGo(i){
+  tourIdx=i;
+  if(tourIdx<0||tourIdx>=TOUR.length){tourEnd();return;}
+  const s=TOUR[tourIdx];
+  showModule(s.mod);
+  bubble.style.display='block';
+  bubble.innerHTML=`<span class="tb-step">产品导览 ${i+1} / ${TOUR.length}</span>
+    <h3>${s.title}</h3><p>${s.desc}</p>
+    <div class="tb-btns">
+      <div class="tour-dots">${TOUR.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
+      <button class="btn btn-primary" id="tbNext">${i===TOUR.length-1?'完成 ✓':'下一步 →'}</button>
+      <button class="btn btn-ghost" id="tbPrev" ${i===0?'style="opacity:.4"':''}>← 上一步</button>
+      <span class="tb-skip" id="tbSkip">跳过导览</span>
+    </div>`;
+  bubble.querySelector('#tbNext').addEventListener('click',()=>{if(i===TOUR.length-1){tourEnd();toast('🎉 导览完成 · 现在可以自由操作每个模块');}else tourGo(i+1);});
+  bubble.querySelector('#tbPrev').addEventListener('click',()=>{if(i>0)tourGo(i-1);});
+  bubble.querySelector('#tbSkip').addEventListener('click',tourEnd);
+  setTimeout(tourPos,420);
+}
+function tourStart(){
+  $('#consoleBox').scrollIntoView({block:'start',behavior:'smooth'});
+  setTimeout(()=>tourGo(0),600);
+}
+$('#tourBtn').addEventListener('click',tourStart);
+$('#fsBtn').addEventListener('click',()=>{
+  if(!document.fullscreenElement)$('#consoleBox').requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+});
+$('#topBell').addEventListener('click',()=>{showModule('alarm');toast('🔔 当前 '+ALARMS.filter(a=>!a.st).length+' 条告警待处置');});
+addEventListener('scroll',()=>{if(tourIdx>=0)tourPos();},{passive:true});
+addEventListener('resize',()=>{if(tourIdx>=0)tourPos();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&tourIdx>=0)tourEnd();});
+
+/* ============================================================
+   现场事实监控 LIVE
+   ============================================================ */
+const liveCamsEl=$('#liveCams');
+if(liveCamsEl){
+  const LIVE_CAMS=[['C-01','工地出入口','gate'],['B-01','吊装区','crane'],['D-05','基坑临边','pit'],['E-03','材料加工区','yard']];
+  liveCamsEl.innerHTML=LIVE_CAMS.map((c,i)=>`
+    <div class="camcell">
+      <div class="v"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(c[2])}</svg>
+        <div class="rec-tag"><i></i>${c[0]} · ${c[1]} · <span id="liveClock${i}">${nowStr()}</span></div>
+        ${DBOXES[c[2]].map((b,j)=>`<div class="dbox ${b.cls}" data-tag="${b.tag}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('')}
+      </div>
+      <div class="meta"><b>${c[1]}</b><span>● 直播中（模拟流）</span></div>
+    </div>`).join('');
+  const devs=[['1# 塔吊',true],['2# 施工升降机',true],['雾炮喷淋',true],['闸机通道',true],['环境监测站',true],['应急广播',true],['2# 塔吊',false]];
+  $('#liveDevs').innerHTML=devs.map(d=>`<div class="dev-row"><span>${d[0]}</span><i class="${d[1]?'on':''}">${d[1]?'● 在线':'○ 检修'}</i></div>`).join('');
+  const ll=$('#liveAlertList');
+  const livePush=()=>{
+    const e=feedPool[feedSeq++%feedPool.length];
+    const d=new Date();
+    const col=e[2]==='高'?'#FF4D4F':e[2]==='中'?'#FFD54A':'#3DDC84';
+    ll.insertAdjacentHTML('afterbegin',`<div class="rl-item"><span class="dot" style="background:${col}"></span><time>${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</time><span>${e[1]}</span><b style="margin-left:auto">${e[0]}</b></div>`);
+    while(ll.children.length>6)ll.lastChild.remove();
+  };
+  livePush();setInterval(livePush,4000);
+  const le={pm:58,no:64,wd:4.2,tp:26};
+  setInterval(()=>{
+    le.pm=Math.max(30,Math.min(110,le.pm+rnd(-3,3)));
+    le.no=Math.max(48,Math.min(92,le.no+rnd(-2,2)));
+    le.wd=Math.max(1,Math.min(10,le.wd+rnd(-.3,.3)));
+    le.tp=Math.max(21,Math.min(34,le.tp+rnd(-.2,.2)));
+    const s=(id,v,u)=>{const el=$(id);if(el)el.textContent=Math.round(v)+' '+u;};
+    s('#livePm25',le.pm,'μg/m³');s('#liveNoise',le.no,'dB(A)');s('#liveTemp',le.tp,'℃');
+    const w=$('#liveWind');if(w)w.textContent=le.wd.toFixed(1)+' m/s';
+  },1500);
+  setInterval(()=>{for(let i=0;i<4;i++){const c=$('#liveClock'+i);if(c)c.textContent=nowStr();}},1000);
+}
+
+/* 初始化 */
+showModule('overview');
+/* 语言切换绑定 + 初始应用 */
+$$('#langSw button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
+if(lang!=='zh')setLang(lang);
+else $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l==='zh'));
+/* 哈希路由：#ppe 直达 PPE 摄像头警报演示 */
+function hashRoute(){
+  if(location.hash==='#ppe'){
+    $('#consoleBox').scrollIntoView({block:'start',behavior:'smooth'});
+    showModule('ppe');
+    setTimeout(()=>{if(curMod==='ppe')toast('🧍 点「📷 开启摄像头」接入真人画面 → 脱掉装备 → 点「▶ 开始检测」触发真实警报');},700);
+  }
+}
+hashRoute();
+addEventListener('hashchange',hashRoute);
+/* 手机访问 → 推荐 App 版 */
+(function(){
+  if(matchMedia('(display-mode: standalone)').matches)return;
+  const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if(!mobile)return;
+  try{if(localStorage.getItem('eagleeye_mgate')==='skip')return;}catch(e){}
+  const gate=$('#mGate');
+  if(!gate)return;
+  gate.hidden=false;
+  $('#mGateSkip').addEventListener('click',()=>{gate.hidden=true;try{localStorage.setItem('eagleeye_mgate','skip');}catch(e){}});
+})();
+})();
+</script>
 </body>
 </html>
