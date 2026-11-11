@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>AEGIS 手表 · 安全腕表</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/watch.css">
+</head>
+<body>
+
+<div class="watch">
+  <!-- 表盘 1：时间 + 风险环 -->
+  <section class="w-screen w-face active" id="wFace">
+    <svg class="w-ring" viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="44"/>
+      <circle class="ring-val" id="wRiskRing" cx="50" cy="50" r="44"/>
+    </svg>
+    <div class="w-center">
+      <div class="w-time" id="wTime">--:--</div>
+      <div class="w-date" id="wDate">---</div>
+      <div class="w-risk" id="wRiskText">风险 低</div>
+    </div>
+    <div class="w-steps" id="wSteps">👣 巡检 0 步</div>
+    <div class="w-alert-dot" id="wAlertDot"></div>
+    <canvas class="w-pulse" id="wPulse"></canvas>
+    <div class="w-tips">◀ 左右滑动切换 ▶</div>
+  </section>
+
+  <!-- 表盘 2：传感器数据 -->
+  <section class="w-screen w-data" id="wData">
+    <h2>感知数据</h2>
+    <div class="w-sensor" id="wSensors"></div>
+    <div class="w-battery" id="wBattery">🔋 --%</div>
+  </section>
+
+  <!-- 表盘 3：预警列表 -->
+  <section class="w-screen w-alerts" id="wAlerts">
+    <h2>预警中心</h2>
+    <ul id="wAlertList"></ul>
+  </section>
+
+  <!-- 表盘 4：呼吸训练 -->
+  <section class="w-screen w-breathe" id="wBreathe">
+    <h2>呼吸训练</h2>
+    <div class="w-breathe-circle" id="wBreathCircle">
+      <span id="wBreathText">吸气</span>
+    </div>
+    <button class="w-btn" id="wBreathBtn">开始 4-7-8</button>
+  </section>
+</div>
+
+<div class="w-pager" aria-hidden="true">
+  <span class="on"></span><span></span><span></span><span></span>
+</div>
+
+<script src="js/watch.js"></script>
+</body>
+</html>
