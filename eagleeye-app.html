@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B0E13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="鹰眼AI">
+<title>鹰眼 AI · 工地安全 App</title>
+<link rel="manifest" href="manifest-eagleeye.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#0B0E13;--panel:#12161F;--panel2:#161B27;--line:rgba(255,255,255,.09);--hl:#FFA726;--red:#FF4D4F;--yel:#FFD54A;--grn:#3DDC84;--blue:#4DA6FF;--text:#F2F4F8;--dim:#8B93A7}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6;overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+svg{display:block}
+
+/* ===== 启动屏 ===== */
+.splash{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 40%,#141B2A,#080B11);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s,visibility .5s}
+.splash.hide{opacity:0;visibility:hidden}
+.splash .logo{animation:beat 1.2s ease infinite}
+@keyframes beat{50%{transform:scale(1.08)}}
+.splash b{font-size:22px;letter-spacing:.2em}
+.splash span{font-size:12px;color:var(--dim);letter-spacing:.3em}
+.splash .bar{width:120px;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}
+.splash .bar i{display:block;height:100%;width:0;background:var(--hl);animation:load 1.1s ease forwards}
+@keyframes load{to{width:100%}}
+
+/* ===== App 框架 ===== */
+.app{height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;position:relative}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0}
+header .logo{width:30px;height:30px}
+header b{font-size:16px;letter-spacing:.04em}
+header .sub{font-size:11px;color:var(--dim);display:block;letter-spacing:.08em}
+header .bell{margin-left:auto;position:relative;font-size:19px;padding:6px;border-radius:10px}
+header .bell i{position:absolute;top:3px;right:3px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:10px;font-style:normal;display:grid;place-items:center;padding:0 4px}
+header .bell i.zero{background:var(--dim)}
+header .clock{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:.05em}
+
+main{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.page{display:none;animation:pageIn .3s ease}
+.page.on{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* 通用 */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{font-size:14px;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 span{margin-left:auto;font-size:11px;color:var(--dim);letter-spacing:.05em}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi .v{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:11.5px;color:var(--dim);letter-spacing:.05em;margin-top:2px}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.06);font-size:13.5px}
+.row:last-child{border-bottom:none}
+.row .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.row time{font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.row b{margin-left:auto;font-weight:600;text-align:right}
+.lv{font-size:10px;padding:2px 8px;border-radius:12px;letter-spacing:.04em;white-space:nowrap}
+.lv.h{background:rgba(255,77,79,.14);color:var(--red)}
+.lv.m{background:rgba(255,213,74,.12);color:var(--yel)}
+.lv.l{background:rgba(61,220,132,.12);color:var(--grn)}
+.lv.b{background:rgba(77,166,255,.12);color:var(--blue)}
+.btn{display:block;width:100%;text-align:center;padding:12px;border-radius:11px;font-size:14.5px;font-weight:700;letter-spacing:.06em;background:linear-gradient(135deg,#FFB000,var(--hl));color:#1a1206}
+.btn:active{transform:scale(.98)}
+.ghost{border:1px solid var(--line);color:var(--dim);background:none;font-size:13px;padding:8px 14px;border-radius:9px}
+.ghost.on{border-color:var(--hl);color:var(--hl);background:rgba(255,167,38,.1)}
+
+/* 视频 */
+.cam{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel);margin-bottom:12px}
+.cam .v{position:relative;aspect-ratio:16/9;background:#0C1420;overflow:hidden}
+.cam .v svg{width:100%;height:100%}
+.cam .meta{display:flex;justify-content:space-between;padding:8px 12px;font-size:12px;color:var(--dim)}
+.cam .meta b{color:var(--text)}
+.rec{position:absolute;top:8px;left:10px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim);background:rgba(8,11,17,.65);padding:3px 9px;border-radius:6px}
+.rec i{width:7px;height:7px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.dbox{position:absolute;border:2px solid var(--blue);border-radius:4px;animation:track 4s ease-in-out infinite}
+.dbox::before{content:attr(data-tag);position:absolute;top:-20px;left:-2px;font-size:10px;color:#fff;background:rgba(77,166,255,.9);padding:1px 6px;border-radius:4px;white-space:nowrap}
+.dbox.red{border-color:var(--red)}.dbox.red::before{background:rgba(255,77,79,.92)}
+.dbox.yel{border-color:var(--yel)}.dbox.yel::before{background:rgba(255,213,74,.92);color:#231a05}
+.dbox.org{border-color:var(--hl)}.dbox.org::before{background:rgba(255,167,38,.94);color:#1a1206}
+@keyframes track{0%,100%{transform:translate(0,0)}30%{transform:translate(3px,-2px)}60%{transform:translate(-2px,2px)}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+
+/* 人员地图 */
+.map{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel);margin-bottom:12px}
+.map svg{width:100%}
+.pdot{position:absolute;width:13px;height:13px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--grn);border:2px solid #0B0E13;box-shadow:0 0 7px rgba(61,220,132,.7);transition:left 1s linear,top 1s linear}
+.pdot.warn{background:var(--red);box-shadow:0 0 9px rgba(255,77,79,.8)}
+.pdot::after{content:attr(data-n);position:absolute;left:14px;top:-3px;font-size:10.5px;color:var(--dim);white-space:nowrap}
+
+/* 我的 */
+.me-head{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.me-head .ava{width:52px;height:52px;border-radius:50%;background:rgba(255,167,38,.15);border:2px solid var(--hl);display:grid;place-items:center;font-size:24px}
+.me-head b{font-size:16px}
+.me-head span{font-size:12px;color:var(--dim);display:block}
+.menu .row{padding:12px 0;font-size:14px;cursor:pointer}
+.menu .row:active{opacity:.6}
+.badge-live{font-size:10.5px;color:var(--grn);border:1px solid rgba(61,220,132,.4);padding:2px 8px;border-radius:10px}
+
+/* 底部导航 */
+nav.tab{display:grid;grid-template-columns:repeat(5,1fr);background:var(--panel);border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));flex-shrink:0}
+nav.tab button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--dim);letter-spacing:.04em}
+nav.tab button .ic{font-size:19px;line-height:1}
+nav.tab button.on{color:var(--hl)}
+nav.tab button.on .ic{filter:drop-shadow(0 0 8px rgba(255,167,38,.7))}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(16px);background:var(--panel);border:1px solid rgba(255,167,38,.5);color:var(--text);padding:10px 20px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s;z-index:99;max-width:86%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <svg class="logo" viewBox="0 0 40 40" width="64" height="64"><path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="2.6" fill="#FFA726"/><path d="M20 5 L20 11 M20 27 L20 33 M6 13 L11 16 M34 13 L29 16" stroke="#FFA726" stroke-width="2" stroke-linecap="round"/></svg>
+  <b>鹰眼 AI</b>
+  <span>工地安全监管 · 경운대학교 산학협력</span>
+  <div class="bar"><i></i></div>
+</div>
+
+<div class="app">
+  <header>
+    <svg class="logo" viewBox="0 0 40 40"><path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="2.6" fill="#FFA726"/></svg>
+    <div><b>高新区城市更新项目</b><span class="sub">二标段 · 鹰眼AI v3.2</span></div>
+    <button class="bell" id="bellBtn">🔔<i id="bellN" class="zero">0</i></button>
+    <span class="clock" id="hClock">--:--:--</span>
+  </header>
+
+  <main>
+    <!-- 总览 -->
+    <div class="page on" data-t="overview">
+      <div class="kpis">
+        <div class="kpi"><div class="v" style="color:var(--hl)" id="mKpiW">863</div><div class="l">在场人员 / 1286</div></div>
+        <div class="kpi"><div class="v" style="color:var(--red)" id="mKpiA">0</div><div class="l">今日告警 · 待处置 <b id="mKpiP" style="color:var(--yel)">0</b></div></div>
+        <div class="kpi"><div class="v" style="color:var(--grn)">96%</div><div class="l">设备在线率</div></div>
+        <div class="kpi"><div class="v" style="color:var(--blue)">58</div><div class="l">PM2.5 μg/m³</div></div>
+      </div>
+      <div class="card"><h3>🔔 最新告警 <span>点击进入告警中心</span></h3><div id="mLatest"></div></div>
+      <div class="card"><h3>🌫 环境实时 <span>E-01 环境站</span></h3><div id="mEnv"></div></div>
+      <div class="card" style="border-color:rgba(255,167,38,.35);background:rgba(255,167,38,.04)">
+        <h3>🏛 경운대학교 · 庆云大学产学研</h3>
+        <div class="row"><span>校园安全事件</span><b style="color:var(--yel)">2 起</b></div>
+        <div class="row"><span>实验室点检率</span><b style="color:var(--grn)">98%</b></div>
+        <div class="row"><span>AI 安全监测实训</span><b class="badge-live">本周五 14:00</b></div>
+      </div>
+    </div>
+
+    <!-- 视频 -->
+    <div class="page" data-t="video">
+      <div class="chips" id="mChips"></div>
+      <div id="mCams"></div>
+    </div>
+
+    <!-- 告警 -->
+    <div class="page" data-t="alarm">
+      <div class="chips">
+        <button class="ghost on" data-f="all">全部</button>
+        <button class="ghost" data-f="h">高风险</button>
+        <button class="ghost" data-f="m">警戒</button>
+        <button class="ghost" data-f="l">低</button>
+      </div>
+      <div class="card" id="mAlarms"></div>
+    </div>
+
+    <!-- 人员 -->
+    <div class="page" data-t="people">
+      <div class="chips"><button class="ghost" id="mFence">🛡 开启基坑电子围栏</button></div>
+      <div class="map" id="mMap">
+        <svg viewBox="0 0 340 260" preserveAspectRatio="none">
+          <rect width="340" height="260" fill="#0E131D"/>
+          <g stroke="rgba(255,255,255,.06)"><path d="M0 52 H340 M0 104 H340 M0 156 H340 M0 208 H340 M68 0 V260 M136 0 V260 M204 0 V260 M272 0 V260"/></g>
+          <path d="M204 0 V260" stroke="#2A3548" stroke-width="6"/>
+          <rect x="14" y="70" width="80" height="60" rx="8" fill="#1A2434"/><text x="54" y="104" fill="#8B93A7" font-size="12" text-anchor="middle">办公区</text>
+          <rect x="14" y="160" width="80" height="52" rx="8" fill="#1A2434"/><text x="54" y="190" fill="#8B93A7" font-size="12" text-anchor="middle">生活区</text>
+          <rect x="246" y="70" width="80" height="66" rx="8" fill="#1A2434"/><text x="286" y="107" fill="#8B93A7" font-size="12" text-anchor="middle">加工区</text>
+          <rect x="118" y="150" width="72" height="80" rx="8" fill="rgba(255,167,38,.1)" stroke="#FFA726" stroke-width="2.5" stroke-dasharray="10 6" id="mPit"/>
+          <text x="154" y="195" fill="#FFA726" font-size="12" text-anchor="middle">基坑危险区</text>
+          <g stroke="#3A4A63" stroke-width="8" stroke-linecap="round" fill="none"><path d="M204 260 V110"/><path d="M204 110 H282"/><path d="M262 110 V136 M262 136 H282 M282 136 V146" stroke-width="6"/></g>
+          <text x="243" y="88" fill="#8B93A7" font-size="11" text-anchor="middle">1# 塔吊</text>
+        </svg>
+        <div id="mDots"></div>
+      </div>
+      <div class="card"><h3>👷 在场工种分布</h3>
+        <div class="row"><span>钢筋工</span><b>212 人</b></div>
+        <div class="row"><span>木工</span><b>186 人</b></div>
+        <div class="row"><span>架子工</span><b>96 人</b></div>
+        <div class="row"><span>特种作业</span><b>84 人</b></div>
+        <div class="row"><span>管理 / 安全</span><b>57 人</b></div>
+      </div>
+    </div>
+
+    <!-- 我的 -->
+    <div class="page" data-t="me">
+      <div class="me-head">
+        <div class="ava">🦅</div>
+        <div><b>鹰眼 AI · 工地安全监管</b><span>경운대학교 산학협력 · 演示账号 安全总监</span></div>
+      </div>
+      <div class="card menu">
+        <h3>🏛 庆云大学 · 产学研</h3>
+        <div class="row"><span>校园安全事件</span><b style="color:var(--yel)">2 起待跟进</b></div>
+        <div class="row"><span>实验室安全点检</span><b style="color:var(--grn)">48/49 完成</b></div>
+        <div class="row"><span>消防设施在线</span><b style="color:var(--grn)">130 台</b></div>
+        <div class="row"><span>AI 安全监测实训</span><b class="badge-live">报名中</b></div>
+      </div>
+      <div class="card menu">
+        <h3>⚙️ 系统</h3>
+        <div class="row" onclick="location.href='eagleeye-safety.html'"><span>🖥 桌面版完整驾驶舱</span><b style="color:var(--hl)">打开 ›</b></div>
+        <div class="row" onclick="location.href='eagleeye-safety.html#live'"><span>📡 现场事实监控 LIVE</span><b style="color:var(--hl)">打开 ›</b></div>
+        <div class="row" id="mInstall"><span>📲 安装到主屏幕</span><b style="color:var(--hl)">安装 ›</b></div>
+        <div class="row"><span>🔔 通知提醒</span><b style="color:var(--grn)">已开启（模拟）</b></div>
+        <div class="row"><span>版本</span><b>v3.2 · DEMO</b></div>
+      </div>
+      <div class="card menu">
+        <h3>📞 联系我们</h3>
+        <div class="row"><span>电话</span><b>[010-0000-0000]</b></div>
+        <div class="row"><span>邮箱</span><b>[contact@example.com]</b></div>
+        <div class="row"><span>公司</span><b>[公司全称]</b></div>
+      </div>
+      <p style="text-align:center;font-size:11.5px;color:var(--dim);padding:6px 0 14px">演示数据均为模拟 · 指标以真实测试为准</p>
+    </div>
+  </main>
+
+  <nav class="tab">
+    <button class="on" data-t="overview"><span class="ic">📊</span>总览</button>
+    <button data-t="video"><span class="ic">🎥</span>视频</button>
+    <button data-t="alarm"><span class="ic">🚨</span>告警</button>
+    <button data-t="people"><span class="ic">👷</span>人员</button>
+    <button data-t="me"><span class="ic">⚙️</span>我的</button>
+  </nav>
+</div>
+
+<div class="toast" id="mToast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const pad=n=>String(n).padStart(2,'0'),rnd=(a,b)=>a+Math.random()*(b-a);
+let toastT=null;
+function toast(m){const t=$('#mToast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ===== 启动屏 ===== */
+setTimeout(()=>$('#splash').classList.add('hide'),1300);
+
+/* ===== Tab 切换 ===== */
+$$('nav.tab button').forEach(b=>b.addEventListener('click',()=>{
+  $$('nav.tab button').forEach(x=>x.classList.toggle('on',x===b));
+  $$('.page').forEach(p=>p.classList.toggle('on',p.dataset.t===b.dataset.t));
+  if(navigator.vibrate)navigator.vibrate(8);
+}));
+
+/* ===== 时钟 ===== */
+const tickClock=()=>{const d=new Date();$('#hClock').textContent=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());};
+tickClock();setInterval(tickClock,1000);
+
+/* ===== 告警数据（与桌面版同源演示） ===== */
+const POOL=[
+  ['未佩戴安全帽','C-03 塔吊东侧','h','高风险'],
+  ['进入吊装警戒区','B-01 吊装区','m','警戒'],
+  ['高处作业未系安全带','A-02 3号楼','h','高风险'],
+  ['未穿反光背心','C-07 夜间出入口','m','警戒'],
+  ['临边越界预警','D-05 基坑西侧','l','低'],
+  ['扬尘超标 · 喷淋联动','E-01 环境站','l','低'],
+  ['吸烟行为','E-03 材料加工区','m','警戒']
+];
+let alarms=[
+  {t:'09:12',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',st:0},
+  {t:'08:47',cam:'A-02 3号楼',type:'高处作业未系安全带',lv:'h',st:0},
+  {t:'08:21',cam:'E-03 材料加工区',type:'吸烟行为',lv:'m',st:1},
+  {t:'07:58',cam:'D-05 基坑西侧',type:'临边越界',lv:'l',st:1}
+];
+let f='all';
+function updateAlarms(){
+  const pending=alarms.filter(a=>!a.st).length;
+  const bell=$('#bellN');bell.textContent=pending;bell.className=pending?'':'zero';
+  $('#mKpiA').textContent=alarms.length;
+  $('#mKpiP').textContent=pending;
+  /* 最新告警 */
+  $('#mLatest').innerHTML=alarms.filter(a=>!a.st).slice(0,3).map(a=>`
+    <div class="row"><span class="dot" style="background:${a.lv==='h'?'var(--red)':a.lv==='m'?'var(--yel)':'var(--grn)'}"></span><time>${a.t}</time><span style="flex:1">${a.type}</span><b style="color:var(--dim)">${a.cam}</b></div>`).join('')||'<div class="row"><span style="color:var(--grn)">✓ 当前无待处置告警</span></div>';
+  /* 告警中心 */
+  $('#mAlarms').innerHTML=alarms.filter(a=>f==='all'||a.lv===f).map(a=>`
+    <div class="row"><span class="dot" style="background:${a.lv==='h'?'var(--red)':a.lv==='m'?'var(--yel)':'var(--grn)'}"></span><time>${a.t}</time>
+    <span style="flex:1">${a.type}<br><span style="font-size:11px;color:var(--dim)">${a.cam}</span></span>
+    <span class="lv ${a.lv}">${a.lv==='h'?'高风险':a.lv==='m'?'警戒':'低'}</span>
+    ${a.st?'<span class="lv l">已处置</span>':`<button class="ghost" data-i="${alarms.indexOf(a)}">处理</button>`}</div>`).join('');
+}
+$('#bellBtn').addEventListener('click',()=>{$$('nav.tab button').forEach(x=>x.classList.toggle('on',x.dataset.t==='alarm'));$$('.page').forEach(p=>p.classList.toggle('on',p.dataset.t==='alarm'));});
+$$('.page[data-t="alarm"] .chips .ghost').forEach(b=>b.addEventListener('click',()=>{
+  f=b.dataset.f;
+  $$('.page[data-t="alarm"] .chips .ghost').forEach(x=>x.classList.toggle('on',x===b));
+  updateAlarms();
+}));
+$('#mAlarms').addEventListener('click',e=>{
+  const btn=e.target.closest('.ghost[data-i]');
+  if(!btn)return;
+  const a=alarms[+btn.dataset.i];
+  a.st=1;updateAlarms();
+  toast('✓ 告警已处置 · 已通知复查');
+  if(navigator.vibrate)navigator.vibrate(30);
+});
+setInterval(()=>{
+  const p=POOL[Math.floor(Math.random()*POOL.length)];
+  const d=new Date();
+  alarms.unshift({t:pad(d.getHours())+':'+pad(d.getMinutes()),cam:p[1],type:p[0],lv:p[2],st:0});
+  if(alarms.length>9)alarms.pop();
+  updateAlarms();
+  toast('🚨 '+p[0]+' · '+p[1]);
+  if(navigator.vibrate)navigator.vibrate([60,40,60]);
+},26000);
+updateAlarms();
+
+/* ===== 环境 ===== */
+let env={pm:58,no:64,wd:4.2,tp:26};
+const updEnv=()=>{
+  $('#mEnv').innerHTML=`
+    <div class="row"><span>PM2.5</span><b style="color:${env.pm>75?'var(--red)':'var(--text)'}">${Math.round(env.pm)} μg/m³</b></div>
+    <div class="row"><span>噪声</span><b>${Math.round(env.no)} dB(A)</b></div>
+    <div class="row"><span>风速</span><b>${env.wd.toFixed(1)} m/s</b></div>
+    <div class="row"><span>温度</span><b>${Math.round(env.tp)} ℃</b></div>
+    <div class="row"><span>喷淋状态</span><b style="color:${env.pm>75?'var(--blue)':'var(--dim)'}">${env.pm>75?'联动开启中':'待命'}</b></div>`;
+};
+setInterval(()=>{
+  env.pm=Math.max(30,Math.min(110,env.pm+rnd(-3,3)));
+  env.no=Math.max(48,Math.min(92,env.no+rnd(-2,2)));
+  env.wd=Math.max(1,Math.min(10,env.wd+rnd(-.3,.3)));
+  env.tp=Math.max(21,Math.min(34,env.tp+rnd(-.2,.2)));
+  updEnv();
+},1500);
+updEnv();
+
+/* ===== 视频 ===== */
+const SCENES={
+  gate:`<rect width="960" height="540" fill="#0C1420"/><rect y="420" width="960" height="120" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g><rect x="430" y="330" width="90" height="90" fill="#171C28" stroke="#3A4A63" stroke-width="4"/><g fill="#1A2434"><rect x="40" y="150" width="200" height="140"/></g>`,
+  crane:`<rect width="960" height="540" fill="#0C1420"/><rect y="420" width="960" height="120" fill="#0E141F"/><path d="M0 420 L120 420 L240 330 L840 330 L960 420 Z" fill="none" stroke="#FFD54A" stroke-width="4" stroke-dasharray="18 12" opacity=".8"/><g stroke="#3A4A63" stroke-width="12" fill="none"><path d="M700 420 V100"/><path d="M700 100 H880" stroke-width="10"/><path d="M880 100 V140 M880 140 H930 M930 140 V160" stroke-width="8"/></g><path d="M694 160 h12 l-6 18 z" fill="#FFD54A"/>`,
+  pit:`<rect width="960" height="540" fill="#0C1420"/><rect y="420" width="960" height="120" fill="#0E141F"/><path d="M180 420 L320 540 L640 540 L780 420" fill="#0A0E15" stroke="#3A4A63" stroke-width="5"/><g stroke="#FFA726" stroke-width="5"><path d="M60 420 V360 M120 420 V360 M840 420 V360 M900 420 V360"/><path d="M60 370 H120 M840 370 H900"/></g>`
+};
+const AI_T=[['helmet','安全帽',true],['vest','反光衣',true],['smoke','吸烟',true],['fence','越界',true]];
+$('#mChips').innerHTML=AI_T.map(t=>`<button class="ghost ${t[2]?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+$('#mChips').addEventListener('click',e=>{
+  const b=e.target.closest('.ghost');if(!b)return;
+  b.classList.toggle('on');
+  $$('#mCams .dbox').forEach(x=>{if(x.dataset.t===b.dataset.t)x.style.display=b.classList.contains('on')?'':'none';});
+});
+const CAMS=[
+  {id:'C-01',n:'工地出入口',s:'gate',box:[{cls:'red',tag:'未佩戴安全帽',t:'helmet',x:'18%',y:'36%',w:'9%',h:'25%'}]},
+  {id:'B-01',n:'吊装区',s:'crane',box:[{cls:'yel',tag:'进入吊装警戒区',t:'fence',x:'30%',y:'32%',w:'14%',h:'34%'}]},
+  {id:'D-05',n:'基坑临边',s:'pit',box:[{cls:'org',tag:'临边越界预警',t:'fence',x:'44%',y:'32%',w:'13%',h:'32%'}]}
+];
+$('#mCams').innerHTML=CAMS.map((c,i)=>`
+  <div class="cam"><div class="v"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${c.s}</svg>
+    <div class="rec"><i></i>${c.id} · ${c.n} · <span class="ck">--:--:--</span></div>
+    ${c.box.map(b=>`<div class="dbox ${b.cls}" data-t="${b.t}" data-tag="${b.tag}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h}"></div>`).join('')}
+  </div><div class="meta"><b>${c.n}</b><span>● 直播中（模拟）</span></div></div>`).join('');
+setInterval(()=>{$$('#mCams .ck').forEach(el=>{const d=new Date();el.textContent=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());});},1000);
+
+/* ===== 人员定位 ===== */
+const WORKERS=[{n:'张伟',x:60,y:30},{n:'李强',x:28,y:24},{n:'王芳',x:40,y:44},{n:'赵磊',x:72,y:52},{n:'陈静',x:50,y:38}];
+let fenceOn=false;
+function renderDots(){
+  $('#mDots').innerHTML=WORKERS.map(w=>`<div class="pdot" data-n="${w.n}" style="left:${w.x}%;top:${w.y}%"></div>`).join('');
+}
+renderDots();
+setInterval(()=>{
+  $$('#mDots .pdot').forEach(dot=>{
+    const i=Array.from(dot.parentElement.children).indexOf(dot),w=WORKERS[i];
+    let nx=w.x+rnd(-3,3),ny=w.y+rnd(-3,3);
+    const inPit=nx>35&&nx<56&&ny>58&&ny<88;
+    if(fenceOn&&inPit){nx=w.x+6;ny=w.y-6;dot.classList.add('warn');toast('⚠ 越界告警：'+w.n+' 闯入基坑危险区');if(navigator.vibrate)navigator.vibrate([80,50,80]);}
+    else dot.classList.remove('warn');
+    w.x=Math.max(6,Math.min(94,nx));w.y=Math.max(12,Math.min(94,ny));
+    dot.style.left=w.x+'%';dot.style.top=w.y+'%';
+  });
+},1500);
+$('#mFence').addEventListener('click',()=>{
+  fenceOn=!fenceOn;
+  $('#mFence').textContent=fenceOn?'🛡 围栏布防中 · 点击关闭':'🛡 开启基坑电子围栏';
+  $('#mFence').classList.toggle('on',fenceOn);
+  $('#mPit').setAttribute('fill',fenceOn?'rgba(255,77,79,.16)':'rgba(255,167,38,.1)');
+  $('#mPit').setAttribute('stroke',fenceOn?'#FF4D4F':'#FFA726');
+  toast(fenceOn?'电子围栏已布防':'电子围栏已关闭');
+});
+
+/* ===== 安装 ===== */
+let deferred=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;});
+$('#mInstall').addEventListener('click',()=>{
+  if(deferred){deferred.prompt();deferred=null;return;}
+  toast('📲 安装：浏览器菜单 →「安装应用 / 添加到主屏幕」');
+});
+
+/* ===== SW 注册（离线可用） ===== */
+if('serviceWorker' in navigator){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw-eagleeye.js').catch(()=>{}));
+}
+})();
+</script>
+</body>
+</html>

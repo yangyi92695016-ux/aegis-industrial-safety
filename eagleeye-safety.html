@@ -243,6 +243,20 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .report-tip{margin-top:12px;font-size:13px;color:var(--dim2);line-height:1.8}
 @media(max-width:640px){.tour-bubble{left:12px!important;right:12px;max-width:none}}
 
+/* ============ v5：现场监控 LIVE / 校园模块 / 手机入口 ============ */
+.live-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+.live-cams{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.live-side{display:flex;flex-direction:column;gap:14px}
+.live-note{margin-top:2px;font-size:13px;color:var(--dim2);line-height:1.8;background:rgba(77,166,255,.06);border:1px dashed rgba(77,166,255,.35);border-radius:10px;padding:12px 14px}
+.live-note b{color:var(--blue)}
+.dev-row{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.dev-row i{font-style:normal;margin-left:auto;font-size:12px}
+.dev-row i.on{color:var(--grn)}
+.app-link{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--hl);border:1px solid rgba(255,167,38,.5);background:rgba(255,167,38,.08);border-radius:20px;padding:6px 14px;transition:.25s;white-space:nowrap}
+.app-link:hover{background:rgba(255,167,38,.18)}
+@media(max-width:900px){.live-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.live-cams{grid-template-columns:1fr}.app-link span{display:none}}
+
 /* ============ AI 能力卡片 ============ */
 .scenes{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .3s,border-color .3s}
@@ -342,6 +356,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
     </a>
     <div class="nav-right">
       <button class="toggle" id="modeBtn"><b id="modeIcon">☀</b><span id="modeTxt">白班模式</span></button>
+      <a class="app-link" href="eagleeye-app.html" title="手机版 App">📱<span>手机版 App</span></a>
       <a class="btn btn-primary" href="#console">进入监管驾驶舱</a>
     </div>
   </div>
@@ -402,7 +417,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
   <div class="wrap">
     <div class="sec-head rv">
       <h2>监管驾驶舱 · <em>这就是系统本身</em></h2>
-      <p>左侧切换 8 大模块 · 每一个都可以亲手操作</p>
+      <p>左侧切换 9 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解</p>
     </div>
 
     <div class="console rv" id="consoleBox">
@@ -417,6 +432,7 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
           <button data-m="env"><span class="ic">🌫</span>环境监测</button>
           <button data-m="hazard"><span class="ic">📋</span>隐患排查</button>
           <button data-m="report"><span class="ic">📈</span>数据报表</button>
+          <button data-m="campus"><span class="ic">🏫</span>庆云大学</button>
         </nav>
         <div class="c-ver">DEMO · 模拟演示数据<br>真实部署以实测为准</div>
       </aside>
@@ -467,20 +483,29 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
   </div>
 </section>
 
-<!-- ============ 数据 ============ -->
-<section class="sec alt" id="data">
+<!-- ============ 现场事实监控 LIVE ============ -->
+<section class="sec" id="live">
   <div class="wrap">
     <div class="sec-head rv">
-      <h2>数字说话 · <em>用数据代替形容词</em></h2>
-      <p>以下指标请以真实测试数据为准</p>
+      <h2>现场事实监控 · <em>LIVE</em></h2>
+      <p>四路实时画面 · 实时告警流 · 环境读数 · 可接入真实现场视频流</p>
     </div>
-    <div class="dash" id="dash">
-      <div class="metric rv" data-i="0"><div class="num">xx.x<span class="unit">%</span></div><div class="label">识别准确率</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 28 L25 24 L50 26 L75 18 L100 20 L125 12 L150 14 L175 6 L200 8"/></svg></div>
-      <div class="metric rv" data-i="1"><div class="num">x.x<span class="unit">秒</span></div><div class="label">告警响应时间</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 26 L25 22 L50 24 L75 16 L100 10 L125 12 L150 8 L175 6 L200 4"/></svg></div>
-      <div class="metric rv" data-i="2"><div class="num">xx<span class="unit">路</span></div><div class="label">日均分析画面</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 24 L25 18 L50 22 L75 14 L100 16 L125 20 L150 12 L175 16 L200 10"/></svg></div>
-      <div class="metric rv" data-i="3"><div class="num">xx<span class="unit">个</span></div><div class="label">已上线工地</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 30 L25 26 L50 28 L75 20 L100 22 L125 14 L150 16 L175 8 L200 10"/></svg></div>
+    <div class="live-grid rv">
+      <div class="live-cams" id="liveCams"></div>
+      <aside class="live-side">
+        <div class="panel"><div class="pt"><b>实时告警流</b><span>自动推送</span></div><div class="row-list" id="liveAlertList"></div></div>
+        <div class="panel"><div class="pt"><b>环境实时读数</b><span>E-01 环境站</span></div>
+          <div class="rl-item"><span>PM2.5</span><b style="margin-left:auto" id="livePm25">--</b></div>
+          <div class="rl-item"><span>噪声</span><b style="margin-left:auto" id="liveNoise">--</b></div>
+          <div class="rl-item"><span>风速</span><b style="margin-left:auto" id="liveWind">--</b></div>
+          <div class="rl-item"><span>温度</span><b style="margin-left:auto" id="liveTemp">--</b></div>
+        </div>
+        <div class="panel"><div class="pt"><b>设备在线状态</b><span>142 / 148</span></div>
+          <div id="liveDevs"></div>
+        </div>
+        <p class="live-note">🔌 <b>接入真实现场画面</b>：在文件顶部 <b>LIVE_STREAM_URL</b> 填入现场 RTSP/HLS 视频流地址，四路模拟画面即替换为实况监控；当前为演示流，指标以真实测试为准。</p>
+      </aside>
     </div>
-    <p class="dash-note rv">数据来源：<b>____________</b>（替换为你方真实测试报告口径，无实测数据请勿填写）</p>
   </div>
 </section>
 
@@ -501,7 +526,11 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       </div>
       <div>
         <h4>公司信息</h4>
-        <p>[公司全称]<br>[ICP 备案号]<br>© 2026 鹰眼 AI</p>
+        <p>[公司全称]<br>产学研合作：[韩国庆云大学 산학협력단]<br>[ICP 备案号]<br>© 2026 鹰眼 AI</p>
+      </div>
+      <div>
+        <h4>产品入口</h4>
+        <p><a href="#console" style="color:var(--hl)">桌面版监管驾驶舱</a><br><a href="eagleeye-app.html" style="color:var(--hl)">📱 手机版 App</a></p>
       </div>
     </div>
     <div class="foot-bottom">
@@ -523,6 +552,8 @@ const pad=n=>String(n).padStart(2,'0');
 const rnd=(a,b)=>a+Math.random()*(b-a);
 /* ★★★ 真实数据一处配置（有实测再填，勿编造）★★★ */
 const REAL_DATA={accuracy:null,response:null,cameras:null,sites:null};
+/* ★★★ 接入真实现场视频流：填入 RTSP/HLS 地址（需配套转码网关），模拟画面即替换为实况 ★★★ */
+const LIVE_STREAM_URL='';
 
 /* ===== 进度条 / 导航 ===== */
 const prog=$('#prog'),nav=$('#nav');
@@ -1009,6 +1040,61 @@ MODULES.report=function(){
   <p class="dash-note" style="margin-top:14px">★ 表格内标注 <b style="color:var(--hl)">x.x</b> 的数值需替换为真实数据，其余演示数据均为模拟</p>`;
 };
 
+/* ⑨ 庆云大学 · 校园安全管理 */
+MODULES.campus=function(){
+  return `
+  <div class="kpis">
+    <div class="kpi" style="--kc:rgba(77,166,255,.12)"><div class="v" style="color:var(--blue)">2,846</div><div class="l">今日入校人员</div><div class="d">学生 <b>2,402</b> · 教职工 <b>212</b> · 访客 <b>232</b></div></div>
+    <div class="kpi" style="--kc:rgba(61,220,132,.12)"><div class="v" style="color:var(--grn)">98%</div><div class="l">实验室安全点检率</div><div class="d">本周完成 <b>48 / 49</b> 间</div></div>
+    <div class="kpi" style="--kc:rgba(255,167,38,.12)"><div class="v" style="color:var(--hl)">130</div><div class="l">消防设施在线</div><div class="d">烟感 <b>96</b> · 消火栓 <b>34</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)">2</div><div class="l">今日校园安全事件</div><div class="d">已处置 <b style="color:var(--grn)">1</b> · 处置中 <b style="color:var(--yel)">1</b></div></div>
+  </div>
+  <div class="grid-2">
+    ${panel('경운대학교 캠퍼스 · 实时人流量热力','演示数据 · 可替换为真实校园地图',`
+      <svg viewBox="0 0 640 380" style="width:100%;height:330px" aria-hidden="true">
+        <rect width="640" height="380" fill="#0E131D"/>
+        <g stroke="rgba(255,255,255,.05)"><path d="M0 76 H640 M0 152 H640 M0 228 H640 M0 304 H640 M128 0 V380 M256 0 V380 M384 0 V380 M512 0 V380"/></g>
+        <path d="M320 0 V380" stroke="#2A3548" stroke-width="10"/>
+        <path d="M0 60 H640 M0 320 H640" stroke="#2A3548" stroke-width="6"/>
+        <g font-size="13" text-anchor="middle" font-family="inherit">
+          <rect x="30" y="90" width="110" height="60" rx="8" fill="rgba(255,167,38,.16)" stroke="#FFA726"/><text x="85" y="125" fill="#FFA726">본관 · 主楼</text>
+          <rect x="30" y="190" width="110" height="60" rx="8" fill="rgba(77,166,255,.14)" stroke="#4DA6FF"/><text x="85" y="225" fill="#4DA6FF">도서관 · 图书馆</text>
+          <rect x="30" y="290" width="110" height="50" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="85" y="320" fill="#3DDC84">기숙사 · 宿舍</text>
+          <rect x="200" y="90" width="150" height="70" rx="8" fill="rgba(255,77,79,.14)" stroke="#FF4D4F"/><text x="275" y="120" fill="#FF4D4F">항공실습관</text><text x="275" y="142" fill="#FF4D4F" font-size="11">航空实训楼</text>
+          <rect x="390" y="90" width="120" height="60" rx="8" fill="rgba(255,213,74,.13)" stroke="#FFD54A"/><text x="450" y="125" fill="#FFD54A">체육관 · 体育馆</text>
+          <rect x="540" y="90" width="80" height="60" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="580" y="120" fill="#3DDC84">안전체험관</text><text x="580" y="140" fill="#3DDC84" font-size="11">安全体验馆</text>
+          <rect x="390" y="200" width="120" height="60" rx="8" fill="rgba(77,166,255,.12)" stroke="#4DA6FF"/><text x="450" y="235" fill="#4DA6FF">공학관 · 工学院</text>
+          <rect x="540" y="200" width="80" height="60" rx="8" fill="rgba(255,167,38,.12)" stroke="#FFA726"/><text x="580" y="230" fill="#FFA726">학생식당</text><text x="580" y="250" fill="#FFA726" font-size="11">食堂</text>
+          <rect x="200" y="200" width="150" height="60" rx="8" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.2)"/><text x="275" y="235" fill="#8B93A7">운동장 · 运动场</text>
+          <rect x="30" y="140" width="30" height="30" fill="none" stroke="#FFA726" stroke-dasharray="4 3"/><text x="45" y="160" font-size="11" fill="#FFA726">正门</text>
+        </g>
+        <g fill="#3DDC84">
+          <circle cx="90" cy="108" r="3"><animate attributeName="r" values="2;4;2" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="120" cy="150" r="3"><animate attributeName="r" values="3;5;3" dur="2.6s" repeatCount="indefinite"/></circle>
+          <circle cx="260" cy="112" r="3"><animate attributeName="r" values="2;4;2" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="420" cy="115" r="3"><animate attributeName="r" values="3;5;3" dur="2.2s" repeatCount="indefinite"/></circle>
+          <circle cx="560" cy="112" r="3"><animate attributeName="r" values="2;4;2" dur="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="60" cy="300" r="3"><animate attributeName="r" values="3;5;3" dur="2.8s" repeatCount="indefinite"/></circle>
+        </g>
+      </svg>`)}
+    ${panel('今日校园安全事件','实时联动',`<div class="row-list">
+      <div class="rl-item"><span class="dot" style="background:#FFA726"></span><time>09:26</time><span>航空实训楼</span><b style="margin-left:auto">实验室门禁未关 · 已提醒</b></div>
+      <div class="rl-item"><span class="dot" style="background:#FF4D4F"></span><time>08:52</time><span>学生食堂</span><b style="margin-left:auto">消防通道占用 · 处置中</b></div>
+      <div class="rl-item"><span class="dot" style="background:#3DDC84"></span><time>08:10</time><span>图书馆</span><b style="margin-left:auto">早间巡检正常</b></div>
+      <div class="rl-item"><span class="dot" style="background:#4DA6FF"></span><time>07:45</time><span>正门</span><b style="margin-left:auto">入校高峰 · 闸机运行正常</b></div>
+    </div>`)}
+  </div>
+  ${panel('安全管理课程 · 产学研联动','示例数据 · 请替换为真实课程',`
+    <table class="alarm-table"><thead><tr><th>课程 / 项目</th><th>对象</th><th>时间</th><th>状态</th></tr></thead><tbody>
+    <tr><td>AI 安全监测实训（鹰眼 AI 平台）</td><td>[安全管理相关专业]</td><td>本周五 14:00</td><td><span class="lv b">报名中</span></td></tr>
+    <tr><td>消防安全实务演练</td><td>全校新生</td><td>下周二</td><td><span class="lv l">已排期</span></td></tr>
+    <tr><td>应急救护（CPR / AED）培训</td><td>教职工</td><td>每月第 2 周</td><td><span class="lv l">常态开展</span></td></tr>
+    <tr><td>施工现场安全见习（产学研基地）</td><td>高年级</td><td>学期内</td><td><span class="lv m">对接中</span></td></tr>
+    </tbody></table>
+    <div class="report-tip">🏛 产学研合作：鹰眼 AI × <b style="color:var(--hl)">경운대학교 산학협력단</b>（韩国庆云大学产学研合作团）· 平台数据接入校园安全管理与实训教学（演示）</div>`)}
+  `;
+};
+
 /* ---- 模块路由 ---- */
 let curMod='overview',consoleVisible=true;
 function showModule(m){
@@ -1360,7 +1446,8 @@ const TOUR=[
   {mod:'machine',title:'⑤ 机械设备监测',desc:'塔吊吊重与力矩、升降机载重与人数、基坑位移——数值实时波动，超限即报警。',sel:'#cBody .grid-3'},
   {mod:'env',title:'⑥ 环境监测联动',desc:'PM2.5 / 噪声等五参数在线；扬尘超标自动联动喷淋降尘，全程留痕。',sel:'#cBody .gauge-grid'},
   {mod:'hazard',title:'⑦ 隐患闭环治理',desc:'完整闭环流程：上报 → 整改 → 复查销项，每一步状态流转都留痕。',sel:'#cBody .hz-stats'},
-  {mod:'report',title:'⑧ 数据报表',desc:'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。',sel:'#cBody .grid-2'}
+  {mod:'report',title:'⑧ 数据报表',desc:'周趋势、类型占比、月度统计，支持一键导出，还能生成 AI 巡检日报。',sel:'#cBody .grid-2'},
+  {mod:'campus',title:'⑨ 庆云大学 · 校园管理',desc:'同一套平台延伸至校园：实时人流量、实验室点检、消防设施在线、安全事件联动，产教融合实训。',sel:'#cBody .kpis'}
 ];
 let tourIdx=-1;
 const hole=document.createElement('div');hole.className='tour-hole';hole.style.display='none';document.body.appendChild(hole);
@@ -1416,6 +1503,44 @@ $('#topBell').addEventListener('click',()=>{showModule('alarm');toast('🔔 当�
 addEventListener('scroll',()=>{if(tourIdx>=0)tourPos();},{passive:true});
 addEventListener('resize',()=>{if(tourIdx>=0)tourPos();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&tourIdx>=0)tourEnd();});
+
+/* ============================================================
+   现场事实监控 LIVE
+   ============================================================ */
+const liveCamsEl=$('#liveCams');
+if(liveCamsEl){
+  const LIVE_CAMS=[['C-01','工地出入口','gate'],['B-01','吊装区','crane'],['D-05','基坑临边','pit'],['E-03','材料加工区','yard']];
+  liveCamsEl.innerHTML=LIVE_CAMS.map((c,i)=>`
+    <div class="camcell">
+      <div class="v"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(c[2])}</svg>
+        <div class="rec-tag"><i></i>${c[0]} · ${c[1]} · <span id="liveClock${i}">${nowStr()}</span></div>
+        ${DBOXES[c[2]].map((b,j)=>`<div class="dbox ${b.cls}" data-tag="${b.tag}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('')}
+      </div>
+      <div class="meta"><b>${c[1]}</b><span>● 直播中（模拟流）</span></div>
+    </div>`).join('');
+  const devs=[['1# 塔吊',true],['2# 施工升降机',true],['雾炮喷淋',true],['闸机通道',true],['环境监测站',true],['应急广播',true],['2# 塔吊',false]];
+  $('#liveDevs').innerHTML=devs.map(d=>`<div class="dev-row"><span>${d[0]}</span><i class="${d[1]?'on':''}">${d[1]?'● 在线':'○ 检修'}</i></div>`).join('');
+  const ll=$('#liveAlertList');
+  const livePush=()=>{
+    const e=feedPool[feedSeq++%feedPool.length];
+    const d=new Date();
+    const col=e[2]==='高'?'#FF4D4F':e[2]==='中'?'#FFD54A':'#3DDC84';
+    ll.insertAdjacentHTML('afterbegin',`<div class="rl-item"><span class="dot" style="background:${col}"></span><time>${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</time><span>${e[1]}</span><b style="margin-left:auto">${e[0]}</b></div>`);
+    while(ll.children.length>6)ll.lastChild.remove();
+  };
+  livePush();setInterval(livePush,4000);
+  const le={pm:58,no:64,wd:4.2,tp:26};
+  setInterval(()=>{
+    le.pm=Math.max(30,Math.min(110,le.pm+rnd(-3,3)));
+    le.no=Math.max(48,Math.min(92,le.no+rnd(-2,2)));
+    le.wd=Math.max(1,Math.min(10,le.wd+rnd(-.3,.3)));
+    le.tp=Math.max(21,Math.min(34,le.tp+rnd(-.2,.2)));
+    const s=(id,v,u)=>{const el=$(id);if(el)el.textContent=Math.round(v)+' '+u;};
+    s('#livePm25',le.pm,'μg/m³');s('#liveNoise',le.no,'dB(A)');s('#liveTemp',le.tp,'℃');
+    const w=$('#liveWind');if(w)w.textContent=le.wd.toFixed(1)+' m/s';
+  },1500);
+  setInterval(()=>{for(let i=0;i<4;i++){const c=$('#liveClock'+i);if(c)c.textContent=nowStr();}},1000);
+}
 
 /* 初始化 */
 showModule('overview');
