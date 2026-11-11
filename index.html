@@ -269,8 +269,9 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .ppe-stamp.show{transform:translate(-50%,-50%) scale(1)}
 .ppe-stamp.bad{color:var(--red);border:3px solid var(--red);background:rgba(40,6,10,.85)}
 .ppe-stamp.good{color:var(--grn);border:3px solid var(--grn);background:rgba(4,20,12,.85)}
-/* 手机访问推荐 App 版 */
-.m-gate{position:fixed;inset:0;z-index:800;background:rgba(4,6,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;padding:24px}
+/* 手机访问推荐 App 版（默认隐藏，JS 加 .show 才显示，保证「继续浏览网页版」有效） */
+.m-gate{position:fixed;inset:0;z-index:800;background:rgba(4,6,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;place-items:center;padding:24px}
+.m-gate.show{display:grid}
 .m-gate-card{background:var(--panel2);border:1px solid rgba(255,167,38,.5);border-radius:18px;padding:30px 26px;max-width:370px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:pop .3s ease}
 @keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 .m-gate-card .gl{font-size:46px}
@@ -983,6 +984,24 @@ const I18N={
 '反光衣检测为真实图像判定':{en:'Vest detection is real image analysis',ko:'반사조끼는 실제 영상판정'},
 '摄像头已开启':{en:'Camera On',ko:'카메라 켜짐'},
 '检测中……':{en:'Scanning…',ko:'검측 중…'},
+'🔌 外置摄像头':{en:'🔌 External Camera',ko:'🔌 외부 카메라'},
+'IP 摄像头 / HLS 网关 / MJPEG':{en:'IP Cam / HLS Gateway / MJPEG',ko:'IP카메라 / HLS게이트웨이 / MJPEG'},
+'自动':{en:'Auto',ko:'자동'},
+'🔌 接入外置摄像头':{en:'🔌 Connect External Cam',ko:'🔌 외부 카메라 연결'},
+'未接入 · 浏览器无法直连 RTSP，请使用 HLS/MJPEG 网关或转码流':{en:'Not connected · use HLS/MJPEG gateway (RTSP needs transcoding)',ko:'미연결 · RTSP 직접 연결 불가, HLS/MJPEG 게이트웨이 사용'},
+'外置摄像头已接入（MJPEG）':{en:'External cam connected (MJPEG)',ko:'외부 카메라 연결됨 (MJPEG)'},
+'外置摄像头 · MJPEG':{en:'External · MJPEG',ko:'외부 · MJPEG'},
+'🔌 已接入 · 断开':{en:'🔌 Connected · Disconnect',ko:'🔌 연결됨 · 해제'},
+'外置摄像头已接入（HLS）':{en:'External cam connected (HLS)',ko:'외부 카메라 연결됨 (HLS)'},
+'外置摄像头 · HLS':{en:'External · HLS',ko:'외부 · HLS'},
+'外置摄像头已接入':{en:'External cam connected',ko:'외부 카메라 연결됨'},
+'外置摄像头':{en:'External Camera',ko:'외부 카메라'},
+'已接入外置摄像头 · 检测将使用外置画面':{en:'External feed active · detection uses it',ko:'외부 영상 연결 · 판정에 사용'},
+'无法连接外置摄像头：请检查地址与跨域设置':{en:'Cannot connect: check URL & CORS',ko:'연결 실패: 주소와 CORS 확인'},
+'请填写外置摄像头地址':{en:'Enter external cam URL first',ko:'외부 카메라 주소 입력'},
+'此浏览器不支持 HLS 播放':{en:'This browser can\'t play HLS',ko:'이 브라우저는 HLS 미지원'},
+'无法连接外置摄像头：浏览器不支持该流格式，请改用 HLS/MJPEG':{en:'Unsupported stream format · use HLS/MJPEG',ko:'지원되지 않는 스트림 · HLS/MJPEG 사용'},
+'外置摄像头已断开':{en:'External cam disconnected',ko:'외부 카메라 해제됨'},
 '🔊 ':': ',/* fallback */
 '📷 ':': ',
 '高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
@@ -1495,7 +1514,7 @@ MODULES.campus=function(){
 
 /* ⑩ PPE 防护检测（真实摄像头 + 真实警报） */
 let ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
-let ppeCamOn=false,ppeCamStream=null,ppeCanvas=null;
+let ppeCamOn=false,ppeCamStream=null,ppeCanvas=null,extSource={type:'none'};
 MODULES.ppe=function(){
   return `
   <div class="filter-row"><span>防护装备：</span>
@@ -1509,7 +1528,7 @@ MODULES.ppe=function(){
   <div class="grid-2">
     <div class="panel">
       <div class="pt"><b>📷 检测站 C-03 · 实时画面</b><span id="ppeCamState">摄像头未开启</span></div>
-      <div class="ppe-stage" id="ppeStage">
+      <div class="ppe-stage" id="ppeStage" style="min-height:320px">
         <video id="ppeVideo" autoplay playsinline muted style="width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E131D;display:block"></video>
         <div id="ppeFallback" hidden style="position:absolute;inset:0"><svg id="ppeSvg" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%"></svg></div>
         <div class="scan-move"></div>
@@ -1528,6 +1547,16 @@ MODULES.ppe=function(){
           <div class="rl-item"><span>📲</span>推送安全员 / 负责人</div>
           <div class="rl-item"><span>🚨</span>写入告警中心</div>
         </div>
+      </div>
+      <div class="panel"><div class="pt"><b>🔌 外置摄像头</b><span>IP 摄像头 / HLS 网关 / MJPEG</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="extUrl" placeholder="http://192.168.x.x/video.mjpg 或 …/stream.m3u8" style="flex:1;min-width:0;background:var(--panel3);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;outline:none">
+          <select id="extMode" style="background:var(--panel3);border:1px solid var(--line);color:var(--text);border-radius:8px;font-size:13px;padding:8px;outline:none">
+            <option value="auto">自动</option><option value="hls">HLS</option><option value="mjpg">MJPEG</option><option value="mp4">MP4</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" id="extConnect" style="width:100%">🔌 接入外置摄像头</button>
+        <div class="rl-item" style="margin-top:10px"><span id="extStatus" style="font-size:12.5px;color:var(--dim2)">未接入 · 浏览器无法直连 RTSP，请使用 HLS/MJPEG 网关或转码流</span></div>
       </div>
       <button class="btn btn-primary" id="ppeStart" style="width:100%">▶ 开始检测</button>
       <button class="btn btn-ghost" id="ppeCamBtn" style="width:100%;margin-top:10px">📷 开启摄像头</button>
@@ -1553,7 +1582,13 @@ const afterRender={
   ppe(){
     ppeGear={helmet:true,goggles:true,gloves:true,belt:true,vest:true};
     const ppeStage=$('#ppeStage');
-    window.ppeStop=()=>{if(ppeCamStream){ppeCamStream.getTracks().forEach(t=>t.stop());ppeCamStream=null;}ppeCamOn=false;};
+    extSource={type:'none'};
+    window.ppeStop=()=>{
+      if(window.hlsInstance){try{window.hlsInstance.destroy();}catch(e){}window.hlsInstance=null;}
+      const im=$('#extImg');if(im)im.remove();
+      if(ppeCamStream){ppeCamStream.getTracks().forEach(t=>t.stop());ppeCamStream=null;}
+      ppeCamOn=false;
+    };
     $('#ppeFallback').hidden=false;
     renderPpeWorker();
     $$('#cBody .ai-chip[data-g]').forEach(ch=>ch.addEventListener('click',()=>{
@@ -1574,6 +1609,87 @@ const afterRender={
         toast('📷 摄像头已接入 · 反光衣将由真实图像判定');
       })
       .catch(()=>{toast('未获得摄像头权限 · 使用示意图模式');$('#ppeFallback').hidden=false;});
+    });
+    /* 外置摄像头接入 */
+    $('#extConnect').addEventListener('click',()=>{
+      /* 已接入 → 断开 */
+      if(extSource.type!=='none'){
+        if(window.hlsInstance){try{window.hlsInstance.destroy();}catch(e){}window.hlsInstance=null;}
+        const im=$('#extImg');if(im)im.remove();
+        const v=$('#ppeVideo');
+        v.src='';v.style.display='block';
+        extSource={type:'none'};
+        $('#extStatus').textContent='未接入 · 浏览器无法直连 RTSP，请使用 HLS/MJPEG 网关或转码流';
+        $('#ppeCamState').textContent=ppeCamOn?'摄像头已开启':'摄像头未开启';
+        $('#extConnect').textContent='🔌 接入外置摄像头';
+        toast('外置摄像头已断开');
+        return;
+      }
+      const url=$('#extUrl').value.trim();
+      if(!url){toast('请填写外置摄像头地址');return;}
+      const mode=$('#extMode').value;
+      const isHls=mode==='hls'||(mode==='auto'&&/\.m3u8(\?|$)/i.test(url));
+      const isMjpg=mode==='mjpg'||(mode==='auto'&&(/\.mjpe?g(\?|$)/i.test(url)||/mjpg|videostream|cgi/i.test(url)));
+      if(isMjpg){
+        const img=document.createElement('img');
+        img.id='extImg';img.crossOrigin='anonymous';
+        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0E131D';
+        img.onload=()=>{
+          extSource={type:'img'};
+          $('#ppeVideo').style.display='none';
+          $('#ppeFallback').hidden=true;
+          $('#extStatus').textContent='外置摄像头已接入（MJPEG）';
+          $('#ppeCamState').textContent='外置摄像头 · MJPEG';
+          $('#extConnect').textContent='🔌 已接入 · 断开';
+          toast('已接入外置摄像头 · 检测将使用外置画面');
+        };
+        img.onerror=()=>{toast('无法连接外置摄像头：请检查地址与跨域设置');img.remove();};
+        img.src=url;
+        $('#ppeStage').appendChild(img);
+        return;
+      }
+      const v=$('#ppeVideo');
+      if(isHls){
+        const loadHls=()=>{
+          const Hls=window.Hls;
+          if(!Hls||!Hls.isSupported()){toast('此浏览器不支持 HLS 播放');return;}
+          if(window.hlsInstance)window.hlsInstance.destroy();
+          const hls=new Hls({liveDurationInfinity:true});
+          hls.loadSource(url);
+          v.style.display='block';
+          $('#ppeFallback').hidden=true;
+          hls.attachMedia(v);
+          hls.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});});
+          hls.on(Hls.Events.ERROR,(e,d)=>{if(d.fatal){toast('HLS 流连接失败：请检查地址');hls.destroy();}});
+          window.hlsInstance=hls;
+          extSource={type:'video'};
+          $('#extStatus').textContent='外置摄像头已接入（HLS）';
+          $('#ppeCamState').textContent='外置摄像头 · HLS';
+          $('#extConnect').textContent='🔌 已接入 · 断开';
+          toast('已接入外置摄像头 · 检测将使用外置画面');
+        };
+        if(!window.Hls){
+          const s=document.createElement('script');
+          s.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
+          s.onload=loadHls;
+          s.onerror=()=>toast('HLS 播放器加载失败（网络原因）');
+          document.head.appendChild(s);
+        }else loadHls();
+        return;
+      }
+      /* MP4 / 直连 */
+      v.style.display='block';
+      $('#ppeFallback').hidden=true;
+      v.crossOrigin='anonymous';
+      v.src=url;
+      v.onloadeddata=()=>{
+        extSource={type:'video'};
+        $('#extStatus').textContent='外置摄像头已接入';
+        $('#ppeCamState').textContent='外置摄像头';
+        $('#extConnect').textContent='🔌 已接入 · 断开';
+        toast('已接入外置摄像头 · 检测将使用外置画面');
+      };
+      v.onerror=()=>toast('无法连接外置摄像头：浏览器不支持该流格式，请改用 HLS/MJPEG');
     });
     $('#ppeStart').addEventListener('click',()=>{
       if('Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(e){}}
@@ -1759,16 +1875,21 @@ function renderPpeWorker(){
 }
 function detectVest(){
   const v=$('#ppeVideo');
-  if(!v||!v.videoWidth||!ppeCamOn)return null;
+  const img=$('#extImg');
+  let src=null,sw=0,sh=0;
+  if(extSource.type==='img'&&img&&img.complete&&img.naturalWidth){src=img;sw=img.naturalWidth;sh=img.naturalHeight;}
+  else if(extSource.type==='video'&&v&&v.videoWidth){src=v;sw=v.videoWidth;sh=v.videoHeight;}
+  else if(ppeCamOn&&v&&v.videoWidth){src=v;sw=v.videoWidth;sh=v.videoHeight;}
+  if(!src)return null;
   if(!ppeCanvas)ppeCanvas=document.createElement('canvas');
-  const vw=v.videoWidth,vh=v.videoHeight;
-  ppeCanvas.width=vw;ppeCanvas.height=vh;
+  ppeCanvas.width=sw;ppeCanvas.height=sh;
   const ctx=ppeCanvas.getContext('2d');
-  ctx.drawImage(v,0,0,vw,vh);
-  const x0=Math.floor(vw*0.38),x1=Math.floor(vw*0.62);
-  const y0=Math.floor(vh*0.30),y1=Math.floor(vh*0.62);
-  const img=ctx.getImageData(x0,y0,x1-x0,y1-y0);
-  const d=img.data;
+  ctx.drawImage(src,0,0,sw,sh);
+  const x0=Math.floor(sw*0.38),x1=Math.floor(sw*0.62);
+  const y0=Math.floor(sh*0.30),y1=Math.floor(sh*0.62);
+  let imgData;
+  try{imgData=ctx.getImageData(x0,y0,x1-x0,y1-y0);}catch(e){return null;}
+  const d=imgData.data;
   let bright=0,orange=0,n=0;
   for(let i=0;i<d.length;i+=4){
     const r=d[i],g=d[i+1],b=d[i+2];
@@ -1807,7 +1928,7 @@ function ppeJudge(){
     if(!ppeGear[g[0]])missing.push(g[1]);
   });
   let vestResult='通过',vestOK=true;
-  if(ppeCamOn){
+  if(ppeCamOn||extSource.type!=='none'){
     const v=detectVest();
     if(v===null){vestOK=true;vestResult='—';}
     else{vestOK=v.pass;vestResult=v.pass?'通过':'未检测到反光衣';}
@@ -2134,8 +2255,11 @@ addEventListener('hashchange',hashRoute);
   try{if(localStorage.getItem('eagleeye_mgate')==='skip')return;}catch(e){}
   const gate=$('#mGate');
   if(!gate)return;
-  gate.hidden=false;
-  $('#mGateSkip').addEventListener('click',()=>{gate.hidden=true;try{localStorage.setItem('eagleeye_mgate','skip');}catch(e){}});
+  gate.classList.add('show');
+  $('#mGateSkip').addEventListener('click',()=>{
+    gate.classList.remove('show');
+    try{localStorage.setItem('eagleeye_mgate','skip');}catch(e){}
+  });
 })();
 })();
 </script>
