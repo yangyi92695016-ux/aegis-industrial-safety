@@ -324,6 +324,41 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .steps i.pass{color:var(--grn)}
 @media(max-width:980px){.scenes{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px}.card{flex:0 0 78%;scroll-snap-align:center}.console{grid-template-columns:1fr}.c-side{flex-direction:row;overflow-x:auto;align-items:center}.c-nav{flex-direction:row}.c-nav button{white-space:nowrap}.c-brand{display:none}.c-side .c-ver{display:none}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.camgrid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
 
+/* ============ 肌肉放松工坊（趣味小游戏） ============ */
+.relief-shell{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:stretch;max-width:1080px;margin:0 auto}
+.relief-stage{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:18px;overflow:hidden;min-height:520px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.relief-stage svg{width:100%;height:auto;display:block}
+.relief-zones{position:absolute;inset:0}
+.rz{position:absolute;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%)}
+.rz::after{content:attr(data-n);position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:var(--panel3);border:1px solid var(--line-2);color:var(--dim);font-size:11px;display:grid;place-items:center}
+.rz:hover{outline:2px solid rgba(255,167,38,.4)}
+.rh-hot{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.rh-hot i{position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--red);animation:hotPulse .5s ease infinite;box-shadow:0 0 18px rgba(255,77,79,.8),inset 0 0 14px rgba(255,77,79,.6);background:radial-gradient(circle,rgba(255,77,79,.55),rgba(255,77,79,.15) 65%)}
+@keyframes hotPulse{50%{transform:scale(1.12);box-shadow:0 0 30px rgba(255,77,79,1),inset 0 0 18px rgba(255,77,79,.8)}}
+.rh-hot::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(255,77,79,.45);animation:hotRing 1s linear infinite}
+@keyframes hotRing{to{transform:scale(1.3);opacity:0}}
+.rh-hot.late i{animation:hotPulse .16s ease infinite}
+.relief-pop{position:absolute;font-size:20px;font-weight:800;color:var(--grn);pointer-events:none;animation:popUp .8s ease forwards;text-shadow:0 0 10px rgba(61,220,132,.8)}
+@keyframes popUp{to{transform:translateY(-56px);opacity:0}}
+.relief-overlay{position:absolute;inset:0;z-index:6;display:none;place-items:center;background:rgba(3,6,12,.82);backdrop-filter:blur(8px)}
+.relief-overlay.show{display:grid}
+.relief-hud{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.relief-score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rh-box{background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+.rh-box span{display:block;font-size:12.5px;color:var(--dim);letter-spacing:.08em}
+.rh-box b{font-size:24px;font-variant-numeric:tabular-nums;color:var(--text)}
+.rh-box b.combo{color:var(--hl);text-shadow:var(--glow-cyan)}
+.rh-tension span{font-size:13px;color:var(--dim);display:block;margin-bottom:8px;letter-spacing:.06em}
+.rh-bar{height:10px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
+.rh-bar i{display:block;height:100%;width:30%;background:linear-gradient(90deg,var(--grn),var(--yel),var(--red));transition:width .4s ease;border-radius:6px}
+.rh-tip{font-size:14px;line-height:1.8;background:rgba(61,220,132,.06);border:1px dashed rgba(61,220,132,.4);border-radius:12px;padding:12px 14px;color:var(--text);min-height:56px}
+.rh-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px}
+.rh-legend span{color:var(--dim)}
+.rh-legend b{color:var(--hl)}
+.relief-note{font-size:13px;color:var(--dim2);line-height:1.8}
+.relief-stage.alarm{animation:redflash .5s ease}
+@media(max-width:900px){.relief-shell{grid-template-columns:1fr}.relief-stage{min-height:0}}
+
 /* ============ 对比 ============ */
 .cmp{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);user-select:none;touch-action:none;aspect-ratio:16/8;min-height:340px}
 .cmp-layer{position:absolute;inset:0}
@@ -493,6 +528,65 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       <p>每个场景 = 识别 → 判定 → 报警 → 闭环</p>
     </div>
     <div class="scenes" id="sceneWrap"></div>
+  </div>
+</section>
+
+<!-- ============ 肌肉放松工坊（趣味小游戏） ============ -->
+<section class="sec" id="relief">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>肌肉放松工坊 · <em>酸痛消消乐</em></h2>
+      <p>点按工人发光的酸痛部位，60 秒挑战你的手速 · 每击碎一处送你一条拉伸小贴士</p>
+    </div>
+    <div class="relief-shell rv">
+      <div class="relief-stage" id="reliefStage">
+        <svg viewBox="0 0 480 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <rect width="480" height="560" fill="var(--sky2)"/>
+          <circle cx="240" cy="300" r="185" fill="rgba(0,229,255,.04)"/>
+          <g stroke="#3A4A63" stroke-width="6"><path d="M60 522 H420"/></g>
+          <text x="240" y="42" fill="#8B93A7" font-size="15" text-anchor="middle" letter-spacing="4">工间放松站</text>
+          <rect x="206" y="392" width="28" height="96" rx="10" fill="#2A3140"/>
+          <rect x="246" y="392" width="28" height="96" rx="10" fill="#2A3140"/>
+          <rect x="200" y="480" width="40" height="14" rx="6" fill="#1A202C"/>
+          <rect x="240" y="480" width="40" height="14" rx="6" fill="#1A202C"/>
+          <path d="M240 150 L300 200 L292 380 Q240 402 188 380 L180 200 Z" fill="#FFA726"/>
+          <path d="M240 158 L252 196 L228 196 Z" fill="#FFD9A0"/>
+          <rect x="200" y="330" width="80" height="10" rx="5" fill="#22303C"/>
+          <rect x="232" y="328" width="16" height="14" rx="3" fill="#FFD54A"/>
+          <rect x="128" y="196" width="30" height="110" rx="15" fill="#FFA726" transform="rotate(14 143 251)"/>
+          <rect x="322" y="196" width="30" height="110" rx="15" fill="#FFA726" transform="rotate(-14 337 251)"/>
+          <circle cx="140" cy="316" r="15" fill="#E8C39A"/>
+          <circle cx="340" cy="316" r="15" fill="#E8C39A"/>
+          <circle cx="240" cy="102" r="40" fill="#E8C39A"/>
+          <path d="M200 92 a40 40 0 0 1 80 0 l-4 -6 l-72 0 z" fill="#3A2A1A"/>
+          <circle cx="224" cy="104" r="5" fill="#1A202C"/>
+          <circle cx="256" cy="104" r="5" fill="#1A202C"/>
+          <path id="reliefMouth" d="M226 122 Q240 128 254 122" fill="none" stroke="#1A202C" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="relief-zones" id="reliefZones"></div>
+        <div class="relief-overlay" id="reliefOverlay" hidden>
+          <div class="go-card">
+            <h3 id="reliefTitle">时间到！</h3>
+            <div class="go-stars" id="reliefStars"></div>
+            <p id="reliefMsg"></p>
+            <button class="btn btn-primary" id="reliefAgain">再来一局</button>
+          </div>
+        </div>
+      </div>
+      <div class="relief-hud">
+        <div class="relief-score-row">
+          <div class="rh-box"><span>得分</span><b id="reliefScore">0</b></div>
+          <div class="rh-box"><span>连击</span><b id="reliefCombo">x1</b></div>
+          <div class="rh-box"><span>时间</span><b id="reliefTime">60</b></div>
+          <div class="rh-box"><span>生命</span><b id="reliefLives">♥♥♥</b></div>
+        </div>
+        <div class="rh-tension"><span>工人酸痛指数</span><div class="rh-bar"><i id="reliefTension"></i></div></div>
+        <div class="rh-tip" id="reliefTip">💡 点击发光部位，或在键盘按 1-6</div>
+        <div class="rh-legend" id="reliefLegend"></div>
+        <button class="btn btn-primary" id="reliefStart" style="width:100%">▶ 开始游戏</button>
+        <p class="relief-note">🧘 工间放松小游戏 · 每个部位对应一个真实拉伸动作 · 最佳纪录保存在本机</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1002,6 +1096,38 @@ const I18N={
 '此浏览器不支持 HLS 播放':{en:'This browser can\'t play HLS',ko:'이 브라우저는 HLS 미지원'},
 '无法连接外置摄像头：浏览器不支持该流格式，请改用 HLS/MJPEG':{en:'Unsupported stream format · use HLS/MJPEG',ko:'지원되지 않는 스트림 · HLS/MJPEG 사용'},
 '外置摄像头已断开':{en:'External cam disconnected',ko:'외부 카메라 해제됨'},
+'肌肉放松工坊 · 酸痛消消乐':{en:'Muscle Relief Arcade · Soreness Pop',ko:'근육 이완 공방 · 뭉침 팡팡'},
+'点按工人发光的酸痛部位，60 秒挑战你的手速 · 每击碎一处送你一条拉伸小贴士':{en:'Tap glowing sore spots in 60s · each pop gives a stretch tip',ko:'빛나는 뭉친 부위를 60초 안에 눌러 스트레칭 팁 획득'},
+'工间放松站':{en:'Break-time Relief Station',ko:'휴식 이완 스테이션'},
+'得分':{en:'Score',ko:'점수'},'连击':{en:'Combo',ko:'콤보'},
+'时间':{en:'Time',ko:'시간'},'生命':{en:'Lives',ko:'목숨'},
+'工人酸痛指数':{en:'Worker Soreness',ko:'근로자 뭉침 지수'},
+'💡 点击发光部位，或在键盘按 1-6':{en:'💡 Tap glowing spots or press 1-6',ko:'💡 빛나는 부위 클릭 또는 1-6 키'},
+'▶ 开始游戏':{en:'▶ Start Game',ko:'▶ 게임 시작'},
+'🔄 重新开始':{en:'🔄 Restart',ko:'🔄 다시 시작'},
+'再来一局':{en:'Play Again',ko:'한 판 더'},
+'时间到！':{en:"Time's Up!",ko:'시간 종료!'},
+'肩颈':{en:'Neck',ko:'목·어깨'},
+'左肩臂':{en:'Left Arm',ko:'왼팔'},
+'右肩臂':{en:'Right Arm',ko:'오른팔'},
+'腰背':{en:'Back',ko:'허리'},
+'左腿':{en:'Left Leg',ko:'왼다리'},
+'右腿':{en:'Right Leg',ko:'오른다리'},
+'肩颈放松：缓慢耸肩画圈 10 次，下巴微收。':{en:'Neck: roll shoulders in slow circles ×10, chin tucked.',ko:'목·어깨: 어깨를 천천히 10회 돌리고 턱 당기기.'},
+'左臂拉伸：左手搭右肩，右臂轻拉肘部 15 秒。':{en:'Left arm: left hand on right shoulder, gently pull elbow 15s.',ko:'왼팔: 왼손을 오른어깨에, 팔꿈치 15초 당기기.'},
+'右臂拉伸：右手搭左肩，左臂轻拉肘部 15 秒。':{en:'Right arm: right hand on left shoulder, gently pull elbow 15s.',ko:'오른팔: 오른손을 왼어깨에, 팔꿈치 15초 당기기.'},
+'腰背放松：双手叉腰，缓慢后仰再前屈，重复 8 次。':{en:'Back: hands on hips, lean back then forward ×8.',ko:'허리: 허리에 손을 대고 뒤로 젖혔다 앞으로 ×8.'},
+'左腿拉伸：扶墙后抬左脚，左手拉脚踝 15 秒。':{en:'Left leg: hold wall, pull left ankle back 15s.',ko:'왼다리: 벽을 짚고 왼발목을 15초 당기기.'},
+'右腿拉伸：扶墙后抬右脚，右手拉脚踝 15 秒。':{en:'Right leg: hold wall, pull right ankle back 15s.',ko:'오른다리: 벽을 짚고 오른발목을 15초 당기기.'},
+'🧘 工间放松小游戏 · 每个部位对应一个真实拉伸动作 · 最佳纪录保存在本机':{en:'🧘 Break-time relief arcade · each spot maps to a real stretch · best saved locally',ko:'🧘 휴식 이완 게임 · 부위별 실제 스트레칭 · 최고기록 로컬 저장'},
+'得分 ':{en:'Score ',ko:'점수 '},
+' · 击碎 ':{en:' · Popped ',ko:' · 해소 '},
+' 处 · 最大连击 ':{en:' · Max combo ',ko:'개 · 최대 콤보 '},
+' · 最佳 ':{en:' · Best ',ko:' · 최고 '},
+'🥇 肌肉放松大师':{en:'🥇 Relief Master',ko:'🥇 이완 마스터'},
+'🥈 放松达人':{en:'🥈 Relief Pro',ko:'🥈 이완 달인'},
+'🥉 新手放松员':{en:'🥉 Rookie',ko:'🥉 초보'},
+'还需要多多拉伸':{en:'Stretch more!',ko:'스트레칭이 더 필요해요!'},
 '🔊 ':': ',/* fallback */
 '📷 ':': ',
 '高':{en:'High',ko:'높음'},'中':{en:'Mid',ko:'중간'},'低':{en:'Low',ko:'낮음'}
@@ -2071,6 +2197,160 @@ SCENES.forEach((s,idx)=>{
   };
   setTimeout(()=>run(),600+idx*400);
 });
+
+/* ============================================================
+   肌肉放松工坊 · 酸痛消消乐（趣味小游戏）
+   ============================================================ */
+(function(){
+  const stage=$('#reliefStage');
+  if(!stage)return;
+  const ZONES=[
+    {id:'neck',label:'肩颈',key:'1',cx:240,cy:118,r:46,tip:'肩颈放松：缓慢耸肩画圈 10 次，下巴微收。'},
+    {id:'armL',label:'左肩臂',key:'2',cx:143,cy:250,r:48,tip:'左臂拉伸：左手搭右肩，右臂轻拉肘部 15 秒。'},
+    {id:'armR',label:'右肩臂',key:'3',cx:337,cy:250,r:48,tip:'右臂拉伸：右手搭左肩，左臂轻拉肘部 15 秒。'},
+    {id:'back',label:'腰背',key:'4',cx:240,cy:300,r:58,tip:'腰背放松：双手叉腰，缓慢后仰再前屈，重复 8 次。'},
+    {id:'legL',label:'左腿',key:'5',cx:220,cy:440,r:45,tip:'左腿拉伸：扶墙后抬左脚，左手拉脚踝 15 秒。'},
+    {id:'legR',label:'右腿',key:'6',cx:260,cy:440,r:45,tip:'右腿拉伸：扶墙后抬右脚，右手拉脚踝 15 秒。'}
+  ];
+  const zonesEl=$('#reliefZones');
+  const $id=s=>document.getElementById(s);
+  ZONES.forEach(z=>{
+    const d=document.createElement('div');
+    d.className='rz';
+    d.style.cssText=`left:${z.cx/480*100}%;top:${z.cy/560*100}%;width:${z.r*2/480*100}%;aspect-ratio:1`;
+    d.dataset.z=z.id;d.dataset.n=z.key;
+    d.title=z.label;
+    d.addEventListener('pointerdown',e=>{e.preventDefault();hitZone(z);});
+    zonesEl.appendChild(d);
+  });
+  $id('reliefLegend').innerHTML=ZONES.map(z=>`<span><b>${z.key}</b> ${z.label}</span>`).join('');
+  /* 音效 */
+  let AC=null;
+  function sfx(freq,dur,type){
+    try{
+      AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+      AC.resume();
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type=type||'sine';o.frequency.value=freq;
+      g.gain.setValueAtTime(0.12,AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
+      o.connect(g).connect(AC.destination);
+      o.start();o.stop(AC.currentTime+dur);
+    }catch(e){}
+  }
+  /* 状态 */
+  let running=false,score=0,combo=0,maxCombo=0,timeLeft=60,lives=3,tension=30,popped=0,elapsed=0;
+  let spawnTimer=null,tickTimer=null;
+  let best=parseInt(localStorage.getItem('eagleeye_relief_best')||'0',10);
+  function setMouth(kind){
+    const m=$id('reliefMouth');
+    if(!m)return;
+    m.setAttribute('d',kind==='happy'?'M226 116 Q240 130 254 116':kind==='sad'?'M226 128 Q240 114 254 128':'M226 122 Q240 128 254 122');
+  }
+  function updHud(){
+    $id('reliefScore').textContent=score;
+    const c=$id('reliefCombo');c.textContent='x'+combo;c.className=combo>=5?'combo':'';
+    $id('reliefTime').textContent=timeLeft;
+    $id('reliefLives').textContent='♥'.repeat(Math.max(0,lives))+'♡'.repeat(Math.max(0,3-lives));
+    $id('reliefTension').style.width=tension+'%';
+  }
+  function hitZone(z){
+    if(!running)return;
+    const hot=zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`);
+    if(!hot){if(navigator.vibrate)navigator.vibrate(25);return;}
+    clearTimeout(hot._t);
+    hot.remove();
+    combo++;maxCombo=Math.max(maxCombo,combo);
+    const pts=100+combo*10;
+    score+=pts;popped++;
+    tension=Math.max(0,tension-12);
+    const pop=document.createElement('div');
+    pop.className='relief-pop';
+    pop.style.cssText=`left:${z.cx/480*100}%;top:${z.cy/560*100}%`;
+    pop.textContent='+'+pts;
+    stage.appendChild(pop);
+    setTimeout(()=>pop.remove(),850);
+    $id('reliefTip').textContent='💡 '+z.tip;
+    setMouth('happy');setTimeout(()=>setMouth('neutral'),500);
+    sfx(520+combo*40,.15,'sine');
+    if(navigator.vibrate)navigator.vibrate(15);
+    updHud();
+  }
+  function spawn(){
+    if(!running)return;
+    const free=ZONES.filter(z=>!zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`));
+    if(!free.length)return;
+    const z=free[Math.floor(Math.random()*free.length)];
+    const el=zonesEl.querySelector(`[data-z="${z.id}"]`);
+    const hot=document.createElement('div');
+    hot.className='rh-hot';
+    hot.innerHTML='<i></i>';
+    const life=Math.max(2800,4400-elapsed*26);
+    el.appendChild(hot);
+    const t=setTimeout(()=>{
+      if(!running)return;
+      const cur=zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`);
+      if(cur===hot){
+        hot.remove();
+        lives--;tension=Math.min(100,tension+18);combo=0;
+        setMouth('sad');setTimeout(()=>setMouth('neutral'),900);
+        stage.classList.remove('alarm');void stage.offsetWidth;stage.classList.add('alarm');
+        sfx(160,.3,'sawtooth');
+        if(navigator.vibrate)navigator.vibrate([80,50,80]);
+        if(lives<=0){updHud();endGame();return;}
+        updHud();
+      }
+    },life);
+    hot._t=t;
+    setTimeout(()=>{if(document.body.contains(hot))hot.classList.add('late');},life*0.6);
+  }
+  function tick(){
+    if(!running)return;
+    elapsed++;
+    timeLeft--;
+    $id('reliefTime').textContent=timeLeft;
+    if(timeLeft<=0){endGame();return;}
+    const interval=Math.max(650,1350-elapsed*14);
+    clearInterval(spawnTimer);
+    spawnTimer=setInterval(spawn,interval);
+    if(elapsed>20&&Math.random()<0.5)spawn();
+  }
+  function endGame(){
+    running=false;
+    clearInterval(spawnTimer);clearInterval(tickTimer);
+    zonesEl.querySelectorAll('.rh-hot').forEach(h=>{clearTimeout(h._t);h.remove();});
+    setMouth('happy');
+    const stars=score>=1200?3:score>=800?2:score>=400?1:0;
+    if(score>best){best=score;try{localStorage.setItem('eagleeye_relief_best',String(best));}catch(e){}}
+    $id('reliefTitle').textContent='时间到！';
+    $id('reliefStars').innerHTML=Array.from({length:3},(_,i)=>i<stars?'⭐':'<span class="off">⭐</span>').join('');
+    const rank=stars===3?'🥇 肌肉放松大师':stars===2?'🥈 放松达人':stars===1?'🥉 新手放松员':'还需要多多拉伸';
+    $id('reliefMsg').innerHTML=`<span>得分 </span><b style="color:var(--hl)">${score}</b><span> · 击碎 </span><b style="color:var(--grn)">${popped}</b><span> 处 · 最大连击 </span><b>${maxCombo}</b><span> · 最佳 </span><b>${best}</b><br><b style="color:var(--grn)">${rank}</b>`;
+    $id('reliefOverlay').classList.add('show');
+    sfx(660,.2,'triangle');
+  }
+  function startGame(){
+    score=0;combo=0;maxCombo=0;timeLeft=60;lives=3;tension=30;popped=0;elapsed=0;running=true;
+    $id('reliefOverlay').classList.remove('show');
+    zonesEl.querySelectorAll('.rh-hot').forEach(h=>{clearTimeout(h._t);h.remove();});
+    $id('reliefTip').textContent='💡 点击发光部位，或在键盘按 1-6';
+    setMouth('neutral');
+    updHud();
+    clearInterval(spawnTimer);clearInterval(tickTimer);
+    spawnTimer=setInterval(spawn,1350);
+    tickTimer=setInterval(tick,1000);
+    $id('reliefStart').textContent='🔄 重新开始';
+    sfx(440,.12,'triangle');
+  }
+  $id('reliefStart').addEventListener('click',startGame);
+  $id('reliefAgain').addEventListener('click',startGame);
+  addEventListener('keydown',e=>{
+    if(!running)return;
+    const z=ZONES.find(x=>x.key===e.key);
+    if(z)hitZone(z);
+  });
+  updHud();
+})();
 
 /* ============================================================
    对比滑块
