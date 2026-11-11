@@ -4,85 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0B0E13">
-<title>鹰眼 AI · 工地安全监督系统</title>
-<meta name="description" content="施工现场实时风险识别与预警系统：AI 看得见每一个风险">
+<title>鹰眼 AI · 工地安全监管驾驶舱</title>
+<meta name="description" content="施工现场安全监管平台：视频AI识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环">
 <style>
 /* ============ 基础 ============ */
 :root{
-  --bg:#0B0E13; --panel:#12161F; --panel2:#171C28; --line:rgba(255,255,255,.09);
-  --hl:#FFA726; --hl-soft:rgba(255,167,38,.14); --red:#FF4D4F; --yel:#FFD54A; --grn:#3DDC84; --blue:#4DA6FF;
-  --text:#F2F4F8; --dim:#8B93A7;
-  --sky1:#101A2C; --sky2:#0C1420; --moon:#FFD9A0;
-  --crane:#2A3548; --crane-l:#3A4A63; --bld:#1A2434; --bld-w:#FFE9A8;
-  --dust:rgba(255,217,160,.55);
-  --scan:#4DA6FF; --nightbox:#3DDC84;
+  --bg:#0B0E13; --panel:#12161F; --panel2:#161B27; --panel3:#0E131D; --line:rgba(255,255,255,.09);
+  --hl:#FFA726; --red:#FF4D4F; --yel:#FFD54A; --grn:#3DDC84; --blue:#4DA6FF;
+  --text:#F2F4F8; --dim:#8B93A7; --dim2:#5D6B7E;
+  --sky1:#101A2C; --sky2:#0C1420; --bld:#1A2434; --bld-w:#FFE9A8; --crane:#2A3548; --crane-l:#3A4A63;
+  --moon:#FFD9A0; --dust:rgba(255,217,160,.55); --scan:#4DA6FF;
 }
-body.night{
-  --sky1:#060910; --sky2:#04060B; --moon:#C9E4FF;
-  --bld:#101722; --bld-w:#FFD77A; --crane:#141C2A; --crane-l:#1E2A3E;
-  --dust:rgba(201,228,255,.4); --scan:#3DDC84;
-}
+body.night{--sky1:#060910;--sky2:#04060B;--bld:#101722;--bld-w:#FFD77A;--crane:#141C2A;--crane-l:#1E2A3E;--moon:#C9E4FF;--dust:rgba(201,228,255,.4);--scan:#3DDC84}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  background:var(--bg); color:var(--text); font-size:16px; line-height:1.7;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased; overflow-x:hidden;
-}
+body{background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 ::selection{background:var(--hl);color:#0B0E13}
-img,svg{display:block;max-width:100%}
+svg{display:block}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input{font-family:inherit}
-.small{font-size:13px}
-.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
-
-/* 顶部进度条 */
-.prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--hl);box-shadow:0 0 12px var(--hl);z-index:200;transition:width .15s linear}
+input,select{font-family:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--hl);box-shadow:0 0 12px var(--hl);z-index:300;transition:width .15s linear}
 
 /* ============ 导航 ============ */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .35s,box-shadow .35s,backdrop-filter .35s;padding:16px 0}
-.nav.solid{background:rgba(11,14,19,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.45);padding:10px 0}
-.nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 0;transition:.35s}
+.nav.solid{background:rgba(11,14,19,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.45);padding:10px 0}
+.nav-in{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .logo{display:flex;align-items:center;gap:10px}
 .logo svg{width:34px;height:34px}
 .logo b{font-size:20px;letter-spacing:.06em}
-.logo span{font-size:13px;color:var(--dim);letter-spacing:.1em;margin-left:2px}
+.logo span{font-size:13px;color:var(--dim);letter-spacing:.1em}
 .nav-right{display:flex;align-items:center;gap:12px}
 .toggle{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:6px 12px;font-size:14px;color:var(--dim);transition:.3s}
 .toggle b{color:var(--hl);font-weight:600}
-.toggle:active{transform:scale(.96)}
-.btn{padding:13px 30px;border-radius:10px;font-size:16px;font-weight:700;letter-spacing:.08em;transition:transform .25s,box-shadow .25s}
+.btn{padding:12px 26px;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:.06em;transition:transform .25s,box-shadow .25s;display:inline-block}
 .btn-primary{background:linear-gradient(135deg,#FFB000,var(--hl));color:#1a1206;box-shadow:0 6px 22px rgba(255,167,38,.35)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,167,38,.5)}
-.btn-primary:active{transform:scale(.97)}
 .btn-ghost{border:1px solid rgba(255,255,255,.22);color:var(--text)}
 .btn-ghost:hover{border-color:var(--hl);color:var(--hl)}
 @media(max-width:640px){.logo span{display:none}.toggle span{display:none}}
 
 /* ============ HERO ============ */
-.hero{position:relative;height:100vh;min-height:640px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,var(--sky1),var(--sky2))}
-.hero .pl{position:absolute;inset:-4% 0;pointer-events:none;will-change:transform}
-.hero .pl svg{width:100%;height:100%;opacity:1}
-.pl1{z-index:1}.pl2{z-index:2}.pl3{z-index:3}
+.hero{position:relative;height:92vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,var(--sky1),var(--sky2))}
+.pl{position:absolute;inset:-4% 0;pointer-events:none;will-change:transform}
+.pl svg{width:100%;height:100%}
 #dust{position:absolute;inset:0;z-index:4;pointer-events:none}
 .vignette{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 75% 65% at 50% 42%,transparent 40%,rgba(6,9,14,.72) 100%)}
 .scanline{position:absolute;left:0;right:0;height:2px;z-index:6;background:linear-gradient(90deg,transparent,var(--scan),transparent);box-shadow:0 0 18px var(--scan);opacity:.5;animation:scanY 7s linear infinite;pointer-events:none}
 .beam{position:absolute;top:0;bottom:0;width:3px;z-index:6;background:linear-gradient(180deg,transparent,var(--scan),transparent);opacity:.28;animation:scanX 9s ease-in-out infinite;pointer-events:none}
 @keyframes scanY{0%{top:8%}50%{top:92%}100%{top:8%}}
 @keyframes scanX{0%{left:6%}50%{left:92%}100%{left:6%}}
+@keyframes crane{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
 .hero-in{position:relative;z-index:10;padding:0 24px;max-width:900px}
 .hero-kicker{display:inline-block;font-size:14px;letter-spacing:.28em;color:var(--hl);border:1px solid rgba(255,167,38,.35);background:rgba(255,167,38,.08);padding:8px 22px;border-radius:30px;margin-bottom:30px}
-.hero h1{font-size:clamp(38px,6.4vw,76px);font-weight:900;line-height:1.14;letter-spacing:.04em;margin-bottom:18px}
+.hero h1{font-size:clamp(38px,6vw,74px);font-weight:900;line-height:1.14;letter-spacing:.04em;margin-bottom:18px}
 .hero h1 em{font-style:normal;color:var(--hl)}
-.hero .sub{font-size:17px;color:var(--dim);letter-spacing:.12em;margin-bottom:42px}
+.hero .sub{font-size:17px;color:var(--dim);letter-spacing:.12em;margin-bottom:40px}
 .hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-.night-tip{margin-top:26px;font-size:14px;color:var(--dim);letter-spacing:.1em}
-.night-tip b{color:var(--grn)}
-/* 实时事件流 */
+.hero-tags{margin-top:34px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hero-tags span{font-size:13px;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);padding:6px 14px;border-radius:20px;letter-spacing:.06em}
 .feed{position:absolute;left:0;right:0;bottom:0;z-index:12;background:rgba(8,11,17,.78);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
-.feed-in{display:flex;align-items:center;gap:0;overflow:hidden;height:52px;max-width:1200px;margin:0 auto;padding:0 24px}
-.feed-label{flex-shrink:0;font-size:13px;letter-spacing:.14em;color:var(--hl);padding-right:18px;border-right:1px solid var(--line);margin-right:0}
+.feed-in{display:flex;align-items:center;overflow:hidden;height:52px;max-width:1280px;margin:0 auto;padding:0 24px}
+.feed-label{flex-shrink:0;font-size:13px;letter-spacing:.14em;color:var(--hl);padding-right:18px;border-right:1px solid var(--line)}
 .feed-label .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:8px;animation:blink 1.2s infinite;vertical-align:1px}
 @keyframes blink{50%{opacity:.25}}
 .feed-list{flex:1;overflow:hidden;position:relative;height:100%}
@@ -90,55 +74,171 @@ input{font-family:inherit}
 .feed-item b{color:var(--text);font-weight:600}
 .feed-item .t{color:var(--hl);font-variant-numeric:tabular-nums}
 @keyframes feedIn{0%{left:100%}100%{left:-120%}}
-.hero-scroll{position:absolute;bottom:74px;left:50%;transform:translateX(-50%);z-index:11;color:var(--dim);font-size:13px;letter-spacing:.3em;display:flex;flex-direction:column;align-items:center;gap:8px}
-.hero-scroll i{width:1px;height:36px;background:linear-gradient(var(--dim),transparent);display:block;animation:drop 1.6s ease infinite}
-@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-@keyframes crane{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
 
-/* ============ 过渡条 ============ */
-.flow{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:44px 0}
-.flow-in{display:flex;justify-content:space-around;gap:20px;flex-wrap:wrap}
-.flow-item{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(26px)}
-.flow-item.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s ease}
-.flow-item b{font-size:22px;letter-spacing:.16em}
-.flow-item b em{font-style:normal;color:var(--hl)}
-.flow-item span{font-size:14px;color:var(--dim);letter-spacing:.14em}
-
-/* ============ 通用 section ============ */
-.sec{padding:110px 0;position:relative}
+/* ============ 通用 ============ */
+.sec{padding:100px 0}
 .sec.alt{background:var(--panel)}
-.sec-head{text-align:center;margin-bottom:64px}
-.sec-head h2{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:.06em;margin-bottom:14px}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-head h2{font-size:clamp(26px,3.6vw,40px);font-weight:800;letter-spacing:.06em;margin-bottom:12px}
 .sec-head h2 em{font-style:normal;color:var(--hl)}
-.sec-head p{font-size:16px;color:var(--dim);letter-spacing:.1em}
+.sec-head p{font-size:16px;color:var(--dim);letter-spacing:.08em}
 .rv{opacity:0;transform:translateY(42px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
 .rv.in{opacity:1;transform:none}
 
-/* ============ ③ 小人场景区 ============ */
+/* ============ 驾驶舱 ============ */
+.console{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.55);display:grid;grid-template-columns:210px 1fr;min-height:680px}
+.c-side{background:var(--panel3);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.c-brand{display:flex;align-items:center;gap:10px;padding:6px 12px 18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.c-brand b{font-size:16px}
+.c-brand span{font-size:12px;color:var(--dim);display:block;letter-spacing:.06em}
+.c-nav{display:flex;flex-direction:column;gap:4px}
+.c-nav button{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 14px;border-radius:10px;font-size:15px;color:var(--dim);transition:.25s;letter-spacing:.04em}
+.c-nav button .ic{width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:rgba(255,255,255,.05);font-size:14px}
+.c-nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.c-nav button.on{background:rgba(255,167,38,.13);color:var(--hl)}
+.c-nav button.on .ic{background:rgba(255,167,38,.2)}
+.c-side .c-ver{margin-top:auto;font-size:12px;color:var(--dim2);text-align:center;letter-spacing:.08em}
+.c-main{display:flex;flex-direction:column;min-width:0}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.c-top .proj{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;letter-spacing:.04em}
+.c-top .proj .st{font-size:12px;font-weight:400;color:var(--grn);border:1px solid rgba(61,220,132,.4);background:rgba(61,220,132,.08);padding:2px 10px;border-radius:20px}
+.c-top .sys{display:flex;gap:16px;font-size:13px;color:var(--dim);letter-spacing:.04em}
+.c-top .sys b{color:var(--text);font-variant-numeric:tabular-nums}
+.c-body{padding:20px;overflow:hidden;position:relative}
+.c-body .panel{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.c-body .pt{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.c-body .pt b{font-size:15px;letter-spacing:.06em}
+.c-body .pt span{font-size:12px;color:var(--dim);letter-spacing:.06em}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-22px;top:-22px;width:74px;height:74px;border-radius:50%;background:var(--kc,rgba(255,167,38,.1))}
+.kpi .v{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .l{font-size:13px;color:var(--dim);letter-spacing:.06em;margin-top:4px}
+.kpi .d{font-size:12px;margin-top:6px;color:var(--dim2);letter-spacing:.04em}
+.grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+canvas.chart{width:100%;height:180px;display:block}
+.row-list{display:flex;flex-direction:column;gap:8px}
+.rl-item{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:9px 12px;background:var(--panel3);border:1px solid var(--line);border-radius:10px}
+.rl-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rl-item time{color:var(--dim2);font-variant-numeric:tabular-nums;margin-left:auto;font-size:12px}
+.lv{font-size:11px;padding:2px 8px;border-radius:20px;letter-spacing:.04em;white-space:nowrap}
+.lv.h{background:rgba(255,77,79,.14);color:var(--red)}
+.lv.m{background:rgba(255,213,74,.12);color:var(--yel)}
+.lv.l{background:rgba(61,220,132,.12);color:var(--grn)}
+.lv.b{background:rgba(77,166,255,.12);color:var(--blue)}
+
+/* 视频AI */
+.camgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.camcell{background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:.25s;position:relative}
+.camcell:hover{border-color:rgba(255,167,38,.5);transform:translateY(-2px)}
+.camcell.sel{border-color:var(--hl);box-shadow:0 0 0 2px rgba(255,167,38,.3)}
+.camcell .v{position:relative;aspect-ratio:16/9;background:var(--sky2);overflow:hidden}
+.camcell .v svg{width:100%;height:100%}
+.camcell .meta{display:flex;justify-content:space-between;padding:8px 12px;font-size:12.5px;color:var(--dim);letter-spacing:.04em}
+.camcell .meta b{color:var(--text)}
+.dbox{position:absolute;border:2px solid var(--blue);border-radius:4px;animation:track 4s ease-in-out infinite;transition:opacity .3s}
+.dbox::before{content:attr(data-tag);position:absolute;top:-24px;left:-2px;font-size:11px;letter-spacing:.04em;color:#fff;background:rgba(77,166,255,.9);padding:1px 7px;border-radius:4px;white-space:nowrap}
+.dbox.red{border-color:var(--red)}.dbox.red::before{background:rgba(255,77,79,.92)}
+.dbox.yel{border-color:var(--yel)}.dbox.yel::before{background:rgba(255,213,74,.92);color:#231a05}
+.dbox.org{border-color:var(--hl)}.dbox.org::before{background:rgba(255,167,38,.94);color:#1a1206}
+.dbox.off{opacity:0}
+@keyframes track{0%,100%{transform:translate(0,0)}30%{transform:translate(4px,-3px)}60%{transform:translate(-3px,3px)}}
+.ai-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ai-chips span{font-size:13px;color:var(--dim);letter-spacing:.06em}
+.ai-chip{font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid var(--line);color:var(--dim);transition:.25s}
+.ai-chip.on{border-color:var(--hl);color:var(--hl);background:rgba(255,167,38,.1)}
+.bigview{position:relative;background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.bigview .v{position:relative;aspect-ratio:16/7.5;background:var(--sky2)}
+.bigview .v svg{width:100%;height:100%}
+.bigview .ctrl{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+.bigview .ctrl input{flex:1;accent-color:var(--hl)}
+.rec-tag{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);background:rgba(8,11,17,.6);padding:4px 10px;border-radius:6px;letter-spacing:.04em}
+.rec-tag i{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
+
+/* 告警中心 */
+.alarm-table{width:100%;border-collapse:collapse;font-size:14px}
+.alarm-table th{text-align:left;padding:10px 12px;color:var(--dim);font-size:13px;letter-spacing:.06em;border-bottom:1px solid var(--line);white-space:nowrap}
+.alarm-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap}
+.alarm-table tr:hover td{background:rgba(255,167,38,.04)}
+.mini-btn{padding:5px 14px;border-radius:8px;border:1px solid var(--line);font-size:13px;color:var(--hl);transition:.25s}
+.mini-btn:hover{background:rgba(255,167,38,.12)}
+.mini-btn.done{color:var(--grn);border-color:rgba(61,220,132,.4);cursor:default}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-row select{background:var(--panel3);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 12px;font-size:13px;outline:none}
+
+/* 人员定位 */
+.sitemap{position:relative;aspect-ratio:16/8.6;background:var(--panel3);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sitemap svg{width:100%;height:100%}
+.pdot{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--grn);border:2px solid #0B0E13;box-shadow:0 0 8px rgba(61,220,132,.7);transition:left 1.2s linear,top 1.2s linear;cursor:pointer;z-index:3}
+.pdot.warn{background:var(--red);box-shadow:0 0 10px rgba(255,77,79,.8)}
+.pdot::after{content:attr(data-n);position:absolute;left:16px;top:-4px;font-size:11px;color:var(--dim);white-space:nowrap}
+.fence-note{position:absolute;bottom:12px;left:14px;font-size:12.5px;color:var(--dim);display:flex;gap:12px;flex-wrap:wrap;background:rgba(8,11,17,.6);padding:6px 12px;border-radius:8px}
+.worker-card{position:absolute;z-index:6;background:var(--panel2);border:1px solid var(--hl);border-radius:12px;padding:12px 16px;font-size:13.5px;min-width:190px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.worker-card b{font-size:15px}
+.worker-card .close{position:absolute;top:6px;right:10px;color:var(--dim)}
+.worker-card .row{display:flex;justify-content:space-between;gap:14px;padding:2px 0;color:var(--dim)}
+.worker-card .row i{font-style:normal;color:var(--text)}
+
+/* 仪表盘 */
+.gauge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.gauge{background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;position:relative}
+.gauge svg{width:100%;height:auto}
+.gauge .gv{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:-6px}
+.gauge .gl{font-size:12.5px;color:var(--dim);letter-spacing:.06em}
+.gauge.over{border-color:rgba(255,77,79,.5)}
+.gauge.over .gv{color:var(--red)}
+.tower-strip{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+.tower-strip b{color:var(--text);font-variant-numeric:tabular-nums}
+
+/* 隐患闭环 */
+.hz-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.hz-stat{background:var(--panel3);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+.hz-stat b{font-size:24px;font-variant-numeric:tabular-nums;display:block}
+.hz-stat span{font-size:12.5px;color:var(--dim);letter-spacing:.05em}
+.hz-flow{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--dim2);margin:8px 0 14px}
+.hz-flow i{font-style:normal;padding:3px 10px;border-radius:14px;border:1px solid var(--line)}
+.hz-flow i.now{color:var(--hl);border-color:var(--hl);background:rgba(255,167,38,.1)}
+.hz-flow i.passed{color:var(--grn);border-color:rgba(61,220,132,.4)}
+
+/* 弹层 */
+.modal{position:fixed;inset:0;z-index:400;background:rgba(4,6,10,.7);backdrop-filter:blur(6px);display:none;place-items:center;padding:20px}
+.modal.show{display:grid}
+.modal-card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:26px;width:100%;max-width:430px;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.modal-card h3{font-size:18px;margin-bottom:18px;letter-spacing:.06em}
+.mfield{margin-bottom:14px}
+.mfield label{display:block;font-size:13.5px;color:var(--dim);margin-bottom:7px;letter-spacing:.05em}
+.mfield input,.mfield select{width:100%;background:var(--panel3);border:1px solid var(--line);border-radius:9px;color:var(--text);font-size:15px;padding:11px 14px;outline:none}
+.mfield input:focus,.mfield select:focus{border-color:var(--hl)}
+.modal-card .btn{width:100%;text-align:center}
+.toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(20px);background:var(--panel2);border:1px solid rgba(255,167,38,.5);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14.5px;letter-spacing:.05em;opacity:0;pointer-events:none;transition:.35s;z-index:500;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ============ AI 能力卡片 ============ */
 .scenes{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s}
-.card:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(255,167,38,.4);box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .3s,border-color .3s}
+.card:hover{transform:translateY(-6px) scale(1.015);border-color:rgba(255,167,38,.4)}
 .card-vis{position:relative;aspect-ratio:4/3;background:var(--sky2);overflow:hidden}
 .card-vis svg{width:100%;height:100%}
-.scanbox{position:absolute;inset:0;pointer-events:none}
 .sbox{position:absolute;border:2.5px dashed var(--red);border-radius:6px;opacity:0;transition:opacity .3s}
 .sbox::before,.sbox::after{content:"";position:absolute;width:14px;height:14px;border:3px solid var(--red)}
 .sbox::before{top:-3px;left:-3px;border-right:none;border-bottom:none}
 .sbox::after{bottom:-3px;right:-3px;border-left:none;border-top:none}
 .sbox.y{border-color:var(--yel)}.sbox.y::before,.sbox.y::after{border-color:var(--yel)}
 .sbox.o{border-color:var(--hl)}.sbox.o::before,.sbox.o::after{border-color:var(--hl)}
-.sbox.g{border-color:var(--nightbox)}.sbox.g::before,.sbox.g::after{border-color:var(--nightbox)}
-.chip{position:absolute;font-size:13px;letter-spacing:.06em;color:#fff;padding:5px 12px;border-radius:6px;white-space:nowrap;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+.sbox.g{border-color:var(--grn)}.sbox.g::before,.sbox.g::after{border-color:var(--grn)}
+.chip{position:absolute;font-size:13px;letter-spacing:.05em;color:#fff;padding:5px 12px;border-radius:6px;white-space:nowrap;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
 .chip.red{background:rgba(255,77,79,.92)}.chip.yel{background:rgba(255,213,74,.92);color:#231a05}.chip.org{background:rgba(255,167,38,.94);color:#1a1206}.chip.grn{background:rgba(61,220,132,.92);color:#04140c}
-.scan-move{position:absolute;left:0;right:0;height:2px;background:var(--scan);box-shadow:0 0 14px var(--scan);opacity:0;transition:opacity .2s}
-.alarm{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:8px;opacity:0;transform:scale(.6);transition:opacity .3s,transform .3s}
+.scan-move{position:absolute;left:0;right:0;height:2px;background:var(--scan);box-shadow:0 0 14px var(--scan);opacity:0}
+.alarm{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:8px;opacity:0;transform:scale(.6);transition:.3s}
 .alarm .bell{width:34px;height:34px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:17px;animation:ring .5s ease infinite}
 @keyframes ring{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
 .alarm .wave{display:flex;align-items:center;gap:4px}
 .alarm .wave i{width:4px;background:var(--red);border-radius:2px;animation:wave 1s ease infinite}
 .alarm .wave i:nth-child(1){height:10px}.alarm .wave i:nth-child(2){height:18px;animation-delay:.15s}.alarm .wave i:nth-child(3){height:26px;animation-delay:.3s}.alarm .wave i:nth-child(4){height:18px;animation-delay:.45s}.alarm .wave i:nth-child(5){height:10px;animation-delay:.6s}
 @keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.15)}}
-.done-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:15px;font-weight:700;letter-spacing:.12em;color:var(--grn);border:2.5px solid var(--grn);border-radius:8px;padding:8px 18px;background:rgba(4,20,12,.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.done-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);font-size:14px;font-weight:700;letter-spacing:.1em;color:var(--grn);border:2.5px solid var(--grn);border-radius:8px;padding:8px 18px;background:rgba(4,20,12,.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
 .card.on .sbox,.card.judge .sbox,.card.alarm .sbox,.card.done .sbox{opacity:1}
 .card.judge .chip,.card.done .chip{opacity:1;transform:none}
 .card.alarm .scan-move{opacity:1;animation:scanMV 1s linear}
@@ -148,151 +248,59 @@ input{font-family:inherit}
 @keyframes scanMV{0%{top:0}100%{top:100%}}
 .card.done .chip{background:rgba(61,220,132,.92);color:#04140c}
 .card.done .done-stamp{transform:translate(-50%,-50%) scale(1)}
-.card.done .sbox{border-color:var(--grn)}.card.done .sbox::before,.card.done .sbox::after{border-color:var(--grn)}
-.card.done .sbox.y{border-color:var(--grn)}.card.done .sbox.y::before,.card.done .sbox.y::after{border-color:var(--grn)}
-.card.done .sbox.o{border-color:var(--grn)}.card.done .sbox.o::before,.card.done .sbox.o::after{border-color:var(--grn)}
-.card.done .sbox.g{border-color:var(--grn)}.card.done .sbox.g::before,.card.done .sbox.g::after{border-color:var(--grn)}
-.card-foot{padding:16px 18px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line)}
-.card-name{font-size:16px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
-.card-name .lv{font-size:12px;padding:2px 10px;border-radius:20px;letter-spacing:.08em}
-.lv.r{background:rgba(255,77,79,.14);color:var(--red)}
-.lv.y{background:rgba(255,213,74,.12);color:var(--yel)}
-.lv.o{background:rgba(255,167,38,.13);color:var(--hl)}
-.lv.g{background:rgba(61,220,132,.12);color:var(--grn)}
+.card.done .sbox,.card.done .sbox::before,.card.done .sbox::after{border-color:var(--grn)}
+.card-foot{padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line)}
+.card-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .steps{display:flex;justify-content:space-between;gap:4px}
-.steps i{flex:1;text-align:center;font-size:13px;font-style:normal;color:var(--dim);padding:6px 0;border-radius:8px;transition:.3s;letter-spacing:.04em}
-.steps i b{display:block;font-size:14px;margin-bottom:2px}
+.steps i{flex:1;text-align:center;font-size:12px;font-style:normal;color:var(--dim);padding:5px 0;border-radius:8px;transition:.3s}
+.steps i b{display:block;font-size:13px}
 .steps i.on{background:rgba(255,167,38,.12);color:var(--hl);font-weight:600}
 .steps i.pass{color:var(--grn)}
-@media(max-width:980px){
-  .scenes{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:14px;-webkit-overflow-scrolling:touch}
-  .card{flex:0 0 78%;scroll-snap-align:center}
-  .scenes::-webkit-scrollbar{height:4px}
-  .scenes::-webkit-scrollbar-thumb{background:var(--hl);border-radius:2px}
-}
-@media(max-width:640px){.card{flex:0 0 88%}}
+@media(max-width:980px){.scenes{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px}.card{flex:0 0 78%;scroll-snap-align:center}.console{grid-template-columns:1fr}.c-side{flex-direction:row;overflow-x:auto;align-items:center}.c-nav{flex-direction:row}.c-nav button{white-space:nowrap}.c-brand{display:none}.c-side .c-ver{display:none}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.camgrid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
 
-/* ============ ④ 真实应用 ============ */
-.live{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:stretch}
-.viewport{background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.video{position:relative;aspect-ratio:16/9;background:var(--sky2);overflow:hidden}
-.video svg{width:100%;height:100%}
-.hud{position:absolute;inset:0;pointer-events:none}
-.rec{position:absolute;top:14px;left:16px;display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.08em;color:var(--dim);background:rgba(8,11,17,.6);padding:6px 12px;border-radius:8px}
-.rec .rdot{width:9px;height:9px;border-radius:50%;background:var(--red);animation:blink 1s infinite}
-.badges{position:absolute;top:14px;right:16px;display:flex;gap:8px}
-.badge{font-size:13px;padding:4px 12px;border-radius:8px;background:rgba(8,11,17,.6);letter-spacing:.06em}
-.badge.h{color:var(--red)}.badge.m{color:var(--yel)}.badge.l{color:var(--grn)}
-.dbox{position:absolute;border:2px solid var(--blue);border-radius:4px;animation:track 4s ease-in-out infinite}
-.dbox::before{content:attr(data-tag);position:absolute;top:-26px;left:-2px;font-size:12px;letter-spacing:.05em;color:#fff;background:rgba(77,166,255,.9);padding:2px 8px;border-radius:4px;white-space:nowrap}
-.dbox.red{border-color:var(--red)}.dbox.red::before{background:rgba(255,77,79,.92)}
-.dbox.yel{border-color:var(--yel)}.dbox.yel::before{background:rgba(255,213,74,.92);color:#231a05}
-.dbox.org{border-color:var(--hl)}.dbox.org::before{background:rgba(255,167,38,.94);color:#1a1206}
-@keyframes track{0%,100%{transform:translate(0,0)}30%{transform:translate(4px,-3px)}60%{transform:translate(-3px,3px)}}
-.video-bar{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:rgba(8,11,17,.66);font-size:13px;color:var(--dim);letter-spacing:.06em;flex-wrap:wrap}
-.video-bar b{color:var(--text);font-variant-numeric:tabular-nums}
-.demo-water{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-18deg);font-size:15px;letter-spacing:.4em;color:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.14);padding:8px 26px;border-radius:8px;pointer-events:none;white-space:nowrap}
-.cams{display:flex;gap:12px;padding:14px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
-.cam{flex:1;min-width:120px;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:14px;color:var(--dim);transition:.25s;display:flex;flex-direction:column;gap:4px}
-.cam b{color:var(--text);font-size:15px}
-.cam.active{border-color:var(--hl);color:var(--hl);background:rgba(255,167,38,.08)}
-.cam:hover{border-color:rgba(255,167,38,.5)}
-.timeaxis{display:flex;align-items:center;gap:14px;padding:12px 16px;border-top:1px solid var(--line)}
-.timeaxis input[type=range]{flex:1;accent-color:var(--hl);height:4px;cursor:pointer}
-.timeaxis span{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.events{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.events h3{font-size:17px;letter-spacing:.1em;margin-bottom:6px}
-.ev{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--line);font-size:14px;transition:.25s}
-.ev:hover{border-color:rgba(255,167,38,.4)}
-.ev .lvdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.ev .info{flex:1;min-width:0}
-.ev .info b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ev .info span{font-size:13px;color:var(--dim)}
-.ev time{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.ev .play{padding:6px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;color:var(--hl);flex-shrink:0;transition:.25s}
-.ev .play:hover{background:rgba(255,167,38,.12)}
-.fullbtn{margin-top:auto;display:flex;justify-content:center;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--dim);transition:.25s;letter-spacing:.1em}
-.fullbtn:hover{color:var(--hl);border-color:rgba(255,167,38,.5)}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--panel2);border:1px solid rgba(255,167,38,.5);color:var(--text);padding:12px 24px;border-radius:12px;font-size:15px;letter-spacing:.06em;opacity:0;pointer-events:none;transition:.35s;z-index:300;box-shadow:0 12px 34px rgba(0,0,0,.5)}
-.toast.show{opacity:1;transform:translateX(-50%)}
-@media(max-width:900px){.live{grid-template-columns:1fr}}
-
-/* ============ ⑤ 对比 ============ */
+/* ============ 对比 ============ */
 .cmp{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);user-select:none;touch-action:none;aspect-ratio:16/8;min-height:340px}
 .cmp-layer{position:absolute;inset:0}
 .cmp-right{clip-path:inset(0 0 0 var(--p,50%))}
 .cmp-left svg{filter:grayscale(.92) brightness(.82) contrast(1.05)}
-.cmp-tag{position:absolute;top:18px;font-size:14px;letter-spacing:.08em;background:rgba(8,11,17,.72);padding:7px 16px;border-radius:8px;z-index:3}
+.cmp-tag{position:absolute;top:18px;font-size:14px;background:rgba(8,11,17,.72);padding:7px 16px;border-radius:8px;z-index:3;letter-spacing:.06em}
 .cmp-tag.l{left:18px;color:var(--dim)}
 .cmp-tag.r{right:18px;color:var(--hl)}
 .cmp-tag b{display:block;font-size:16px;color:var(--text)}
 .cmp-tag.r b{color:var(--hl)}
 .cmp-handle{position:absolute;top:0;bottom:0;left:var(--p,50%);width:3px;background:var(--hl);z-index:4;transform:translateX(-50%);box-shadow:0 0 16px rgba(255,167,38,.6)}
 .cmp-handle::after{content:"⇔";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:var(--hl);color:#1a1206;border-radius:50%;display:grid;place-items:center;font-size:19px;font-weight:700;box-shadow:0 0 0 6px rgba(255,167,38,.25)}
-.cmp-note{display:flex;justify-content:space-between;margin-top:16px;font-size:14px;color:var(--dim);letter-spacing:.06em;gap:12px}
+.cmp-note{display:flex;justify-content:space-between;margin-top:16px;font-size:14px;color:var(--dim);gap:12px}
 .cmp-note b{color:var(--hl)}
 
-/* ============ ⑥ 数据 ============ */
+/* ============ 数据 ============ */
 .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .metric{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:34px 26px;text-align:center;transition:transform .3s,border-color .3s}
 .metric:hover{transform:translateY(-6px);border-color:rgba(255,167,38,.4)}
-.metric .num{font-size:clamp(40px,5vw,58px);font-weight:900;letter-spacing:.02em;color:var(--hl);font-variant-numeric:tabular-nums;line-height:1.1}
+.metric .num{font-size:clamp(40px,5vw,58px);font-weight:900;color:var(--hl);font-variant-numeric:tabular-nums;line-height:1.1}
 .metric .unit{font-size:18px;color:var(--dim);margin-left:4px}
 .metric .label{margin-top:12px;font-size:16px;color:var(--dim);letter-spacing:.1em}
 .metric svg{width:100%;height:34px;margin-top:16px;opacity:.8}
 .metric svg path{fill:none;stroke:var(--hl);stroke-width:2.4;stroke-dasharray:240;stroke-dashoffset:240;transition:stroke-dashoffset 1.6s ease .3s}
 .metric.in svg path{stroke-dashoffset:0}
 .dash-note{margin-top:28px;text-align:center;font-size:14px;color:var(--dim);letter-spacing:.08em}
-.dash-note b{color:var(--hl);font-weight:600}
+.dash-note b{color:var(--hl)}
 @media(max-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
-
-/* ============ ⑦ 预约 ============ */
-.book{max-width:560px;margin:0 auto;background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:52px 46px;position:relative;overflow:hidden}
-.book::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--hl),transparent)}
-.field{margin-bottom:22px}
-.field label{display:block;font-size:15px;color:var(--dim);letter-spacing:.1em;margin-bottom:10px}
-.field input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:16px;padding:15px 18px;outline:none;transition:.25s}
-.field input:focus{border-color:var(--hl);box-shadow:0 0 0 3px rgba(255,167,38,.15)}
-.field input.err{border-color:var(--red);animation:shake .4s}
-@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-.book .btn{width:100%;font-size:17px;padding:16px}
-.book-done{text-align:center;padding:34px 0;display:none}
-.book-done .check{width:86px;height:86px;margin:0 auto 26px;border-radius:50%;background:rgba(61,220,132,.14);border:3px solid var(--grn);display:grid;place-items:center}
-.book-done .check svg{width:42px;height:42px}
-.book-done .check path{stroke:var(--grn);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw 0.7s ease forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-.book-done h3{font-size:22px;margin-bottom:10px;letter-spacing:.08em}
-.book-done p{font-size:15px;color:var(--dim)}
-.book form.hidden{display:none}
-.book .sec-head{margin-bottom:36px}
-
-/* 手机悬浮预约条 */
-.float-cta{position:fixed;left:0;right:0;bottom:0;z-index:150;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(11,14,19,.9);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:none;transform:translateY(100%);transition:transform .4s}
-.float-cta.show{transform:none}
-.float-cta .btn{width:100%;text-align:center}
-@media(max-width:640px){.float-cta{display:block}}
 
 /* ============ 页脚 ============ */
 footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
 .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;margin-bottom:44px}
 .foot-grid h4{font-size:16px;letter-spacing:.14em;margin-bottom:16px}
-.foot-grid p,.foot-grid a{font-size:14px;color:var(--dim);line-height:2}
-.foot-grid a:hover{color:var(--hl)}
-.foot-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--dim);letter-spacing:.06em}
+.foot-grid p{font-size:14px;color:var(--dim);line-height:2}
+.foot-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--dim)}
 @media(max-width:700px){.foot-grid{grid-template-columns:1fr}}
-
-/* 动效降级 */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-  html{scroll-behavior:auto}
-}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 
 <div class="prog" id="prog"></div>
 
-<!-- ============ 导航 ============ -->
 <header class="nav" id="nav">
   <div class="wrap nav-in">
     <a class="logo" href="#top">
@@ -302,164 +310,129 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
         <circle cx="20" cy="19" r="2.6" fill="#FFA726"/>
         <path d="M20 5 L20 11 M20 27 L20 33 M6 13 L11 16 M34 13 L29 16" stroke="#FFA726" stroke-width="2" stroke-linecap="round"/>
       </svg>
-      <b>鹰眼 AI</b><span>工地安全监督系统</span>
+      <b>鹰眼 AI</b><span>工地安全监管驾驶舱</span>
     </a>
     <div class="nav-right">
-      <button class="toggle" id="modeBtn" aria-label="切换昼夜模式">
-        <b id="modeIcon">☀</b><span id="modeTxt">白班模式</span>
-      </button>
-      <a class="btn btn-primary" href="#book">预约演示</a>
+      <button class="toggle" id="modeBtn"><b id="modeIcon">☀</b><span id="modeTxt">白班模式</span></button>
+      <a class="btn btn-primary" href="#console">进入监管驾驶舱</a>
     </div>
   </div>
 </header>
 
-<!-- ============ ① HERO ============ -->
+<!-- HERO -->
 <section class="hero" id="top">
-  <!-- 远景：天空 + 城市轮廓 -->
-  <div class="pl pl1" id="pl1"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <div class="pl" id="pl1"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <rect width="1440" height="810" fill="var(--sky2)"/>
-    <circle cx="1150" cy="140" r="46" fill="var(--moon)" opacity=".9"/>
-    <circle cx="1138" cy="132" r="42" fill="var(--sky2)" opacity=".55"/>
-    <g fill="var(--bld)" opacity=".85">
-      <rect x="80" y="430" width="150" height="380"/><rect x="250" y="360" width="120" height="450"/>
-      <rect x="1200" y="400" width="160" height="410"/><rect x="1050" y="470" width="120" height="340"/>
-      <rect x="620" y="500" width="200" height="310"/><rect x="850" y="440" width="150" height="370"/>
-    </g>
-    <g fill="var(--bld-w)" opacity=".5">
-      <rect x="100" y="470" width="14" height="18"/><rect x="130" y="470" width="14" height="18"/><rect x="100" y="520" width="14" height="18"/><rect x="130" y="520" width="14" height="18"/>
-      <rect x="270" y="400" width="12" height="16"/><rect x="296" y="400" width="12" height="16"/><rect x="270" y="440" width="12" height="16"/><rect x="296" y="440" width="12" height="16"/>
-      <rect x="870" y="480" width="12" height="16"/><rect x="896" y="480" width="12" height="16"/><rect x="870" y="520" width="12" height="16"/><rect x="896" y="520" width="12" height="16"/>
-      <rect x="1220" y="440" width="12" height="16"/><rect x="1246" y="440" width="12" height="16"/><rect x="1220" y="480" width="12" height="16"/><rect x="1246" y="480" width="12" height="16"/>
-    </g>
+    <circle cx="1150" cy="140" r="46" fill="var(--moon)" opacity=".9"/><circle cx="1138" cy="132" r="42" fill="var(--sky2)" opacity=".55"/>
+    <g fill="var(--bld)" opacity=".85"><rect x="80" y="430" width="150" height="380"/><rect x="250" y="360" width="120" height="450"/><rect x="1200" y="400" width="160" height="410"/><rect x="1050" y="470" width="120" height="340"/><rect x="620" y="500" width="200" height="310"/><rect x="850" y="440" width="150" height="370"/></g>
+    <g fill="var(--bld-w)" opacity=".5"><rect x="100" y="470" width="14" height="18"/><rect x="130" y="470" width="14" height="18"/><rect x="100" y="520" width="14" height="18"/><rect x="130" y="520" width="14" height="18"/><rect x="270" y="400" width="12" height="16"/><rect x="296" y="400" width="12" height="16"/><rect x="870" y="480" width="12" height="16"/><rect x="896" y="480" width="12" height="16"/><rect x="1220" y="440" width="12" height="16"/><rect x="1246" y="440" width="12" height="16"/></g>
   </svg></div>
-  <!-- 中景：塔吊群（摆动吊臂） -->
-  <div class="pl pl2" id="pl2"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <div class="pl" id="pl2"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <g stroke="var(--crane)" stroke-width="14" stroke-linecap="round" fill="none">
       <path d="M300 810 V330"/><path d="M420 810 V300"/>
-      <g style="transform-origin:300px 330px;animation:crane 9s ease-in-out infinite">
-        <path d="M300 330 H700"/><path d="M640 330 V396" stroke-width="10"/><path d="M640 396 H700" stroke-width="10"/>
-      </g>
-      <g style="transform-origin:420px 300px;animation:crane 13s ease-in-out infinite reverse">
-        <path d="M420 300 H120" stroke-width="12"/><path d="M180 300 V356" stroke-width="9"/><path d="M180 356 H120" stroke-width="9"/>
-      </g>
+      <g style="transform-origin:300px 330px;animation:crane 9s ease-in-out infinite"><path d="M300 330 H700"/><path d="M640 330 V396" stroke-width="10"/><path d="M640 396 H700" stroke-width="10"/></g>
+      <g style="transform-origin:420px 300px;animation:crane 13s ease-in-out infinite reverse"><path d="M420 300 H120" stroke-width="12"/><path d="M180 300 V356" stroke-width="9"/><path d="M180 356 H120" stroke-width="9"/></g>
     </g>
-    <g stroke="var(--crane-l)" stroke-width="5" fill="none">
-      <path d="M280 380 L320 330 M320 380 L280 330 M400 350 L440 300 M440 350 L400 300"/>
-    </g>
-    @keyframes crane{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+    <g stroke="var(--crane-l)" stroke-width="5" fill="none"><path d="M280 380 L320 330 M320 380 L280 330 M400 350 L440 300 M440 350 L400 300"/></g>
   </svg></div>
-  <!-- 近景：脚手架工地 -->
-  <div class="pl pl3" id="pl3"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <div class="pl" id="pl3"><svg viewBox="0 0 1440 810" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <rect y="600" width="1440" height="210" fill="#0A0E15"/>
-    <g stroke="var(--crane-l)" stroke-width="8" opacity=".9">
-      <path d="M0 810 V520 H240 V810"/><path d="M80 810 V560 H160 V810"/>
-      <path d="M1200 810 V500 H1440 V810"/><path d="M1280 810 V540 H1360 V810"/>
-    </g>
-    <g stroke="var(--crane)" stroke-width="6" opacity=".9">
-      <path d="M0 560 H240 M0 600 H240 M0 640 H240 M1200 540 H1440 M1200 580 H1440 M1200 620 H1440 M1200 660 H1440"/>
-    </g>
-    <g stroke="var(--crane-l)" stroke-width="7">
-      <path d="M80 560 L160 640 M160 560 L80 640 M1280 540 L1360 620 M1360 540 L1280 620" opacity=".8"/>
-    </g>
+    <g stroke="var(--crane-l)" stroke-width="8" opacity=".9"><path d="M0 810 V520 H240 V810"/><path d="M80 810 V560 H160 V810"/><path d="M1200 810 V500 H1440 V810"/><path d="M1280 810 V540 H1360 V810"/></g>
+    <g stroke="var(--crane)" stroke-width="6" opacity=".9"><path d="M0 560 H240 M0 600 H240 M0 640 H240 M1200 540 H1440 M1200 580 H1440 M1200 620 H1440 M1200 660 H1440"/></g>
+    <g stroke="var(--crane-l)" stroke-width="7"><path d="M80 560 L160 640 M160 560 L80 640 M1280 540 L1360 620 M1360 540 L1280 620" opacity=".8"/></g>
     <rect x="520" y="740" width="420" height="70" fill="var(--bld)"/>
-    <g fill="var(--bld-w)" opacity=".6">
-      <rect x="560" y="762" width="22" height="26"/><rect x="610" y="762" width="22" height="26"/><rect x="660" y="762" width="22" height="26"/>
-      <rect x="710" y="762" width="22" height="26"/><rect x="760" y="762" width="22" height="26"/><rect x="810" y="762" width="22" height="26"/>
-    </g>
+    <g fill="var(--bld-w)" opacity=".6"><rect x="560" y="762" width="22" height="26"/><rect x="610" y="762" width="22" height="26"/><rect x="660" y="762" width="22" height="26"/><rect x="710" y="762" width="22" height="26"/><rect x="760" y="762" width="22" height="26"/><rect x="810" y="762" width="22" height="26"/></g>
   </svg></div>
-
   <canvas id="dust"></canvas>
   <div class="vignette"></div>
   <div class="scanline"></div>
   <div class="beam"></div>
 
   <div class="hero-in">
-    <span class="hero-kicker">施工现场实时风险识别与预警</span>
+    <span class="hero-kicker">施工现场安全监管平台 · 全模块演示</span>
     <h1>工地的每一个风险<br><em>AI 都看得见</em></h1>
-    <p class="sub">不眨眼 · 不疲劳 · 秒级报警 · 全天候守护</p>
+    <p class="sub">视频 AI 识别 · 告警中心 · 人员定位 · 设备监测 · 环境联动 · 隐患闭环</p>
     <div class="hero-cta">
-      <a class="btn btn-primary" href="#book">预约演示</a>
-      <a class="btn btn-ghost" href="#live">▶ 看真实应用</a>
+      <a class="btn btn-primary" href="#console">▶ 进入监管驾驶舱</a>
+      <a class="btn btn-ghost" href="#scenes">AI 识别能力</a>
     </div>
-    <p class="night-tip" id="nightTip">☀ 当前：白班模式 · 安全帽 / 警戒区 / 安全带识别</p>
+    <div class="hero-tags">
+      <span>安全帽 / 反光衣识别</span><span>行为与越界检测</span><span>塔吊 / 升降机 / 基坑监测</span><span>扬尘噪声联动喷淋</span><span>隐患闭环治理</span>
+    </div>
   </div>
-
-  <div class="hero-scroll" aria-hidden="true">SCROLL<i></i></div>
 
   <div class="feed" aria-hidden="true">
     <div class="feed-in">
-      <span class="feed-label"><span class="dot"></span>实时识别事件</span>
+      <span class="feed-label"><span class="dot"></span>实时告警流</span>
       <div class="feed-list" id="feedList"></div>
     </div>
   </div>
 </section>
 
-<!-- ============ ② 过渡条 ============ -->
-<section class="flow">
-  <div class="wrap flow-in">
-    <div class="flow-item" data-i="0"><b>看<em>得</em>见</b><span>全天候视频监测</span></div>
-    <div class="flow-item" data-i="1"><b>认<em>得</em>出</b><span>AI 秒级判定</span></div>
-    <div class="flow-item" data-i="2"><b>叫<em>得</em>醒</b><span>声光联动报警</span></div>
-    <div class="flow-item" data-i="3"><b>管<em>得</em>住</b><span>隐患闭环处置</span></div>
-  </div>
-</section>
-
-<!-- ============ ③ 小人场景区 ============ -->
-<section class="sec" id="scenes">
+<!-- ============ 监管驾驶舱 ============ -->
+<section class="sec" id="console">
   <div class="wrap">
     <div class="sec-head rv">
-      <h2>AI 在一线 · <em>4 类典型风险</em> 现场识别</h2>
-      <p>每个场景 = 一次完整的 识别 → 判定 → 报警 → 闭环</p>
+      <h2>监管驾驶舱 · <em>这就是系统本身</em></h2>
+      <p>左侧切换 8 大模块 · 每一个都可以亲手操作</p>
     </div>
-    <div class="scenes" id="sceneWrap"><!-- JS 注入 4 张卡 --></div>
-  </div>
-</section>
 
-<!-- ============ ④ 真实应用 ============ -->
-<section class="sec alt" id="live">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <h2>真实应用 · <em>这就是监控画面</em></h2>
-      <p>点击机位切换 · 拖动时间轴回放 · 点击事件回看</p>
-    </div>
-    <div class="live rv" id="liveGrid">
-      <div class="viewport" id="viewport">
-        <div class="video" id="video"><!-- JS 注入 SVG 场景 + HUD --></div>
-        <div class="cams" id="cams"></div>
-        <div class="timeaxis">
-          <span id="axisTime">13:42:08</span>
-          <input type="range" id="axisRange" min="0" max="100" value="100" aria-label="回放时间轴">
-          <span>实时</span>
-        </div>
-      </div>
-      <aside class="events">
-        <h3>最近事件</h3>
-        <div id="evList"></div>
-        <button class="fullbtn" id="fullBtn">⛶ 全屏查看监控画面</button>
+    <div class="console rv" id="consoleBox">
+      <aside class="c-side">
+        <div class="c-brand"><b>鹰眼 AI</b><span>智慧工地监管平台 v3.2</span></div>
+        <nav class="c-nav" id="cNav">
+          <button class="on" data-m="overview"><span class="ic">📊</span>驾驶舱总览</button>
+          <button data-m="video"><span class="ic">🎥</span>视频 AI 识别</button>
+          <button data-m="alarm"><span class="ic">🚨</span>告警中心</button>
+          <button data-m="people"><span class="ic">👷</span>人员定位</button>
+          <button data-m="machine"><span class="ic">🏗</span>机械设备</button>
+          <button data-m="env"><span class="ic">🌫</span>环境监测</button>
+          <button data-m="hazard"><span class="ic">📋</span>隐患排查</button>
+          <button data-m="report"><span class="ic">📈</span>数据报表</button>
+        </nav>
+        <div class="c-ver">DEMO · 模拟演示数据<br>真实部署以实测为准</div>
       </aside>
+      <div class="c-main">
+        <div class="c-top">
+          <div class="proj">🏗 高新区城市更新项目 · 二标段 <span class="st">● 系统运行中</span></div>
+          <div class="sys"><span>时间 <b id="sysClock">--:--:--</b></span><span>天气 <b>晴 26℃</b></span><span>在线设备 <b>142/148</b></span></div>
+        </div>
+        <div class="c-body" id="cBody"><!-- 模块内容 --></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ ⑤ 人工 vs AI ============ -->
+<!-- ============ AI 识别能力 ============ -->
+<section class="sec alt" id="scenes">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <h2>AI 识别能力 · <em>4 类典型风险</em></h2>
+      <p>每个场景 = 识别 → 判定 → 报警 → 闭环</p>
+    </div>
+    <div class="scenes" id="sceneWrap"></div>
+  </div>
+</section>
+
+<!-- ============ 对比 ============ -->
 <section class="sec" id="compare">
   <div class="wrap">
     <div class="sec-head rv">
       <h2>一道题 · <em>谁来盯工地</em></h2>
-      <p>拖动中间滑块，亲眼看看差别</p>
+      <p>拖动中间滑块对比</p>
     </div>
     <div class="cmp rv" id="cmp">
       <div class="cmp-layer cmp-left"><svg id="cmpLeft" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
       <div class="cmp-layer cmp-right"><svg id="cmpRight" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
       <div class="cmp-tag l">人工巡检<b>1 天 3 次 · 靠经验 · 会疲劳</b></div>
       <div class="cmp-tag r">AI 监督<b>7×24 · 秒级告警 · 不眨眼</b></div>
-      <div class="cmp-handle" id="cmpHandle"></div>
+      <div class="cmp-handle"></div>
     </div>
-    <div class="cmp-note"><span>◀ 拖动滑块对比</span><b>隐患从「发现靠运气」到「识别常态化」</b><span>拖动滑块对比 ▶</span></div>
+    <div class="cmp-note"><span>◀ 拖动对比</span><b>从「发现靠运气」到「识别常态化」</b><span>拖动对比 ▶</span></div>
   </div>
 </section>
 
-<!-- ============ ⑥ 数据 ============ -->
+<!-- ============ 数据 ============ -->
 <section class="sec alt" id="data">
   <div class="wrap">
     <div class="sec-head rv">
@@ -467,52 +440,25 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       <p>以下指标请以真实测试数据为准</p>
     </div>
     <div class="dash" id="dash">
-      <div class="metric rv" data-i="0"><div class="num" data-num="0" data-fill="xx.x">xx.x<span class="unit">%</span></div><div class="label">识别准确率</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 28 L25 24 L50 26 L75 18 L100 20 L125 12 L150 14 L175 6 L200 8"/></svg></div>
-      <div class="metric rv" data-i="1"><div class="num" data-num="0" data-fill="x.x">x.x<span class="unit">秒</span></div><div class="label">告警响应时间</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 26 L25 22 L50 24 L75 16 L100 10 L125 12 L150 8 L175 6 L200 4"/></svg></div>
-      <div class="metric rv" data-i="2"><div class="num" data-num="0" data-fill="xx">xx<span class="unit">路</span></div><div class="label">日均分析画面</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 24 L25 18 L50 22 L75 14 L100 16 L125 20 L150 12 L175 16 L200 10"/></svg></div>
-      <div class="metric rv" data-i="3"><div class="num" data-num="0" data-fill="xx">xx<span class="unit">个</span></div><div class="label">已上线工地</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 30 L25 26 L50 28 L75 20 L100 22 L125 14 L150 16 L175 8 L200 10"/></svg></div>
+      <div class="metric rv" data-i="0"><div class="num">xx.x<span class="unit">%</span></div><div class="label">识别准确率</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 28 L25 24 L50 26 L75 18 L100 20 L125 12 L150 14 L175 6 L200 8"/></svg></div>
+      <div class="metric rv" data-i="1"><div class="num">x.x<span class="unit">秒</span></div><div class="label">告警响应时间</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 26 L25 22 L50 24 L75 16 L100 10 L125 12 L150 8 L175 6 L200 4"/></svg></div>
+      <div class="metric rv" data-i="2"><div class="num">xx<span class="unit">路</span></div><div class="label">日均分析画面</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 24 L25 18 L50 22 L75 14 L100 16 L125 20 L150 12 L175 16 L200 10"/></svg></div>
+      <div class="metric rv" data-i="3"><div class="num">xx<span class="unit">个</span></div><div class="label">已上线工地</div><svg viewBox="0 0 200 34" preserveAspectRatio="none"><path d="M0 30 L25 26 L50 28 L75 20 L100 22 L125 14 L150 16 L175 8 L200 10"/></svg></div>
     </div>
-    <p class="dash-note rv">数据来源：<b>____________</b>（请替换为你方真实测试报告口径，无实测数据请勿填写）</p>
+    <p class="dash-note rv">数据来源：<b>____________</b>（替换为你方真实测试报告口径，无实测数据请勿填写）</p>
   </div>
 </section>
 
-<!-- ============ ⑦ 预约 ============ -->
-<section class="sec" id="book">
-  <div class="wrap">
-    <div class="book rv">
-      <div class="sec-head">
-        <h2>预约 <em>现场演示</em></h2>
-        <p>30 分钟 · 看真实系统跑一遍</p>
-      </div>
-      <form id="bookForm">
-        <div class="field"><label for="fName">姓名</label><input id="fName" type="text" placeholder="怎么称呼您" autocomplete="name"></div>
-        <div class="field"><label for="fComp">公司</label><input id="fComp" type="text" placeholder="公司 / 项目部名称" autocomplete="organization"></div>
-        <div class="field"><label for="fTel">联系方式</label><input id="fTel" type="text" placeholder="手机号或邮箱" autocomplete="tel"></div>
-        <button class="btn btn-primary" type="submit">提交预约</button>
-      </form>
-      <div class="book-done" id="bookDone">
-        <div class="check"><svg viewBox="0 0 50 50"><path d="M12 26 L21 35 L38 15"/></svg></div>
-        <h3>预约已收到</h3>
-        <p>我们将在 1 个工作日内与您联系</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ ⑧ 页脚 ============ -->
+<!-- ============ 页脚 ============ -->
 <footer>
   <div class="wrap">
     <div class="foot-grid">
       <div>
         <a class="logo" href="#top">
-          <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true">
-            <path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/>
-            <circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/>
-            <circle cx="20" cy="19" r="2.6" fill="#FFA726"/>
-          </svg>
+          <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><path d="M20 3 L35 13 L32 32 Q20 38 8 32 L5 13 Z" fill="rgba(255,167,38,.12)" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="6.5" fill="#0B0E13" stroke="#FFA726" stroke-width="2.4"/><circle cx="20" cy="19" r="2.6" fill="#FFA726"/></svg>
           <b>鹰眼 AI</b>
         </a>
-        <p style="margin-top:16px">施工现场实时风险识别与预警系统<br>让每一个风险，都被看见。</p>
+        <p style="margin-top:16px">施工现场安全监管平台<br>视频 AI · 设备物联 · 隐患闭环 一体化</p>
       </div>
       <div>
         <h4>联系方式</h4>
@@ -524,105 +470,93 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 鹰眼 AI · 工地安全监督系统</span>
-      <span>页面演示画面均为模拟数据 · 产品指标以真实测试为准</span>
+      <span>© 2026 鹰眼 AI · 工地安全监管驾驶舱</span>
+      <span>页面演示数据均为模拟 · 产品指标以真实测试为准</span>
     </div>
   </div>
 </footer>
 
-<!-- 手机悬浮预约条 -->
-<div class="float-cta" id="floatCta"><a class="btn btn-primary" href="#book">预约现场演示</a></div>
+<div class="modal" id="modal"><div class="modal-card" id="modalCard"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
 'use strict';
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pad=n=>String(n).padStart(2,'0');
-
-/* ============ ★ 需要替换的真实数据（一处配置） ============ */
+const rnd=(a,b)=>a+Math.random()*(b-a);
+/* ★★★ 真实数据一处配置（有实测再填，勿编造）★★★ */
 const REAL_DATA={accuracy:null,response:null,cameras:null,sites:null};
-/* 例：REAL_DATA.accuracy=98.6 后该卡片自动变成计数动画显示 98.6% */
 
-/* ============ 进度条 / 导航 / 悬浮条 ============ */
-const prog=$('#prog'),nav=$('#nav'),floatCta=$('#floatCta');
+/* ===== 进度条 / 导航 ===== */
+const prog=$('#prog'),nav=$('#nav');
 addEventListener('scroll',()=>{
   const h=document.documentElement,max=h.scrollHeight-h.clientHeight;
   prog.style.width=(max?(h.scrollTop/max)*100:0)+'%';
   nav.classList.toggle('solid',h.scrollTop>40);
-  floatCta.classList.toggle('show',h.scrollTop>innerHeight*0.8);
 },{passive:true});
 
-/* ============ 昼夜切换 ============ */
-const modeBtn=$('#modeBtn'),modeIcon=$('#modeIcon'),modeTxt=$('#modeTxt');
+/* ===== 昼夜切换 ===== */
+const modeBtn=$('#modeBtn');
 let night=false;
 modeBtn.addEventListener('click',()=>{
   night=!night;
   document.body.classList.toggle('night',night);
-  modeIcon.textContent=night?'☾':'☀';
-  modeTxt.textContent=night?'夜班模式':'白班模式';
-  $('#nightTip').innerHTML=night
-    ?'☾ 当前：夜班模式 · 反光衣 / 夜间侵入识别'
-    :'☀ 当前：白班模式 · 安全帽 / 警戒区 / 安全带识别';
+  $('#modeIcon').textContent=night?'☾':'☀';
+  $('#modeTxt').textContent=night?'夜班模式':'白班模式';
 });
 
-/* ============ Hero 视差 + 粒子 ============ */
-const pl1=$('#pl1'),pl2=$('#pl2'),pl3=$('#pl3'),hero=$('.hero');
-let tx=0,ty=0,curX=0,curY=0,curS=0;
+/* ===== Hero 视差 + 粒子 ===== */
+const pls=[$('#pl1'),$('#pl2'),$('#pl3')],hero=$('.hero');
+let tx=0,ty=0,cx=0,cy=0,cs=0;
 if(!REDUCE&&matchMedia('(pointer:fine)').matches){
-  hero.addEventListener('mousemove',e=>{
-    tx=(e.clientX/innerWidth-.5)*2; ty=(e.clientY/innerHeight-.5)*2;
-  });
+  hero.addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2;});
 }
-const tick=()=>{
-  curX+=(tx-curX)*.05; curY+=(ty-curY)*.05;
-  const sy=scrollY;
-  curS+=(sy-curS)*.09;
-  pl1.style.transform=`translate(${curX*-10}px,${curS*0.06+curY*-6}px)`;
-  pl2.style.transform=`translate(${curX*-22}px,${curS*0.14+curY*-12}px)`;
-  pl3.style.transform=`translate(${curX*-38}px,${curS*0.26+curY*-20}px)`;
-  requestAnimationFrame(tick);
-};
-if(!REDUCE)tick();
-else pl3.style.transform='none';
-
+(function loop(){
+  cx+=(tx-cx)*.05;cy+=(ty-cy)*.05;cs+=(scrollY-cs)*.09;
+  if(!REDUCE){
+    pls[0].style.transform=`translate(${cx*-10}px,${cs*.06+cy*-6}px)`;
+    pls[1].style.transform=`translate(${cx*-22}px,${cs*.14+cy*-12}px)`;
+    pls[2].style.transform=`translate(${cx*-38}px,${cs*.26+cy*-20}px)`;
+  }
+  requestAnimationFrame(loop);
+})();
 const dust=$('#dust'),dctx=dust.getContext('2d');
 let DW=0,DH=0,motes=[];
 function sizeDust(){
-  DW=dust.width=hero.clientWidth; DH=dust.height=hero.clientHeight;
-  motes=Array.from({length:44},()=>({x:Math.random()*DW,y:Math.random()*DH,r:.8+Math.random()*2,s:.25+Math.random()*.6,sw:Math.random()*6.28}));
+  DW=dust.width=hero.clientWidth;DH=dust.height=hero.clientHeight;
+  motes=Array.from({length:42},()=>({x:Math.random()*DW,y:Math.random()*DH,r:.8+Math.random()*2,s:.25+Math.random()*.6,sw:Math.random()*6.28}));
 }
 sizeDust();addEventListener('resize',sizeDust);
-let heroVisible=true;
-new IntersectionObserver(e=>heroVisible=e[0].isIntersecting).observe(hero);
+let heroOn=true;
+new IntersectionObserver(e=>heroOn=e[0].isIntersecting).observe(hero);
 (function dustLoop(){
-  if(heroVisible&&!REDUCE){
+  if(heroOn&&!REDUCE){
     dctx.clearRect(0,0,DW,DH);
-    const c=getComputedStyle(document.body).getPropertyValue('--dust').trim()||'rgba(255,217,160,.55)';
+    const c=getComputedStyle(document.body).getPropertyValue('--dust').trim();
     motes.forEach(m=>{
-      m.y-=m.s; m.x+=Math.sin(m.sw+=.01)*.3;
+      m.y-=m.s;m.x+=Math.sin(m.sw+=.01)*.3;
       if(m.y<-6){m.y=DH+6;m.x=Math.random()*DW;}
-      dctx.globalAlpha=.35+.3*Math.sin(m.sw);
-      dctx.fillStyle=c; dctx.beginPath(); dctx.arc(m.x,m.y,m.r,0,6.283); dctx.fill();
+      dctx.globalAlpha=.35+.3*Math.sin(m.sw);dctx.fillStyle=c;
+      dctx.beginPath();dctx.arc(m.x,m.y,m.r,0,6.283);dctx.fill();
     });
   }
   requestAnimationFrame(dustLoop);
 })();
 
-/* ============ 实时事件流 ============ */
+/* ===== Hero 实时告警流 ===== */
 const feedPool=[
   ['未佩戴安全帽','C-03 塔吊东侧','高'],
   ['进入吊装警戒区','B-01 吊装区','中'],
   ['高处作业未系安全带','A-02 3号楼','高'],
   ['未穿反光背心','C-07 夜间出入口','中'],
   ['临边越界预警','D-05 基坑西侧','低'],
-  ['消防通道占用','B-04 北门','低']
+  ['扬尘超标 · 喷淋已联动','E-01 环境站','低']
 ];
 const feedList=$('#feedList');
 let feedSeq=0;
 function pushFeed(){
-  if(document.hidden)return;
   const e=feedPool[feedSeq++%feedPool.length];
   const d=new Date();
   const item=document.createElement('div');
@@ -634,128 +568,609 @@ function pushFeed(){
 }
 setInterval(pushFeed,3200);pushFeed();
 
-/* ============ 滚动渐入 ============ */
+/* ===== 滚动渐入 ===== */
 const io=new IntersectionObserver(es=>es.forEach(en=>{
   if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
 }),{threshold:.15,rootMargin:'0px 0px -30px 0px'});
 $$('.rv').forEach((el,i)=>{el.style.setProperty('--d',(i%4*90)+'ms');io.observe(el);});
-/* 过渡条 4 词 */
-new IntersectionObserver(es=>es.forEach(en=>{
-  if(en.isIntersecting){
-    $$('.flow-item').forEach((el,i)=>{setTimeout(()=>el.classList.add('in'),i*260);});
-  }
-}),{threshold:.4}).observe($('.flow'));
 
-/* ============ ③ 小人场景卡（统一风格 SVG） ============ */
+/* ===== toast ===== */
+let toastTimer=null;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ============================================================
+   监管驾驶舱
+   ============================================================ */
+const cBody=$('#cBody');
+const nowStr=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());};
+setInterval(()=>{const c=$('#sysClock');if(c)c.textContent=nowStr();},1000);
+
+/* ---- 通用小工具 ---- */
+function panel(title,tag,inner,extra){
+  return `<div class="panel" ${extra||''}><div class="pt"><b>${title}</b>${tag?`<span>${tag}</span>`:''}</div>${inner}</div>`;
+}
+function gaugeSVG(pct,color){
+  const R=54,C=2*Math.PI*R;
+  const a=Math.max(0.001,Math.min(1,pct))*C;
+  return `<svg viewBox="0 0 140 82"><path d="M16 70 A54 54 0 0 1 124 70" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="11" stroke-linecap="round"/><path d="M16 70 A54 54 0 0 1 124 70" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${a.toFixed(1)} ${C.toFixed(1)}" style="transition:stroke-dasharray 1s ease;filter:drop-shadow(0 0 6px ${color})"/></svg>`;
+}
+function drawLine(cv,data,color,fill){
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+  cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+  ctx.clearRect(0,0,W,H);
+  const max=Math.max(...data)*1.15||1,n=data.length;
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+  for(let i=1;i<=3;i++){const y=H*i/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  if(fill){
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,color+'55');g.addColorStop(1,color+'00');
+    ctx.beginPath();ctx.moveTo(0,H);
+    data.forEach((v,i)=>{const x=i/(n-1)*W,y=H-v/max*H;ctx.lineTo(x,y);});
+    ctx.lineTo(W,H);ctx.closePath();ctx.fillStyle=g;ctx.fill();
+  }
+  ctx.beginPath();
+  data.forEach((v,i)=>{const x=i/(n-1)*W,y=H-v/max*H;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.shadowColor=color;ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;
+  const lx=W,ly=H-data[n-1]/max*H;
+  ctx.beginPath();ctx.arc(lx,ly,3.5,0,6.283);ctx.fillStyle=color;ctx.fill();
+}
+function drawBars(cv,data,color){
+  const ctx=cv.getContext('2d');
+  const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+  cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+  ctx.clearRect(0,0,W,H);
+  const max=Math.max(...data)*1.2||1,bw=W/data.length*.55;
+  data.forEach((v,i)=>{
+    const h=v/max*H,x=i*W/data.length+(W/data.length-bw)/2;
+    const g=ctx.createLinearGradient(0,H-h,0,H);
+    g.addColorStop(0,color);g.addColorStop(1,color+'22');
+    ctx.fillStyle=g;ctx.fillRect(x,H-h,bw,h);
+  });
+}
+
+/* ---- 模块内容 ---- */
+const MODULES={};
+
+/* ① 总览 */
+MODULES.overview=function(){
+  const trend=[8,12,9,15,11,18,14,23,17,13,10,16];
+  const types=[['安全帽',14,'#FF4D4F'],['反光衣',5,'#3DDC84'],['越界',9,'#FFD54A'],['行为',6,'#4DA6FF'],['其他',3,'#8B93A7']];
+  const maxT=14;
+  return `
+  <div class="kpis">
+    <div class="kpi" style="--kc:rgba(255,167,38,.12)"><div class="v" style="color:var(--hl)" id="kpiWorkers">1286</div><div class="l">在册劳务人员</div><div class="d">今日在场 <b style="color:var(--grn)">863</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,77,79,.12)"><div class="v" style="color:var(--red)" id="kpiAlarm">23</div><div class="l">今日告警</div><div class="d">高风险 <b style="color:var(--red)">4</b> · 已处置 <b style="color:var(--grn)">19</b></div></div>
+    <div class="kpi" style="--kc:rgba(255,213,74,.12)"><div class="v" style="color:var(--yel)" id="kpiPending">3</div><div class="l">待处置隐患</div><div class="d">超 24h 未闭环 <b style="color:var(--red)">1</b></div></div>
+    <div class="kpi" style="--kc:rgba(61,220,132,.12)"><div class="v" style="color:var(--grn)">96%</div><div class="l">设备在线率</div><div class="d">142 / 148 台在线</div></div>
+  </div>
+  <div class="grid-2">
+    ${panel('今日告警趋势（小时）','单位：起',`<canvas class="chart" id="cvTrend" style="height:190px"></canvas>`)}
+    ${panel('告警类型分布','今日',types.map(t=>`
+      <div class="rl-item"><span class="dot" style="background:${t[2]}"></span><span style="width:70px">${t[0]}</span>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><i style="display:block;height:100%;width:${t[1]/maxT*100}%;background:${t[2]};border-radius:4px"></i></div>
+      <b style="font-variant-numeric:tabular-nums">${t[1]}</b></div>`).join(''))}
+  </div>
+  <div class="grid-2">
+    ${panel('实时快讯','滚动更新',`<div class="row-list" id="kvList"></div>`)}
+    ${panel('区域风险热力','红>橙>黄>蓝',`
+      <svg viewBox="0 0 420 220" style="width:100%;height:190px" aria-hidden="true">
+        <rect width="420" height="220" fill="#0E131D"/>
+        <rect x="20" y="30" width="120" height="80" rx="8" fill="rgba(255,77,79,.22)" stroke="#FF4D4F"/><text x="80" y="76" fill="#FF4D4F" font-size="14" text-anchor="middle">基坑区 · 高</text>
+        <rect x="160" y="30" width="120" height="80" rx="8" fill="rgba(255,167,38,.2)" stroke="#FFA726"/><text x="220" y="76" fill="#FFA726" font-size="14" text-anchor="middle">吊装区 · 较高</text>
+        <rect x="300" y="30" width="100" height="80" rx="8" fill="rgba(255,213,74,.16)" stroke="#FFD54A"/><text x="350" y="76" fill="#FFD54A" font-size="14" text-anchor="middle">加工区 · 中</text>
+        <rect x="20" y="130" width="180" height="70" rx="8" fill="rgba(77,166,255,.14)" stroke="#4DA6FF"/><text x="110" y="170" fill="#4DA6FF" font-size="14" text-anchor="middle">生活区 · 低</text>
+        <rect x="220" y="130" width="180" height="70" rx="8" fill="rgba(61,220,132,.12)" stroke="#3DDC84"/><text x="310" y="170" fill="#3DDC84" font-size="14" text-anchor="middle">出入口 · 正常</text>
+      </svg>`)}
+  </div>`;
+};
+
+/* ② 视频AI */
+const CAM_POOL=[
+  {id:'C-01',name:'工地出入口',scene:'gate'},
+  {id:'B-01',name:'吊装区',scene:'crane'},
+  {id:'D-05',name:'基坑临边',scene:'pit'},
+  {id:'E-03',name:'材料加工区',scene:'yard'}
+];
+function siteScene(kind){
+  const G='<rect width="960" height="540" fill="var(--sky2)"/>';
+  if(kind==='gate')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><rect x="0" y="330" width="960" height="14" fill="#2A3548"/><g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g><rect x="430" y="330" width="90" height="90" fill="#171C28" stroke="#3A4A63" stroke-width="4"/><text x="460" y="382" fill="#8B93A7" font-size="20" text-anchor="middle">入口</text><g stroke="#FFA726" stroke-width="5" opacity=".7"><path d="M380 420 V360 M520 420 V360"/></g><g fill="#1A2434"><rect x="40" y="150" width="200" height="140"/><rect x="60" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="140" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>`;
+  if(kind==='crane')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><path d="M0 420 L120 420 L240 330 L840 330 L960 420 Z" fill="none" stroke="#FFD54A" stroke-width="4" stroke-dasharray="18 12" opacity=".8"/><g stroke="#3A4A63" stroke-width="12" fill="none"><path d="M700 420 V100"/><path d="M700 100 H880" stroke-width="10"/><path d="M880 100 V140 M880 140 H930 M930 140 V160" stroke-width="8"/></g><path d="M694 160 h12 l-6 18 z" fill="#FFD54A"/><text x="330" y="300" fill="#FFD54A" font-size="18" letter-spacing="3">警戒区</text><g fill="#1A2434"><rect x="60" y="200" width="180" height="220"/></g>`;
+  if(kind==='pit')return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><path d="M0 420 H960" stroke="#2A3548" stroke-width="8"/><path d="M180 420 L320 540 L640 540 L780 420" fill="#0A0E15" stroke="#3A4A63" stroke-width="5"/><path d="M200 420 L340 520 M760 420 L620 520" stroke="#3A4A63" stroke-width="4" opacity=".6"/><g stroke="#FFA726" stroke-width="5"><path d="M60 420 V360 M120 420 V360 M840 420 V360 M900 420 V360"/><path d="M60 370 H120 M840 370 H900"/></g><text x="480" y="290" fill="#FFA726" font-size="18" letter-spacing="3">临边危险</text>`;
+  return G+`<rect y="420" width="960" height="120" fill="#0E141F"/><g fill="#1A2434"><rect x="80" y="260" width="260" height="160"/><rect x="500" y="280" width="200" height="140"/></g><g fill="#8B93A7" opacity=".5"><rect x="120" y="200" width="90" height="60"/><rect x="260" y="220" width="70" height="40"/><rect x="540" y="220" width="80" height="60"/><rect x="660" y="240" width="50" height="30"/></g><g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g>`;
+}
 function workerSVG(x,y,s,opts){
-  /* opts: {helmet:true, vest:true, dark:false}  统一风格：圆头+简洁线条 */
+  opts=opts||{};
   const skin=opts.dark?'#6E7A8F':'#E8C39A';
-  const pants='#2A3140';
-  const shirt=opts.vest?'#FFA726':'#4A5568';
+  const pants='#2A3140',shirt=opts.vest===false?'#4A5568':'#FFA726';
   const sc=s||1;
-  let svg='';
-  if(opts.high!==undefined){
-    svg+=`<rect x="${x-40}" y="${y+60}" width="${80*sc}" height="10" fill="#3A4A63"/>`;
-  }
-  svg+=`<rect x="${x-13*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/>
-  <rect x="${x+2*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/>
-  <rect x="${x-15*sc}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/>
-  <rect x="${x+0*sc}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/>
-  <rect x="${x-15*sc}" y="${y+16*sc}" width="${30*sc}" height="${24*sc}" rx="${6*sc}" fill="${shirt}"/>
-  <rect x="${x-22*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/>
-  <rect x="${x+14*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/>
-  <rect x="${x-15*sc}" y="${y+22*sc}" width="${30*sc}" height="${3*sc}" fill="#FFD9A0" opacity=".9"/>
-  <circle cx="${x}" cy="${y+8*sc}" r="${11*sc}" fill="${skin}"/>
-  <circle cx="${x-16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/>
-  <circle cx="${x+16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/>`;
-  if(opts.helmet){
-    svg+=`<path d="M${x-13*sc} ${y+3*sc} a13 13 0 0 1 ${26*sc} 0 l-2 ${-2} l${-22*sc} 0 z" fill="#FFA726" stroke="#D97F00" stroke-width="1.2"/>
-    <rect x="${x-4*sc}" y="${y-14*sc}" width="${8*sc}" height="${3*sc}" rx="1.5" fill="#FFD9A0"/>`;
-  }else{
-    svg+=`<path d="M${x-11*sc} ${y+2*sc} a11 11 0 0 1 ${22*sc} 0 z" fill="#3A2A1A"/>`;
-  }
+  let svg=`<rect x="${x-13*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x+2*sc}" y="${y+34*sc}" width="${11*sc}" height="${26*sc}" fill="${pants}"/><rect x="${x-15*sc}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x}" y="${y+56*sc}" width="${15*sc}" height="${7*sc}" fill="#1A202C"/><rect x="${x-15*sc}" y="${y+16*sc}" width="${30*sc}" height="${24*sc}" rx="${6*sc}" fill="${shirt}"/><rect x="${x-22*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x+14*sc}" y="${y+17*sc}" width="${8*sc}" height="${22*sc}" rx="4" fill="${shirt}"/><rect x="${x-15*sc}" y="${y+22*sc}" width="${30*sc}" height="${3*sc}" fill="#FFD9A0" opacity=".9"/><circle cx="${x}" cy="${y+8*sc}" r="${11*sc}" fill="${skin}"/><circle cx="${x-16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/><circle cx="${x+16*sc}" cy="${y+18*sc}" r="${4*sc}" fill="${skin}"/>`;
+  if(opts.helmet===false){svg+=`<path d="M${x-11*sc} ${y+2*sc} a11 11 0 0 1 ${22*sc} 0 z" fill="#3A2A1A"/>`;}
+  else{svg+=`<path d="M${x-13*sc} ${y+3*sc} a13 13 0 0 1 ${26*sc} 0 l-2 -2 l${-22*sc} 0 z" fill="#FFA726" stroke="#D97F00" stroke-width="1.2"/><rect x="${x-4*sc}" y="${y-14*sc}" width="${8*sc}" height="${3*sc}" rx="1.5" fill="#FFD9A0"/>`;}
   return svg;
 }
+const DBOXES={
+  gate:[{t:'helmet',cls:'red',tag:'未佩戴安全帽',x:'18%',y:'36%',w:'9%',h:'25%'},{t:'person',cls:'',tag:'人员',x:'40%',y:'38%',w:'9%',h:'24%'},{t:'person',cls:'',tag:'人员',x:'58%',y:'42%',w:'9%',h:'22%'}],
+  crane:[{t:'fence',cls:'yel',tag:'进入吊装警戒区',x:'30%',y:'32%',w:'14%',h:'34%'},{t:'person',cls:'',tag:'人员',x:'64%',y:'42%',w:'9%',h:'24%'}],
+  pit:[{t:'edge',cls:'org',tag:'临边越界预警',x:'44%',y:'32%',w:'13%',h:'32%'},{t:'person',cls:'',tag:'人员',x:'12%',y:'44%',w:'9%',h:'24%'}],
+  yard:[{t:'smoke',cls:'red',tag:'吸烟行为',x:'26%',y:'40%',w:'11%',h:'26%'},{t:'vest',cls:'org',tag:'未穿反光衣',x:'60%',y:'42%',w:'10%',h:'24%'}]
+};
+const AI_TYPES=[['helmet','安全帽'],['vest','反光衣'],['smoke','吸烟'],['fence','越界'],['edge','临边'],['person','人员']];
+let aiOn={helmet:true,vest:true,smoke:true,fence:true,edge:true,person:true};
+function camCellHtml(cam,i){
+  const boxes=DBOXES[cam.scene].map((b,j)=>`<div class="dbox ${b.cls} ${aiOn[b.t]?'':'off'}" data-tag="${b.tag}" data-t="${b.t}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('');
+  return `<div class="camcell" data-c="${i}">
+    <div class="v"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(cam.scene)}</svg>
+      <div class="rec-tag"><i></i>${cam.id} · ${cam.name}</div>
+      ${boxes}
+    </div>
+    <div class="meta"><b>${cam.name}</b><span>AI 在线 · 2K</span></div>
+  </div>`;
+}
+MODULES.video=function(){
+  return `
+  <div class="ai-chips"><span>识别类型开关：</span>${AI_TYPES.map(t=>`<button class="ai-chip ${aiOn[t[0]]?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('')}</div>
+  <div class="bigview" id="bigView">
+    <div class="v" id="bigVideo"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(CAM_POOL[0].scene)}</svg>
+      <div class="rec-tag"><i></i><span id="bigRec">C-01 · 工地出入口</span> · <span id="bigTime">${nowStr()}</span></div>
+      <div id="bigBoxes"></div>
+    </div>
+    <div class="ctrl"><span>回放时间轴</span><input type="range" min="0" max="100" value="100" id="bigAxis"><span id="bigAxisT">实时</span></div>
+  </div>
+  <div class="camgrid" style="margin-top:14px" id="camGrid">${CAM_POOL.map((c,i)=>camCellHtml(c,i)).join('')}</div>`;
+};
+function renderBigCam(i){
+  const cam=CAM_POOL[i];
+  $('#bigVideo').innerHTML=`<svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${siteScene(cam.scene)}</svg>
+    <div class="rec-tag"><i></i><span id="bigRec">${cam.id} · ${cam.name}</span> · <span id="bigTime">${nowStr()}</span></div>
+    <div id="bigBoxes">${DBOXES[cam.scene].map((b,j)=>`<div class="dbox ${b.cls} ${aiOn[b.t]?'':'off'}" data-tag="${b.tag}" data-t="${b.t}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${j*.7}s"></div>`).join('')}</div>`;
+  $$('#camGrid .camcell').forEach(el=>el.classList.toggle('sel',+el.dataset.c===i));
+  toast('已切换机位 '+cam.id+' · '+cam.name);
+}
+
+/* ③ 告警中心 */
+const ALARMS=[
+  {t:'09:12:34',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',lvT:'高风险',st:0},
+  {t:'09:05:18',cam:'B-01 吊装区',type:'进入吊装警戒区',lv:'m',lvT:'警戒',st:0},
+  {t:'08:47:02',cam:'A-02 3号楼',type:'高处作业未系安全带',lv:'h',lvT:'高风险',st:0},
+  {t:'08:21:44',cam:'E-03 材料加工区',type:'吸烟行为',lv:'m',lvT:'警戒',st:1},
+  {t:'07:58:11',cam:'D-05 基坑西侧',type:'临边越界',lv:'l',lvT:'低',st:1},
+  {t:'07:33:26',cam:'C-07 夜间出入口',type:'未穿反光背心',lv:'m',lvT:'警戒',st:1},
+  {t:'07:12:09',cam:'C-03 塔吊东侧',type:'未佩戴安全帽',lv:'h',lvT:'高风险',st:1},
+  {t:'06:44:51',cam:'E-01 环境站',type:'扬尘超标联动喷淋',lv:'l',lvT:'低',st:1}
+];
+let alarmFilter='all';
+MODULES.alarm=function(){
+  return `
+  <div class="filter-row">
+    <span style="font-size:13px;color:var(--dim)">筛选：</span>
+    <button class="ai-chip ${alarmFilter==='all'?'on':''}" data-f="all">全部</button>
+    <button class="ai-chip ${alarmFilter==='h'?'on':''}" data-f="h">高风险</button>
+    <button class="ai-chip ${alarmFilter==='m'?'on':''}" data-f="m">警戒</button>
+    <button class="ai-chip ${alarmFilter==='l'?'on':''}" data-f="l">低风险</button>
+    <select id="alarmTypeSel"><option value="">全部类型</option><option>未佩戴安全帽</option><option>进入吊装警戒区</option><option>高处作业未系安全带</option><option>吸烟行为</option><option>临边越界</option><option>未穿反光背心</option><option>扬尘超标联动喷淋</option></select>
+  </div>
+  <div class="grid-2" style="grid-template-columns:1.6fr 1fr">
+    ${panel('告警事件列表','点击「处理」完成闭环',`<table class="alarm-table"><thead><tr><th>时间</th><th>机位</th><th>类型</th><th>等级</th><th>状态</th><th></th></tr></thead><tbody id="alarmTbody"></tbody></table>`,)`id="alarmPanel"`}
+    <div>
+      ${panel('本周告警分布','按类型',`<canvas class="chart" id="cvDonut" style="height:170px"></canvas>`)}
+      ${panel('处置率','本周',`
+        <div class="rl-item"><span style="color:var(--grn)">已处置</span><b style="margin-left:auto">${Math.round((ALARMS.filter(a=>a.st).length/ALARMS.length)*100)}%</b></div>
+        <div class="rl-item"><span style="color:var(--dim)">平均处置时长</span><b style="margin-left:auto">x.x 分钟</b></div>
+        <div class="rl-item"><span style="color:var(--dim)">推送触达率</span><b style="margin-left:auto">xx.x%</b></div>`)}
+    </div>
+  </div>`;
+};
+function renderAlarmTable(){
+  const tSel=$('#alarmTypeSel')?$('#alarmTypeSel').value:'';
+  const rows=ALARMS.filter(a=>{
+    if(alarmFilter==='h'&&a.lv!=='h')return false;
+    if(alarmFilter==='m'&&a.lv!=='m')return false;
+    if(alarmFilter==='l'&&a.lv!=='l')return false;
+    if(tSel&&a.type!==tSel)return false;
+    return true;
+  });
+  $('#alarmTbody').innerHTML=rows.map((a,i)=>`
+    <tr><td style="color:var(--dim2)">${a.t}</td><td>${a.cam}</td><td>${a.type}</td>
+    <td><span class="lv ${a.lv}">${a.lvT}</span></td>
+    <td>${a.st?'<span class="lv l">已处置</span>':'<span class="lv b">待处理</span>'}</td>
+    <td>${a.st?'<button class="mini-btn done">已闭环 ✓</button>':`<button class="mini-btn" data-i="${ALARMS.indexOf(a)}">处理</button>`}</td></tr>`).join('');
+}
+
+/* ④ 人员定位 */
+const WORKERS=[
+  {n:'张伟',r:'钢筋工',x:62,y:30},{n:'李强',r:'塔吊司机',x:30,y:22},{n:'王芳',r:'信号工',x:38,y:44},
+  {n:'赵磊',r:'木工',x:70,y:52},{n:'陈静',r:'安全员',x:50,y:38},{n:'刘洋',r:'电工',x:22,y:58},
+  {n:'孙浩',r:'架子工',x:58,y:64},{n:'周敏',r:'资料员',x:82,y:30},{n:'吴刚',r:'焊工',x:44,y:66}
+];
+let fenceOn=false;
+MODULES.people=function(){
+  return `
+  <div class="filter-row">
+    <span style="font-size:13px;color:var(--dim)">基坑电子围栏：</span>
+    <button class="ai-chip ${fenceOn?'on':''}" id="fenceBtn">${fenceOn?'围栏开启中 · 点击关闭':'点击开启电子围栏'}</button>
+    <span style="font-size:13px;color:var(--dim)">点地图上的绿点查看人员档案</span>
+  </div>
+  <div class="sitemap" id="sitemap">
+    <svg viewBox="0 0 1000 540" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="1000" height="540" fill="#0E131D"/>
+      <g stroke="rgba(255,255,255,.06)"><path d="M0 90 H1000 M0 180 H1000 M0 270 H1000 M0 360 H1000 M0 450 H1000 M125 0 V540 M250 0 V540 M375 0 V540 M500 0 V540 M625 0 V540 M750 0 V540 M875 0 V540"/></g>
+      <path d="M600 0 V540 M0 80 H1000" stroke="#2A3548" stroke-width="8" fill="none"/>
+      <rect x="40" y="120" width="180" height="140" rx="8" fill="#1A2434"/><text x="130" y="195" fill="#8B93A7" font-size="16" text-anchor="middle">办公区</text>
+      <rect x="40" y="300" width="180" height="120" rx="8" fill="#1A2434"/><text x="130" y="365" fill="#8B93A7" font-size="16" text-anchor="middle">生活区</text>
+      <rect x="700" y="120" width="220" height="160" rx="8" fill="#1A2434"/><text x="810" y="205" fill="#8B93A7" font-size="16" text-anchor="middle">加工区</text>
+      <rect x="320" y="300" width="260" height="180" rx="8" fill="${fenceOn?'rgba(255,77,79,.16)':'rgba(255,167,38,.1)'}" stroke="${fenceOn?'#FF4D4F':'#FFA726'}" stroke-width="3" stroke-dasharray="14 8"/>
+      <text x="450" y="395" fill="${fenceOn?'#FF4D4F':'#FFA726'}" font-size="16" text-anchor="middle">基坑危险区 ${fenceOn?'· 电子围栏已布防':'· 未布防'}</text>
+      <g stroke="#3A4A63" stroke-width="14" stroke-linecap="round" fill="none"><path d="M560 540 V240"/><path d="M560 240 H800"/><path d="M740 240 V300 M740 300 H800 M800 300 V320" stroke-width="9"/></g>
+      <text x="640" y="180" fill="#8B93A7" font-size="15" text-anchor="middle">1# 塔吊</text>
+    </svg>
+    ${WORKERS.map((w,i)=>`<div class="pdot" data-i="${i}" data-n="${w.n}" style="left:${w.x}%;top:${w.y}%"></div>`).join('')}
+    <div class="fence-note"><span style="color:var(--grn)">● 在线 9 人</span><span>▲ 塔吊 1 台运行</span><span>${fenceOn?'<b style="color:var(--red)">围栏布防中</b>':'围栏未开启'}</span></div>
+  </div>`;
+};
+function moveWorkers(){
+  $$('.pdot').forEach(dot=>{
+    const i=+dot.dataset.i,w=WORKERS[i];
+    let nx=w.x+rnd(-3,3),ny=w.y+rnd(-3,3);
+    /* 基坑区 32%-58% x, 55%-88% y：围栏开启时驱逐 */
+    const inPit=nx>32&&nx<58&&ny>55&&ny<88;
+    if(fenceOn&&inPit){
+      nx=w.x+(w.x>45?6:-6);ny=w.y-6;
+      dot.classList.add('warn');
+      if(Math.random()<.4)toast('⚠ 越界告警：'+w.n+' 闯入基坑危险区');
+    }else dot.classList.remove('warn');
+    w.x=Math.max(6,Math.min(94,nx));w.y=Math.max(14,Math.min(92,ny));
+    dot.style.left=w.x+'%';dot.style.top=w.y+'%';
+  });
+}
+
+/* ⑤ 机械设备 */
+let tower={load:2.4,torque:78,wind:5.2,angle:126};
+let lift={load:0.9,people:6,height:24};
+let pitData=[2.1,2.3,2.2,2.5,2.4,2.7,2.6,2.8,2.7,2.9,2.8,3.0];
+MODULES.machine=function(){
+  return `
+  <div class="grid-3">
+    ${panel('1# 塔吊 · 运行中','TC-5010',`
+      <div class="gauge-grid" style="grid-template-columns:1fr 1fr">
+        <div class="gauge"><div id="gLoad">${gaugeSVG(tower.load/5,'#FFA726')}</div><div class="gv">${tower.load.toFixed(1)}<span style="font-size:12px;color:var(--dim)"> t</span></div><div class="gl">吊重（额定 5t）</div></div>
+        <div class="gauge"><div id="gTorque">${gaugeSVG(tower.torque/100,'#4DA6FF')}</div><div class="gv">${Math.round(tower.torque)}<span style="font-size:12px;color:var(--dim)"> %</span></div><div class="gl">力矩比</div></div>
+      </div>
+      <div class="tower-strip" style="margin-top:10px"><span>风速 <b id="tWind">${tower.wind.toFixed(1)} m/s</b></span><span>回转角 <b id="tAngle">${tower.angle}°</b></span><span>高度 <b>38.5 m</b></span></div>`)}
+    ${panel('2# 施工升降机 · 运行中','SC200',`
+      <div class="gauge-grid" style="grid-template-columns:1fr 1fr">
+        <div class="gauge"><div id="gLiftLoad">${gaugeSVG(lift.load/2,'#3DDC84')}</div><div class="gv">${lift.load.toFixed(1)}<span style="font-size:12px;color:var(--dim)"> t</span></div><div class="gl">载重（额定 2t）</div></div>
+        <div class="gauge"><div id="gLiftP">${gaugeSVG(lift.people/9,'#FFD54A')}</div><div class="gv">${lift.people}<span style="font-size:12px;color:var(--dim)"> 人</span></div><div class="gl">轿厢人数（限 9 人）</div></div>
+      </div>
+      <div class="tower-strip" style="margin-top:10px"><span>当前高度 <b id="lHeight">${lift.height.toFixed(0)} m</b></span><span>门联锁 <b style="color:var(--grn)">正常</b></span></div>`)}
+    ${panel('基坑监测 · 位移曲线','深层水平位移 mm',`<canvas class="chart" id="cvPit" style="height:150px"></canvas>
+      <div class="tower-strip"><span>累计位移 <b style="color:var(--yel)">3.0 mm</b></span><span>速率 <b>0.02 mm/d</b></span><span>水位 <b>2.4 m</b></span></div>`)}
+  </div>`;
+};
+
+/* ⑥ 环境监测 */
+let env={pm25:58,pm10:92,noise:64,wind:4.2,temp:26};
+let sprayOn=false;
+MODULES.env=function(){
+  const g=(v,max,c)=>gaugeSVG(v/max,c);
+  return `
+  <div class="filter-row"><span style="font-size:13px;color:var(--dim)">扬尘超标联动：</span>
+    <button class="ai-chip ${sprayOn?'on':''}" id="sprayBtn">${sprayOn?'喷淋开启中（模拟）':'手动触发喷淋'}</button>
+    <span style="font-size:13px;color:var(--dim)">PM2.5 > 75μg/m³ 自动联动</span></div>
+  <div class="gauge-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="gauge ${env.pm25>75?'over':''}" id="gPm25"><div>${g(env.pm25,150,'#FF4D4F')}</div><div class="gv">${Math.round(env.pm25)}</div><div class="gl">PM2.5 μg/m³</div></div>
+    <div class="gauge ${env.pm10>150?'over':''}" id="gPm10"><div>${g(env.pm10,250,'#FFA726')}</div><div class="gv">${Math.round(env.pm10)}</div><div class="gl">PM10 μg/m³</div></div>
+    <div class="gauge ${env.noise>70?'over':''}" id="gNoise"><div>${g(env.noise,120,'#FFD54A')}</div><div class="gv">${Math.round(env.noise)}</div><div class="gl">噪声 dB(A)</div></div>
+    <div class="gauge" id="gWind"><div>${g(env.wind,12,'#4DA6FF')}</div><div class="gv">${env.wind.toFixed(1)}</div><div class="gl">风速 m/s</div></div>
+    <div class="gauge" id="gTemp"><div>${g(env.temp,50,'#3DDC84')}</div><div class="gv">${Math.round(env.temp)}</div><div class="gl">温度 ℃</div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    ${panel('今日扬尘走势','μg/m³',`<canvas class="chart" id="cvEnv" style="height:160px"></canvas>`)}
+    ${panel('联动记录','自动触发',`<div class="row-list" id="envLog"></div>`)}
+  </div>`;
+};
+const envHistory=[46,52,49,58,64,61,72,68,77,71,66,63,58,55,52];
+function envTick(){
+  env.pm25=Math.max(28,Math.min(120,env.pm25+rnd(-4,4)+(sprayOn?-7:0)));
+  env.pm10=Math.max(45,Math.min(200,env.pm10+rnd(-6,6)+(sprayOn?-9:0)));
+  env.noise=Math.max(45,Math.min(95,env.noise+rnd(-3,3)));
+  env.wind=Math.max(1,Math.min(11,env.wind+rnd(-.4,.4)));
+  env.temp=Math.max(20,Math.min(36,env.temp+rnd(-.3,.3)));
+  if(!sprayOn&&env.pm25>75)sprayOn=true;
+  if(sprayOn&&env.pm25<45)sprayOn=false;
+  /* 仅当模块可见时刷新 DOM */
+  const gP=$('#gPm25');if(!gP)return;
+  const upd=(id,v,max,c,cls)=>{const el=$(id);el.querySelector('div').innerHTML=gaugeSVG(v/max,c);el.querySelector('.gv').textContent=Math.round(v*10)/10;el.classList.toggle('over',v>max*(id==='#gPm25'?.5:.6));};
+  upd('#gPm25',env.pm25,150,'#FF4D4F');upd('#gPm10',env.pm10,250,'#FFA726');upd('#gNoise',env.noise,120,'#FFD54A');
+  upd('#gWind',env.wind,12,'#4DA6FF');upd('#gTemp',env.temp,50,'#3DDC84');
+  $('#sprayBtn').textContent=sprayOn?'喷淋开启中（模拟）':'手动触发喷淋';
+  $('#sprayBtn').classList.toggle('on',sprayOn);
+}
+
+/* ⑦ 隐患排查 */
+let hazards=[
+  {id:1,loc:'3号楼 12F 临边',type:'临边防护缺失',st:0,who:'陈静'},
+  {id:2,loc:'基坑西侧',type:'边坡局部渗水',st:1,who:'张伟'},
+  {id:3,loc:'材料加工区',type:'配电箱未上锁',st:0,who:'刘洋'},
+  {id:4,loc:'1#塔吊基础',type:'接地电阻偏高',st:2,who:'王芳'}
+];
+MODULES.hazard=function(){
+  const c=hazards.filter(h=>h.st===0).length,p=hazards.filter(h=>h.st===1).length,d=hazards.filter(h=>h.st===2).length;
+  return `
+  <div class="hz-stats">
+    <div class="hz-stat"><b style="color:var(--red)">${c}</b><span>待整改</span></div>
+    <div class="hz-stat"><b style="color:var(--yel)">${p}</b><span>整改中</span></div>
+    <div class="hz-stat"><b style="color:var(--grn)">${d}</b><span>已闭环</span></div>
+  </div>
+  <div class="hz-flow"><span>闭环流程：</span><i class="passed">① 上报</i>→<i class="${hazards.some(h=>h.st>0)?'passed':''}">② 整改</i>→<i class="${hazards.some(h=>h.st>1)?'passed':''}">③ 复查</i>→<i class="${hazards.some(h=>h.st===2)?'passed':''}">④ 销项</i></div>
+  ${panel('隐患台账','模拟演示 · 数据保存在浏览器本地',`<table class="alarm-table"><thead><tr><th>编号</th><th>位置</th><th>类型</th><th>上报人</th><th>状态</th><th>操作</th></tr></thead><tbody id="hzTbody"></tbody></table>`)}
+  <div style="margin-top:14px"><button class="btn btn-primary" id="hzAdd" style="padding:10px 24px;font-size:14px">＋ 新增隐患（模拟上报）</button></div>`;
+};
+function renderHz(){
+  $('#hzTbody').innerHTML=hazards.map(h=>`
+    <tr><td style="color:var(--dim2)">YZ-${String(h.id).padStart(4,'0')}</td><td>${h.loc}</td><td>${h.type}</td><td>${h.who}</td>
+    <td>${h.st===0?'<span class="lv b">待整改</span>':h.st===1?'<span class="lv m">整改中</span>':'<span class="lv l">已闭环 ✓</span>'}</td>
+    <td>${h.st===0?`<button class="mini-btn" data-hz="${h.id}" data-act="1">开始整改</button>`:h.st===1?`<button class="mini-btn" data-hz="${h.id}" data-act="2">复查销项</button>`:'<button class="mini-btn done">已归档</button>'}</td></tr>`).join('');
+}
+
+/* ⑧ 数据报表 */
+MODULES.report=function(){
+  return `
+  <div class="grid-2">
+    ${panel('近 7 日告警趋势','单位：起',`<canvas class="chart" id="cvWeek" style="height:190px"></canvas>`)}
+    ${panel('识别类型占比','近 7 日',`<canvas class="chart" id="cvPie" style="height:190px"></canvas>`)}
+  </div>
+  ${panel('月度统计','演示数据',`<table class="alarm-table"><thead><tr><th>月份</th><th>告警总数</th><th>高风险</th><th>隐患闭环率</th><th>平均处置时长</th></tr></thead>
+  <tbody><tr><td>2026-01</td><td>286</td><td>12</td><td style="color:var(--grn)">96.2%</td><td>x.x 分钟</td></tr>
+  <tr><td>2026-02</td><td>241</td><td>9</td><td style="color:var(--grn)">97.5%</td><td>x.x 分钟</td></tr>
+  <tr><td>2026-03</td><td>198</td><td>7</td><td style="color:var(--grn)">98.1%</td><td>x.x 分钟</td></tr></tbody></table>
+  <div style="margin-top:14px"><button class="btn btn-ghost" id="exportBtn" style="padding:10px 24px;font-size:14px">⬇ 导出报表（演示）</button></div>`)}
+  <p class="dash-note" style="margin-top:14px">★ 表格内标注 <b style="color:var(--hl)">x.x</b> 的数值需替换为真实数据，其余演示数据均为模拟</p>`;
+};
+
+/* ---- 模块路由 ---- */
+let curMod='overview',consoleVisible=true;
+function showModule(m){
+  curMod=m;
+  cBody.innerHTML=MODULES[m]();
+  $$('#cNav button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  afterRender[m]&&afterRender[m]();
+  cBody.scrollTop=0;
+}
+const afterRender={
+  overview(){
+    drawLine($('#cvTrend'),[8,12,9,15,11,18,14,23,17,13,10,16],'#FFA726',true);
+    const kv=$('#kvList');
+    const news=[['08:12','B-01 吊装区','吊装作业开始 · AI 监护中','#3DDC84'],['08:06','E-01 环境站','PM2.5 达标 · 喷淋待命','#3DDC84'],['07:58','C-03 塔吊东侧','未佩戴安全帽 · 已推送安全员','#FF4D4F'],['07:41','A-02 3号楼','高处作业安全带已确认','#3DDC84'],['07:30','全场','晨会安全交底完成 · 863 人在场','#4DA6FF']];
+    kv.innerHTML=news.map(n=>`<div class="rl-item"><span class="dot" style="background:${n[3]}"></span><time>${n[0]}</time><span>${n[1]}</span><b style="margin-left:auto">${n[2]}</b></div>`).join('');
+  },
+  video(){
+    renderBigCam(0);
+    $('#camGrid').addEventListener('click',e=>{
+      const cell=e.target.closest('.camcell');
+      if(cell)renderBigCam(+cell.dataset.c);
+    });
+    $$('.ai-chip[data-t]').forEach(ch=>ch.addEventListener('click',()=>{
+      const t=ch.dataset.t;
+      aiOn[t]=!aiOn[t];
+      ch.classList.toggle('on',aiOn[t]);
+      $$('#cBody .dbox').forEach(b=>{if(b.dataset.t===t)b.classList.toggle('off',!aiOn[t]);});
+    }));
+    $('#bigAxis').addEventListener('input',()=>{
+      const v=+$('#bigAxis').value;
+      $('#bigAxisT').textContent=v>=100?'实时':'回放 08:'+pad(Math.round(v*0.4+10))+' 片段';
+    });
+  },
+  alarm(){
+    renderAlarmTable();
+    $$('#cBody .ai-chip[data-f]').forEach(ch=>ch.addEventListener('click',()=>{alarmFilter=ch.dataset.f;showModule('alarm');}));
+    $('#alarmTypeSel').addEventListener('change',renderAlarmTable);
+    $('#alarmTbody').addEventListener('click',e=>{
+      const btn=e.target.closest('.mini-btn');
+      if(!btn||btn.dataset.i==null)return;
+      const a=ALARMS[+btn.dataset.i];
+      a.st=1;
+      toast('✓ 告警已处置：'+a.type+' · 已通知复查');
+      renderAlarmTable();
+    });
+    /* donut */
+    const cv=$('#cvDonut'),ctx=cv.getContext('2d');
+    const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+    cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+    const data=[14,9,6,5,3],cols=['#FF4D4F','#FFD54A','#4DA6FF','#3DDC84','#8B93A7'];
+    const total=data.reduce((a,b)=>a+b,0),cx0=W/2,cy0=H/2,r0=Math.min(W,H)/2-12;
+    let start=-Math.PI/2;
+    data.forEach((v,i)=>{
+      const ang=v/total*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx0,cy0);
+      ctx.arc(cx0,cy0,r0,start,start+ang);
+      ctx.closePath();ctx.fillStyle=cols[i];ctx.fill();
+      start+=ang;
+    });
+    ctx.beginPath();ctx.arc(cx0,cy0,r0*.55,0,6.283);ctx.fillStyle='#161B27';ctx.fill();
+    ctx.fillStyle='#F2F4F8';ctx.font='bold 22px sans-serif';ctx.textAlign='center';
+    ctx.fillText(total+' 起',cx0,cy0+2);
+    ctx.fillStyle='#8B93A7';ctx.font='12px sans-serif';ctx.fillText('本周告警',cx0,cy0+22);
+  },
+  people(){
+    $('#fenceBtn').addEventListener('click',()=>{
+      fenceOn=!fenceOn;
+      toast(fenceOn?'🛡 电子围栏已布防 · 越界将实时告警':'电子围栏已关闭');
+      showModule('people');
+    });
+    $$('#sitemap .pdot').forEach(dot=>dot.addEventListener('click',e=>{
+      e.stopPropagation();
+      const w=WORKERS[+dot.dataset.i];
+      const old=$('.worker-card');if(old)old.remove();
+      const card=document.createElement('div');
+      card.className='worker-card';
+      card.innerHTML=`<button class="close">✕</button><b>${w.n}</b><span style="color:var(--dim);margin-left:6px">${w.r}</span>
+        <div class="row"><span>进场时间</span><i>2025-03-12</i></div>
+        <div class="row"><span>今日工时</span><i>${rnd(4,9).toFixed(1)} h</i></div>
+        <div class="row"><span>培训状态</span><i style="color:var(--grn)">已通过 · 2026-08</i></div>
+        <div class="row"><span>今日告警</span><i>${Math.random()<.5?0:1} 次</i></div>`;
+      card.style.left=Math.min(+w.x+6,78)+'%';
+      card.style.top=Math.min(+w.y+4,60)+'%';
+      $('#sitemap').appendChild(card);
+      card.querySelector('.close').addEventListener('click',()=>card.remove());
+    }));
+    $('#sitemap').addEventListener('click',()=>{const old=$('.worker-card');if(old)old.remove();});
+  },
+  machine(){
+    drawLine($('#cvPit'),pitData,'#FFD54A',true);
+  },
+  env(){
+    drawLine($('#cvEnv'),envHistory,'#FFA726',true);
+    const log=$('#envLog');
+    const logs=[['08:14','PM2.5 62 μg/m³ · 喷淋自动开启','#4DA6FF'],['07:52','噪声 68 dB · 临近限值关注','#FFD54A'],['07:30','PM10 88 · 洒水车已调度','#FFA726'],['07:05','全部指标正常 · 监测站自检通过','#3DDC84']];
+    log.innerHTML=logs.map(l=>`<div class="rl-item"><span class="dot" style="background:${l[2]}"></span><time>${l[0]}</time><b>${l[1]}</b></div>`).join('');
+    $('#sprayBtn').addEventListener('click',()=>{
+      sprayOn=!sprayOn;
+      toast(sprayOn?'💦 喷淋联动已开启（模拟）':'喷淋已关闭');
+      $('#sprayBtn').classList.toggle('on',sprayOn);
+      $('#sprayBtn').textContent=sprayOn?'喷淋开启中（模拟）':'手动触发喷淋';
+    });
+  },
+  hazard(){
+    renderHz();
+    $('#hzTbody').addEventListener('click',e=>{
+      const btn=e.target.closest('.mini-btn');
+      if(!btn)return;
+      const h=hazards.find(x=>x.id===+btn.dataset.hz);
+      if(btn.dataset.act==='1'){h.st=1;toast('🛠 隐患进入整改：'+h.type+' · 已指派责任人');}
+      else{h.st=2;toast('✓ 复查通过 · 隐患已闭环归档');}
+      showModule('hazard');
+    });
+    $('#hzAdd').addEventListener('click',()=>{
+      $('#modalCard').innerHTML=`<h3>新增隐患上报</h3>
+        <div class="mfield"><label>位置</label><input id="mLoc" placeholder="如：2号楼 5F 电梯井"></div>
+        <div class="mfield"><label>类型</label><select id="mType"><option>临边防护缺失</option><option>用电安全</option><option>消防设施</option><option>机械防护</option><option>文明施工</option></select></div>
+        <div class="mfield"><label>描述</label><input id="mDesc" placeholder="简要描述隐患情况"></div>
+        <button class="btn btn-primary" id="mSave">提交上报</button>`;
+      $('#modal').classList.add('show');
+      $('#mSave').addEventListener('click',()=>{
+        const loc=$('#mLoc').value.trim(),desc=$('#mDesc').value.trim();
+        if(!loc){toast('请填写隐患位置');return;}
+        hazards.unshift({id:hazards.length+1,loc,type:$('#mType').value,st:0,who:'我',desc});
+        $('#modal').classList.remove('show');
+        toast('已上报隐患 · 进入待整改');
+        showModule('hazard');
+      });
+    });
+  },
+  report(){
+    drawBars($('#cvWeek'),[32,28,36,24,30,22,26],'#FFA726');
+    const cv=$('#cvPie'),ctx=cv.getContext('2d');
+    const W=cv.clientWidth,H=cv.clientHeight,D=Math.min(devicePixelRatio||1,2);
+    cv.width=W*D;cv.height=H*D;ctx.setTransform(D,0,0,D,0,0);
+    const data=[45,22,18,15],cols=['#FF4D4F','#FFD54A','#4DA6FF','#3DDC84'];
+    const total=data.reduce((a,b)=>a+b,0),cx0=W/2,cy0=H/2,r0=Math.min(W,H)/2-12;
+    let start=-Math.PI/2;
+    data.forEach((v,i)=>{
+      const ang=v/total*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx0,cy0);ctx.arc(cx0,cy0,r0,start,start+ang);ctx.closePath();
+      ctx.fillStyle=cols[i];ctx.fill();start+=ang;
+    });
+    ctx.beginPath();ctx.arc(cx0,cy0,r0*.5,0,6.283);ctx.fillStyle='#161B27';ctx.fill();
+    ctx.fillStyle='#F2F4F8';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText(total+'%',cx0,cy0+2);
+    ctx.fillStyle='#8B93A7';ctx.font='11px sans-serif';ctx.fillText('风险类型占比',cx0,cy0+20);
+    $('#exportBtn').addEventListener('click',()=>toast('⬇ 报表导出中……（演示环境，请接入真实系统导出）'));
+  }
+};
+$$('#cNav button').forEach(b=>b.addEventListener('click',()=>showModule(b.dataset.m)));
+new IntersectionObserver(e=>consoleVisible=e[0].isIntersecting).observe($('#consoleBox'));
+
+/* 驾驶舱全局模拟时钟 */
+setInterval(()=>{
+  if(!consoleVisible)return;
+  const t=$('#bigTime');if(t)t.textContent=nowStr();
+  if(curMod==='people')moveWorkers();
+  if(curMod==='machine'){
+    tower.load=Math.max(.8,Math.min(4.8,tower.load+rnd(-.15,.15)));
+    tower.torque=Math.max(30,Math.min(96,tower.torque+rnd(-2,2)));
+    tower.wind=Math.max(1,Math.min(10,tower.wind+rnd(-.3,.3)));
+    tower.angle=(tower.angle+rnd(1,3))%360;
+    lift.load=Math.max(.4,Math.min(1.9,lift.load+rnd(-.08,.08)));
+    lift.people=Math.max(2,Math.min(9,lift.people+(Math.random()<.3?(Math.random()<.5?1:-1):0)));
+    lift.height=Math.max(2,Math.min(60,lift.height+rnd(-1.5,1.5)));
+    const upd=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+    upd('#gLoad',`${gaugeSVG(tower.load/5,'#FFA726')}`);/* 重新注入 svg */
+    const gLoad=$('#gLoad');if(gLoad){gLoad.innerHTML=gaugeSVG(tower.load/5,'#FFA726');gLoad.parentElement.querySelector('.gv').innerHTML=tower.load.toFixed(1)+'<span style="font-size:12px;color:var(--dim)"> t</span>';}
+    const gTorque=$('#gTorque');if(gTorque){gTorque.innerHTML=gaugeSVG(tower.torque/100,'#4DA6FF');gTorque.parentElement.querySelector('.gv').innerHTML=Math.round(tower.torque)+'<span style="font-size:12px;color:var(--dim)"> %</span>';}
+    const gLiftLoad=$('#gLiftLoad');if(gLiftLoad){gLiftLoad.innerHTML=gaugeSVG(lift.load/2,'#3DDC84');gLiftLoad.parentElement.querySelector('.gv').innerHTML=lift.load.toFixed(1)+'<span style="font-size:12px;color:var(--dim)"> t</span>';}
+    const gLiftP=$('#gLiftP');if(gLiftP){gLiftP.innerHTML=gaugeSVG(lift.people/9,'#FFD54A');gLiftP.parentElement.querySelector('.gv').innerHTML=lift.people+'<span style="font-size:12px;color:var(--dim)"> 人</span>';}
+    const tw=$('#tWind');if(tw)tw.textContent=tower.wind.toFixed(1)+' m/s';
+    const ta=$('#tAngle');if(ta)ta.textContent=tower.angle+'°';
+    const lh=$('#lHeight');if(lh)lh.textContent=lift.height.toFixed(0)+' m';
+    pitData.push(pitData[pitData.length-1]+rnd(-.15,.15));pitData.shift();
+    const cvP=$('#cvPit');if(cvP)drawLine(cvP,pitData,'#FFD54A',true);
+  }
+  if(curMod==='env'){
+    envTick();
+    envHistory.push(env.pm25);envHistory.shift();
+    const cvE=$('#cvEnv');if(cvE)drawLine(cvE,envHistory,'#FFA726',true);
+  }
+},1200);
+
+/* ============================================================
+   AI 识别能力卡（四步闭环）
+   ============================================================ */
 function cardScene(type){
-  /* 返回 {svg, box:{cls,style}, chip:{cls,text,style}} */
   const G='<rect width="480" height="360" fill="var(--sky2)"/>';
   if(type==='helmet')return{
-    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/>
-      <g stroke="#3A4A63" stroke-width="7"><path d="M40 300 V120 H440 V300"/><path d="M40 160 H440 M40 200 H440 M40 240 H440"/></g>
-      <g stroke="#2A3548" stroke-width="5"><path d="M40 120 L440 160 M440 120 L40 160" opacity=".5"/></g>
-      ${workerSVG(240,196,1,{helmet:false,vest:true})}
-      <rect x="150" y="238" width="180" height="62" fill="#1A2434"/>
-      <circle cx="190" cy="250" r="6" fill="#FFA726" opacity=".4"/><circle cx="290" cy="250" r="6" fill="#FFA726" opacity=".4"/>`,
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="7"><path d="M40 300 V120 H440 V300"/><path d="M40 160 H440 M40 200 H440 M40 240 H440"/></g>${workerSVG(240,196,1,{helmet:false})}<rect x="150" y="238" width="180" height="62" fill="#1A2434"/><circle cx="190" cy="250" r="6" fill="#FFA726" opacity=".4"/><circle cx="290" cy="250" r="6" fill="#FFA726" opacity=".4"/>`,
     box:{cls:'',style:'left:44%;top:26%;width:24%;height:34%'},
     chip:{cls:'red',text:'未佩戴安全帽',style:'left:44%;top:18%'}
   };
   if(type==='crane')return{
-    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/>
-      <g stroke="#FFD54A" stroke-width="3" opacity=".85"><path d="M60 300 L420 300" stroke-dasharray="14 10"/></g>
-      <g stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 300 V60"/><path d="M300 60 H430"/><path d="M430 60 V96 M430 96 H472 M472 96 V110" stroke-width="7"/></g>
-      <g style="transform-origin:300px 60px;animation:crane 8s ease-in-out infinite" stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 60 H170"/><path d="M170 60 V92 M170 92 H140 M140 92 V106" stroke-width="7"/></g>
-      <path d="M296 110 h8 l-4 12 z" fill="#FFD54A"/>
-      ${workerSVG(240,224,1,{helmet:true,vest:true})}
-      <text x="320" y="292" fill="#FFD54A" font-size="15" font-family="inherit" letter-spacing="2">警戒线</text>`,
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><g stroke="#FFD54A" stroke-width="3" opacity=".85"><path d="M60 300 L420 300" stroke-dasharray="14 10"/></g><g stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 300 V60"/><path d="M300 60 H430"/><path d="M430 60 V96 M430 96 H472 M472 96 V110" stroke-width="7"/></g><g style="transform-origin:300px 60px;animation:crane 8s ease-in-out infinite" stroke="#3A4A63" stroke-width="9" fill="none"><path d="M300 60 H170"/><path d="M170 60 V92 M170 92 H140 M140 92 V106" stroke-width="7"/></g><path d="M296 110 h8 l-4 12 z" fill="#FFD54A"/>${workerSVG(240,224,1,{})}<text x="320" y="292" fill="#FFD54A" font-size="15" letter-spacing="2">警戒线</text>`,
     box:{cls:'y',style:'left:38%;top:40%;width:26%;height:34%'},
     chip:{cls:'yel',text:'进入吊装警戒区 · 3.2m',style:'left:34%;top:30%'}
   };
   if(type==='harness')return{
-    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/>
-      <rect x="120" y="150" width="240" height="150" fill="#1A2434"/>
-      <g stroke="#3A4A63" stroke-width="7"><path d="M120 150 H360 V300 M120 150 V300 M360 150 V300"/><path d="M120 200 H360 M120 250 H360"/></g>
-      <g stroke="#2A3548" stroke-width="5"><path d="M120 150 L360 250 M360 150 L120 250" opacity=".5"/></g>
-      <rect x="160" y="170" width="60" height="30" fill="#2A3548"/><rect x="160" y="260" width="60" height="30" fill="#2A3548"/>
-      ${workerSVG(240,210,1,{helmet:true,vest:true,high:true})}
-      <path d="M262 216 q18 10 26 26" stroke="#FFA726" stroke-width="4" fill="none" stroke-dasharray="6 5"/>`,
+    svg:G+`<rect y="300" width="480" height="60" fill="#0E141F"/><rect x="120" y="150" width="240" height="150" fill="#1A2434"/><g stroke="#3A4A63" stroke-width="7"><path d="M120 150 H360 V300 M120 150 V300 M360 150 V300"/><path d="M120 200 H360 M120 250 H360"/></g><rect x="160" y="170" width="60" height="30" fill="#2A3548"/><rect x="160" y="260" width="60" height="30" fill="#2A3548"/>${workerSVG(240,210,1,{})}<path d="M262 216 q18 10 26 26" stroke="#FFA726" stroke-width="4" fill="none" stroke-dasharray="6 5"/>`,
     box:{cls:'o',style:'left:40%;top:38%;width:22%;height:32%'},
     chip:{cls:'org',text:'高处作业未系安全带',style:'left:37%;top:30%'}
   };
-  if(type==='vest')return{
-    svg:`<rect width="480" height="360" fill="#060910"/>
-      <circle cx="70" cy="64" r="22" fill="#C9E4FF" opacity=".9"/>
-      <rect y="300" width="480" height="60" fill="#0A0E15"/>
-      <g stroke="#1E2A3E" stroke-width="7"><path d="M60 300 V140 H420 V300"/><path d="M60 190 H420 M60 240 H420"/></g>
-      ${workerSVG(240,206,1,{helmet:true,vest:false,dark:true})}
-      <text x="60" y="120" fill="#3DDC84" font-size="14" font-family="inherit" letter-spacing="3">NIGHT MODE</text>`,
+  return{
+    svg:`<rect width="480" height="360" fill="#060910"/><circle cx="70" cy="64" r="22" fill="#C9E4FF" opacity=".9"/><rect y="300" width="480" height="60" fill="#0A0E15"/><g stroke="#1E2A3E" stroke-width="7"><path d="M60 300 V140 H420 V300"/><path d="M60 190 H420 M60 240 H420"/></g>${workerSVG(240,206,1,{vest:false,dark:true})}<text x="60" y="120" fill="#3DDC84" font-size="14" letter-spacing="3">NIGHT MODE</text>`,
     box:{cls:'g',style:'left:43%;top:36%;width:24%;height:32%'},
     chip:{cls:'grn',text:'未穿反光背心',style:'left:42%;top:27%'}
   };
 }
 const SCENES=[
-  {type:'helmet',name:'未佩戴安全帽',lv:'r',lvTxt:'高风险'},
-  {type:'crane',name:'闯入吊装警戒区',lv:'y',lvTxt:'警戒'},
-  {type:'harness',name:'高处作业未系安全带',lv:'o',lvTxt:'高风险'},
-  {type:'vest',name:'夜班未穿反光背心',lv:'g',lvTxt:'夜间模式'}
+  {type:'helmet',name:'未佩戴安全帽',lv:'r',lvT:'高风险'},
+  {type:'crane',name:'闯入吊装警戒区',lv:'y',lvT:'警戒'},
+  {type:'harness',name:'高处作业未系安全带',lv:'o',lvT:'高风险'},
+  {type:'vest',name:'夜班未穿反光背心',lv:'g',lvT:'夜间模式'}
 ];
 const sceneWrap=$('#sceneWrap');
-const STEP_LABELS=[['①','识别'],['②','判定'],['③','报警'],['④','闭环']];
 SCENES.forEach((s,idx)=>{
-  const scene=cardScene(s.type);
+  const sc=cardScene(s.type);
   const card=document.createElement('div');
   card.className='card rv';
   card.innerHTML=`
     <div class="card-vis">
-      <svg viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice">${scene.svg}</svg>
-      <div class="scanbox">
-        <div class="sbox ${scene.box.cls}" style="${scene.box.style}"></div>
-        <div class="chip ${scene.chip.cls}" style="${scene.chip.style}">${scene.chip.text}</div>
-        <div class="scan-move"></div>
-        <div class="alarm"><span class="bell">🔔</span><span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
-        <div class="done-stamp">✓ 已处置闭环</div>
-      </div>
+      <svg viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice">${sc.svg}</svg>
+      <div class="sbox ${sc.box.cls}" style="${sc.box.style}"></div>
+      <div class="chip ${sc.chip.cls}" style="${sc.chip.style}">${sc.chip.text}</div>
+      <div class="scan-move"></div>
+      <div class="alarm"><span class="bell">🔔</span><span class="wave"><i></i><i></i><i></i><i></i><i></i></span></div>
+      <div class="done-stamp">✓ 已处置闭环</div>
     </div>
     <div class="card-foot">
-      <div class="card-name">${s.name}<span class="lv ${s.lv}">${s.lvTxt}</span></div>
-      <div class="steps">${STEP_LABELS.map((l,i)=>`<i data-s="${i}"><b>${l[0]}</b>${l[1]}</i>`).join('')}</div>
+      <div class="card-name">${s.name}<span class="lv ${s.lv}">${s.lvT}</span></div>
+      <div class="steps">${[['①','识别'],['②','判定'],['③','报警'],['④','闭环']].map((l,i)=>`<i data-s="${i}"><b>${l[0]}</b>${l[1]}</i>`).join('')}</div>
     </div>`;
   sceneWrap.appendChild(card);
   io.observe(card);
-  /* 四步循环（离屏暂停） */
   const steps=Array.from(card.querySelectorAll('.steps i'));
-  let visible=false;
+  let visible=false,phase=0;
   new IntersectionObserver(es=>visible=es[0].isIntersecting).observe(card);
-  let phase=0;
   const run=()=>{
     if(!visible||REDUCE)return;
     card.className='card rv in';
@@ -770,157 +1185,21 @@ SCENES.forEach((s,idx)=>{
   setTimeout(()=>run(),600+idx*400);
 });
 
-/* ============ ④ 真实应用（VMS 模拟） ============ */
-const CAM_DATA={
-  gate:{id:'C-01',name:'工地出入口',boxes:[
-    {cls:'red',tag:'未佩戴安全帽',x:'18%',y:'38%',w:'9%',h:'26%'},
-    {cls:'',tag:'人员',x:'38%',y:'40%',w:'9%',h:'25%'},
-    {cls:'',tag:'人员',x:'55%',y:'44%',w:'9%',h:'22%'}],
-    scene:`<rect width="960" height="540" fill="var(--sky2)"/>
-      <rect y="420" width="960" height="120" fill="#0E141F"/>
-      <rect x="0" y="330" width="960" height="14" fill="#2A3548"/>
-      <rect x="700" y="120" width="180" height="210" fill="#1A2434"/>
-      <g stroke="#3A4A63" stroke-width="6"><path d="M0 420 V330 H960 V420"/></g>
-      <rect x="430" y="330" width="90" height="90" fill="#171C28" stroke="#3A4A63" stroke-width="4"/>
-      <text x="460" y="382" fill="#8B93A7" font-size="20" text-anchor="middle" font-family="inherit">入口</text>
-      <g stroke="#FFA726" stroke-width="5" opacity=".7"><path d="M380 420 V360 M520 420 V360"/></g>
-      ${workerSVG(200,330,1.6,{helmet:false,vest:true})}
-      ${workerSVG(390,356,1.3,{helmet:true,vest:true})}
-      ${workerSVG(540,372,1.15,{helmet:true,vest:true})}
-      <g fill="#2A3548"><rect x="40" y="150" width="200" height="140"/><rect x="60" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="140" y="170" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>`
-  },
-  crane:{id:'B-01',name:'吊装警戒区',boxes:[
-    {cls:'yel',tag:'进入吊装警戒区',x:'30%',y:'34%',w:'13%',h:'34%'},
-    {cls:'',tag:'人员',x:'62%',y:'44%',w:'9%',h:'24%'}],
-    scene:`<rect width="960" height="540" fill="var(--sky2)"/>
-      <rect y="420" width="960" height="120" fill="#0E141F"/>
-      <path d="M0 420 L120 420 L240 330 L840 330 L960 420 Z" fill="none" stroke="#FFD54A" stroke-width="4" stroke-dasharray="18 12" opacity=".8"/>
-      <g stroke="#3A4A63" stroke-width="12" fill="none"><path d="M700 420 V100"/><path d="M700 100 H880" stroke-width="10"/><path d="M880 100 V140 M880 140 H930 M930 140 V160" stroke-width="8"/></g>
-      <path d="M694 160 h12 l-6 18 z" fill="#FFD54A"/>
-      ${workerSVG(320,330,1.6,{helmet:true,vest:true})}
-      ${workerSVG(640,370,1.3,{helmet:true,vest:true})}
-      <text x="330" y="300" fill="#FFD54A" font-size="18" font-family="inherit" letter-spacing="3">警戒区</text>
-      <g fill="#1A2434"><rect x="60" y="200" width="180" height="220"/><rect x="90" y="230" width="50" height="34" fill="#FFE9A8" opacity=".45"/><rect x="160" y="230" width="50" height="34" fill="#FFE9A8" opacity=".45"/><rect x="90" y="300" width="50" height="34" fill="#FFE9A8" opacity=".45"/><rect x="160" y="300" width="50" height="34" fill="#FFE9A8" opacity=".45"/></g>`
-  },
-  pit:{id:'D-05',name:'基坑临边',boxes:[
-    {cls:'org',tag:'临边越界预警',x:'44%',y:'34%',w:'12%',h:'32%'},
-    {cls:'',tag:'人员',x:'12%',y:'46%',w:'9%',h:'24%'},
-    {cls:'',tag:'人员',x:'70%',y:'42%',w:'9%',h:'24%'}],
-    scene:`<rect width="960" height="540" fill="var(--sky2)"/>
-      <rect y="420" width="960" height="120" fill="#0E141F"/>
-      <path d="M0 420 H960" stroke="#2A3548" stroke-width="8"/>
-      <path d="M180 420 L320 540 L640 540 L780 420" fill="#0A0E15" stroke="#3A4A63" stroke-width="5"/>
-      <path d="M200 420 L340 520 M760 420 L620 520" stroke="#3A4A63" stroke-width="4" opacity=".6"/>
-      <g stroke="#FFA726" stroke-width="5"><path d="M60 420 V360 M120 420 V360 M840 420 V360 M900 420 V360"/><path d="M60 370 H120 M840 370 H900"/></g>
-      ${workerSVG(470,320,1.55,{helmet:true,vest:true})}
-      ${workerSVG(150,368,1.25,{helmet:true,vest:true})}
-      ${workerSVG(700,356,1.2,{helmet:true,vest:true})}
-      <text x="480" y="290" fill="#FFA726" font-size="18" font-family="inherit" letter-spacing="3">临边危险</text>`
-  }
-};
-const video=$('#video'),cams=$('#cams'),evList=$('#evList');
-let curCam='gate';
-function nowT(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
-function renderCam(key){
-  curCam=key;
-  const c=CAM_DATA[key];
-  video.innerHTML=`
-    <svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice">${c.scene}</svg>
-    <div class="hud">
-      <div class="rec"><span class="rdot"></span>${c.id} · ${c.name} · <span id="camTime">${nowT()}</span></div>
-      <div class="badges"><span class="badge h">高风险 1</span><span class="badge m">警戒 0</span><span class="badge l">正常 ${c.boxes.length-1}</span></div>
-      ${c.boxes.map((b,i)=>`<div class="dbox ${b.cls}" data-tag="${b.tag}" style="left:${b.x};top:${b.y};width:${b.w};height:${b.h};animation-delay:${i*0.8}s"></div>`).join('')}
-      <div class="video-bar"><span>在线人数 <b>${Math.floor(Math.random()*8+8)}</b></span><span>识别帧率 <b id="fps">25</b> FPS</span><span>联动报警器 <b>在线</b></span></div>
-      <div class="demo-water">DEMO · 模拟画面</div>
-    </div>`;
-  $$('.cam').forEach(el=>el.classList.toggle('active',el.dataset.k===key));
-}
-/* 机位按钮 */
-Object.entries(CAM_DATA).forEach(([k,v])=>{
-  const b=document.createElement('button');
-  b.className='cam active'+(k===curCam);b.dataset.k=k;
-  b.innerHTML=`<b>${v.id}</b><span>${v.name}</span>`;
-  b.addEventListener('click',()=>{renderCam(k);toast('已切换机位 '+v.id+' · '+v.name);});
-  cams.appendChild(b);
-});
-renderCam('gate');
-setInterval(()=>{const t=$('#camTime');if(t)t.textContent=nowT();},1000);
-setInterval(()=>{const f=$('#fps');if(f)f.textContent=24+Math.floor(Math.random()*3);},800);
-
-/* 事件列表 */
-const EV_POOL=[
-  ['未佩戴安全帽','C-03 塔吊东侧','#FF4D4F','高'],
-  ['进入吊装警戒区','B-01 吊装区','#FFD54A','中'],
-  ['高处作业未系安全带','A-02 3号楼','#FFA726','高'],
-  ['临边越界预警','D-05 基坑西侧','#4DA6FF','低'],
-  ['未穿反光背心','C-07 夜间出入口','#3DDC84','中']
-];
-const evTimes=[42,18,57,21,6].map(m=>{const d=new Date(Date.now()-m*60*1000);return pad(d.getHours())+':'+pad(d.getMinutes());});
-EV_POOL.forEach((e,i)=>{
-  const d=document.createElement('div');
-  d.className='ev';
-  d.innerHTML=`<span class="lvdot" style="background:${e[2]}"></span>
-    <span class="info"><b>${e[0]}</b><span>${e[1]}</span></span>
-    <time>${evTimes[i]}</time>
-    <button class="play">回放 ▶</button>`;
-  d.querySelector('.play').addEventListener('click',()=>{
-    toast('正在回放 '+evTimes[i]+' · '+e[0]+'（模拟）');
-    video.classList.remove('replay');void video.offsetWidth;video.classList.add('replay');
-    setTimeout(()=>video.classList.remove('replay'),2600);
-  });
-  evList.appendChild(d);
-});
-/* 回放时间轴 */
-const axisRange=$('#axisRange'),axisTime=$('#axisTime');
-const dayStart=new Date();dayStart.setHours(6,0,0,0);
-axisRange.addEventListener('input',()=>{
-  const v=+axisRange.value;
-  const t=new Date(dayStart.getTime()+((Date.now()-dayStart.getTime())*v/100));
-  axisTime.textContent=pad(t.getHours())+':'+pad(t.getMinutes())+':'+pad(t.getSeconds());
-  if(v<100&&Math.random()<.25)toast('回放中 · 拖动时间轴查看事件（模拟）');
-});
-/* 全屏 */
-$('#fullBtn').addEventListener('click',()=>{
-  const vp=$('#viewport');
-  if(!document.fullscreenElement)vp.requestFullscreen().catch(()=>{});
-  else document.exitFullscreen();
-});
-/* toast */
-let toastTimer=null;
-function toast(msg){
-  const t=$('#toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
-}
-/* 回放重播动效 CSS 注入 */
-const st=document.createElement('style');
-st.textContent='.video.replay .dbox{animation:track 1.2s ease-in-out 2;border-width:3px}.video.replay::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(77,166,255,.08),rgba(77,166,255,.02));pointer-events:none}';
-document.head.appendChild(st);
-
-/* ============ ⑤ 对比滑块 ============ */
+/* ============================================================
+   对比滑块
+   ============================================================ */
 function cmpScene(boxes){
-  return `<rect width="1200" height="600" fill="var(--sky2)"/>
-    <rect y="470" width="1200" height="130" fill="#0E141F"/>
-    <g stroke="#3A4A63" stroke-width="8"><path d="M100 470 V250 H1100 V470"/><path d="M100 320 H1100 M100 390 H1100"/></g>
-    <g stroke="#2A3548" stroke-width="6"><path d="M100 250 L1100 320 M1100 250 L100 320" opacity=".5"/></g>
-    ${workerSVG(350,340,1.9,{helmet:false,vest:true})}
-    ${workerSVG(600,380,1.6,{helmet:true,vest:true})}
-    ${workerSVG(800,350,1.7,{helmet:true,vest:true})}
-    <g fill="#1A2434"><rect x="900" y="330" width="220" height="140"/><rect x="930" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="1020" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>
-    ${boxes}
-    <text x="600" y="120" font-size="30" fill="#8B93A7" text-anchor="middle" font-family="inherit" letter-spacing="8">施工现场</text>`;
+  return `<rect width="1200" height="600" fill="var(--sky2)"/><rect y="470" width="1200" height="130" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="8"><path d="M100 470 V250 H1100 V470"/><path d="M100 320 H1100 M100 390 H1100"/></g>${workerSVG(350,340,1.9,{helmet:false})}${workerSVG(600,380,1.6,{})}${workerSVG(800,350,1.7,{})}<g fill="#1A2434"><rect x="900" y="330" width="220" height="140"/><rect x="930" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="1020" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>${boxes}<text x="600" y="120" font-size="30" fill="#8B93A7" text-anchor="middle" letter-spacing="8">施工现场</text>`;
 }
 $('#cmpLeft').innerHTML=cmpScene('');
 $('#cmpRight').innerHTML=cmpScene(`
   <rect x="300" y="300" width="110" height="150" fill="none" stroke="#FF4D4F" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1s" repeatCount="indefinite"/></rect>
-  <text x="305" y="288" fill="#FF4D4F" font-size="22" font-family="inherit">未佩戴安全帽</text>
+  <text x="305" y="288" fill="#FF4D4F" font-size="22">未佩戴安全帽</text>
   <rect x="550" y="345" width="105" height="130" fill="none" stroke="#4DA6FF" stroke-width="4" stroke-dasharray="12 8"><animate attributeName="stroke-dashoffset" from="0" to="40" dur="1.2s" repeatCount="indefinite"/></rect>
-  <text x="555" y="333" fill="#4DA6FF" font-size="20" font-family="inherit">人员</text>
+  <text x="555" y="333" fill="#4DA6FF" font-size="20">人员</text>
   <rect x="740" y="310" width="120" height="140" fill="none" stroke="#FFA726" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1.1s" repeatCount="indefinite"/></rect>
-  <text x="745" y="298" fill="#FFA726" font-size="22" font-family="inherit">未系安全带</text>
-  <text x="600" y="560" font-size="24" fill="#3DDC84" text-anchor="middle" font-family="inherit" letter-spacing="4">AI 已识别 3 处风险 · 已报警</text>
-`);
+  <text x="745" y="298" fill="#FFA726" font-size="22">未系安全带</text>
+  <text x="600" y="560" font-size="24" fill="#3DDC84" text-anchor="middle" letter-spacing="4">AI 已识别 3 处风险 · 已报警</text>`);
 const cmp=$('#cmp');
 let dragging=false;
 function setCmpP(clientX){
@@ -931,44 +1210,34 @@ function setCmpP(clientX){
 cmp.addEventListener('pointerdown',e=>{dragging=true;setCmpP(e.clientX);cmp.setPointerCapture(e.pointerId);});
 cmp.addEventListener('pointermove',e=>{if(dragging)setCmpP(e.clientX);});
 cmp.addEventListener('pointerup',()=>dragging=false);
-cmp.addEventListener('pointercancel',()=>dragging=false);
 
-/* ============ ⑥ 数据计数 ============ */
+/* ============================================================
+   数据卡（真实数据一处配置）
+   ============================================================ */
 const metricIO=new IntersectionObserver(es=>es.forEach(en=>{
   if(!en.isIntersecting)return;
   const m=en.target;m.classList.add('in');
-  const numEl=m.querySelector('.num');
-  const fill=numEl.dataset.fill;
   const real=[REAL_DATA.accuracy,REAL_DATA.response,REAL_DATA.cameras,REAL_DATA.sites][+m.dataset.i];
   if(real!=null&&!REDUCE){
+    const numEl=m.querySelector('.num');
+    const unit=numEl.querySelector('.unit').outerHTML;
     const dur=1600,t0=performance.now();
     const step=t=>{
       const p=Math.min(1,(t-t0)/dur),ease=1-Math.pow(1-p,3);
-      numEl.firstChild.textContent=(real*ease).toFixed(real%1?1:0);
+      numEl.innerHTML=(real*ease).toFixed(real%1?1:0)+unit;
       if(p<1)requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
-  }else{
-    numEl.firstChild.textContent=fill;
   }
   metricIO.unobserve(m);
 }),{threshold:.5});
 $$('.metric').forEach(m=>metricIO.observe(m));
 
-/* ============ ⑦ 表单 ============ */
-const form=$('#bookForm'),done=$('#bookDone');
-form.addEventListener('submit',e=>{
-  e.preventDefault();
-  const name=$('#fName'),comp=$('#fComp'),tel=$('#fTel');
-  let ok=true;
-  [name,comp,tel].forEach(inp=>{
-    if(!inp.value.trim()){inp.classList.add('err');ok=false;setTimeout(()=>inp.classList.remove('err'),600);}
-  });
-  if(!ok)return;
-  form.classList.add('hidden');
-  done.style.display='block';
-  toast('预约提交成功 · 我们将在 1 个工作日内联系');
-});
+/* modal 关闭 */
+$('#modal').addEventListener('click',e=>{if(e.target===e.currentTarget)$('#modal').classList.remove('show');});
+
+/* 初始化 */
+showModule('overview');
 })();
 </script>
 </body>
