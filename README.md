@@ -2,6 +2,10 @@
 
 可交互的工业安全态势感知平台 —— 3D 数字孪生 + 实时监测大屏 + 游戏化训练 + 应急演练认证，**手机 / 电脑 / 手表三端一体**。
 
+## 🌍 公网地址（GitHub Pages）
+
+**https://yangyi92695016-ux.github.io/aegis-industrial-safety/**
+
 ## 运行方式
 
 - 方式一：直接双击 `index.html` 用浏览器打开
