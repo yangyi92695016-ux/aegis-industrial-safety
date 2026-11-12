@@ -3890,10 +3890,17 @@ showModule('overview');
 $$('#langSw button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
 if(lang!=='zh')setLang(lang);
 else $$('#langSw button').forEach(b=>b.classList.toggle('on',b.dataset.l==='zh'));
+/* Service Worker：HTML 网络优先，发布新版后用户端自动更新，不再显示旧版页面 */
+addEventListener('load',()=>{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});});
 /* 哈希路由：#ppe 直达 PPE 摄像头警报演示 */
 function hashRoute(){
   if(location.hash==='#ppe'){
-    $('#consoleBox').scrollIntoView({block:'start',behavior:'smooth'});
+    const box=$('#consoleBox');
+    if(box&&box.style.display==='none'){
+      box.style.display='';
+      const db=$('#deepBtn');if(db)db.textContent='▾ 收起深度演示舱';
+    }
+    if(box)box.scrollIntoView({block:'start',behavior:'smooth'});
     showModule('ppe');
     setTimeout(()=>{if(curMod==='ppe')toast('🧍 点「📷 开启摄像头」接入真人画面 → 脱掉装备 → 点「▶ 开始检测」触发真实警报');},700);
   }

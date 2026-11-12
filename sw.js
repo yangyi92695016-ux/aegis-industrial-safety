@@ -1,5 +1,5 @@
-// AEGIS Service Worker v4：HTML 永远网络优先（不再出现旧版页面），静态资源缓存优先
-const CACHE='aegis-v4';
+// AEGIS Service Worker v5：HTML 永远网络优先（不再出现旧版页面），静态资源缓存优先
+const CACHE='aegis-v5';
 const STATIC_ASSETS=[
   './index.html','./eagleeye-safety.html','./eagleeye-app.html',
   './css/style.css','./css/upgrade.css','./css/watch.css',
