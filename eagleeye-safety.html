@@ -281,9 +281,11 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
   @keyframes pktY{from{top:4px;opacity:1}to{top:22px;opacity:0}}
 }
 
-/* ============ v7：人体骨骼 / 安全体检 / 数字孪生 ============ */
-.sk-shell{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
-.sk-stage{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:4/3;max-height:560px}
+/* ============ v7：人体骨骼(REBA) / 安全体检 / 数字孪生 ============ */
+@keyframes dangerFlash{0%,100%{opacity:1}50%{opacity:.35}}
+.sk-shell{display:grid;grid-template-columns:1.22fr 1fr;gap:20px;max-width:1280px;margin:0 auto;align-items:start}
+.sk-stage{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:4/3;max-height:620px}
+@media(min-width:901px){.sk-stage{position:sticky;top:96px}}
 .sk-stage video,.sk-stage canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .sk-stage canvas{z-index:2}
 .sk-stage .rec-tag{z-index:3}
@@ -293,11 +295,101 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .sk-status.danger{color:var(--red);border-color:var(--red);animation:dangerFlash 1s infinite}
 .sk-idle{position:absolute;z-index:3;left:14px;bottom:56px;font-size:12.5px;color:var(--dim);letter-spacing:.06em}
 .sk-side{display:flex;flex-direction:column;gap:14px}
-.sk-todo{display:flex;flex-direction:column;gap:8px}
-.sk-todo .tl{font-size:13.5px;color:var(--dim);display:flex;gap:8px;align-items:center}
-.sk-todo .tl i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--dim2)}
-.sk-todo .tl.done{color:var(--grn)}
+/* REBA 徽章 */
+.sk-reba-badge{position:absolute;z-index:3;right:14px;top:14px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 18px 12px;border-radius:16px;background:rgba(8,11,17,.78);border:1.5px solid var(--line);min-width:98px;transition:border-color .25s}
+.sk-reba-badge b{font-size:34px;line-height:1;font-weight:900;letter-spacing:.02em;color:var(--grn);font-variant-numeric:tabular-nums}
+.sk-reba-badge span{font-size:11px;color:var(--dim);letter-spacing:.18em}
+.sk-reba-badge i{font-style:normal;font-size:11.5px;padding:2px 10px;border-radius:10px;background:rgba(61,220,132,.15);color:var(--grn);white-space:nowrap}
+.sk-reba-badge.r1 b{color:#64E59A}.sk-reba-badge.r1 i{background:rgba(100,229,154,.15);color:#64E59A}
+.sk-reba-badge.r2 b{color:var(--grn)}.sk-reba-badge.r2 i{background:rgba(61,220,132,.15);color:var(--grn)}
+.sk-reba-badge.r3 b{color:var(--yel)}.sk-reba-badge.r3 i{background:rgba(255,213,74,.15);color:var(--yel)}
+.sk-reba-badge.r4 b{color:var(--hl)}.sk-reba-badge.r4 i{background:rgba(255,167,38,.16);color:var(--hl)}
+.sk-reba-badge.r5 b{color:var(--red)}.sk-reba-badge.r5 i{background:rgba(255,77,79,.18);color:var(--red)}
+.sk-reba-badge.r5{animation:dangerFlash 1s infinite;border-color:rgba(255,77,79,.6)}
+.sk-reba-badge.act{animation:dangerFlash .25s ease 4;border-color:var(--red)}
+/* 角度 HUD */
+.sk-angles{position:absolute;z-index:3;right:14px;bottom:14px;display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:62%}
+.sk-ang{font-size:11.5px;padding:4px 9px;border-radius:14px;background:rgba(8,11,17,.72);border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.sk-ang b{color:var(--text);font-weight:700;margin-left:3px;font-variant-numeric:tabular-nums}
+.sk-ang.hot{color:var(--red);border-color:rgba(255,77,79,.6)}
+.sk-ang.hot b{color:var(--red)}
+/* REBA 评估卡 */
+.sk-reba-card .sg{background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px}
+.sg-h{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);letter-spacing:.04em}
+.sg-h b{margin-left:auto;font-size:19px;color:var(--blue);font-variant-numeric:tabular-nums}
+.sg-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim2)}
+.sg-row>span:first-child{width:46px;color:var(--dim);flex-shrink:0}
+.sg-row .mv{color:var(--text);min-width:46px;font-variant-numeric:tabular-nums}
+.sg-row .bar{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.sg-row .bar i{display:block;height:100%;width:0;background:var(--grn);border-radius:3px;transition:width .25s,background .25s}
+.sg-row .bar i.over{background:var(--red)}
+.sg-row .sc{margin-left:auto;width:32px;text-align:center;font-size:15px;font-weight:800;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 0;font-variant-numeric:tabular-nums}
+.sg-add{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11.5px;color:var(--dim2)}
+.sg-lab{color:var(--dim2);font-size:11.5px}
+.sg-add b{color:var(--blue);font-variant-numeric:tabular-nums}
+.sg-seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.sg-seg button{padding:4px 9px;font-size:11.5px;color:var(--dim)}
+.sg-seg button.on{background:rgba(255,167,38,.16);color:var(--hl)}
+select.sg-sel{background:var(--panel3);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:4px 8px;font-size:11.5px}
+.sk-calc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);background:rgba(77,166,255,.06);border:1px dashed rgba(77,166,255,.35);border-radius:10px;padding:10px 12px}
+.sk-calc b{font-size:16px;color:var(--blue);font-variant-numeric:tabular-nums}
+.sk-calc .tot{margin-left:auto;font-size:22px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums}
+.sk-risk-bar{display:grid;grid-template-columns:1fr 2fr 4fr 3fr 4fr;gap:3px}
+.sk-risk-bar i{height:10px;border-radius:3px;opacity:.28;transition:opacity .25s}
+.sk-risk-bar i:nth-child(1){background:#64E59A}.sk-risk-bar i:nth-child(2){background:var(--grn)}
+.sk-risk-bar i:nth-child(3){background:var(--yel)}.sk-risk-bar i:nth-child(4){background:var(--hl)}.sk-risk-bar i:nth-child(5){background:var(--red)}
+.sk-risk-bar i.on{opacity:1;box-shadow:0 0 12px currentColor}
+.sk-risk-labels{display:grid;grid-template-columns:1fr 2fr 4fr 3fr 4fr;gap:3px;font-size:10px;color:var(--dim2);margin-top:4px}
+.sk-risk-labels span{text-align:center;white-space:nowrap;overflow:hidden}
+.sk-rtxt{margin-top:8px;font-size:13px;color:var(--dim);line-height:1.6;min-height:22px}
+.sk-rtxt b{color:var(--text)}
+.sk-sugg{font-size:12.5px;color:var(--dim);background:rgba(255,167,38,.07);border-left:3px solid var(--hl);border-radius:6px;padding:8px 10px;line-height:1.7;min-height:44px}
+/* 检测项细分卡 */
+.sk-detect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sk-detect{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:border-color .25s}
+.sk-detect .sd-h{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--dim);letter-spacing:.02em}
+.sk-detect .sd-h i{width:8px;height:8px;border-radius:50%;background:var(--dim2);flex-shrink:0;box-shadow:0 0 6px transparent;transition:.25s}
+.sk-detect .sd-h b{margin-left:auto;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.sk-detect .sd-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.sk-detect .sd-bar i{display:block;height:100%;width:0;border-radius:2px;transition:width .15s linear}
+.sk-detect .sd-t{font-size:10.5px;color:var(--dim2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-detect.live{border-color:rgba(61,220,132,.4)}
+.sk-detect.live .sd-h i{background:var(--grn);box-shadow:0 0 6px var(--grn)}
+.sk-detect.act{border-color:var(--red);animation:redflash .6s ease}
+.sk-detect.act .sd-h i{background:var(--red);box-shadow:0 0 8px var(--red)}
+.sk-detect.act .sd-bar i{filter:brightness(1.6)}
+/* 角度面板 */
+.sk-angle-panel .ar{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.05)}
+.sk-angle-panel .ar:last-child{border-bottom:none}
+.sk-angle-panel .ar>span{width:58px;color:var(--dim);flex-shrink:0}
+.sk-angle-panel .ar .bar{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.sk-angle-panel .ar .bar i{display:block;height:100%;width:0;background:var(--grn);border-radius:3px;transition:width .25s,background .25s}
+.sk-angle-panel .ar .bar i.over{background:var(--red)}
+.sk-angle-panel .ar .v{width:44px;text-align:right;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.sk-angle-panel .ar b{width:108px;text-align:right;font-size:10.5px;color:var(--dim2);white-space:nowrap;overflow:hidden;font-weight:400}
+/* 挑战 */
+.sk-todo{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.sk-todo .tl{font-size:12px;color:var(--dim);display:flex;gap:8px;align-items:center;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:var(--panel3)}
+.sk-todo .tl i{font-style:normal;width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:10px;color:var(--dim2);flex-shrink:0}
+.sk-todo .tl.done{color:var(--grn);border-color:rgba(61,220,132,.35)}
 .sk-todo .tl.done i{border-color:var(--grn);color:var(--grn);background:rgba(61,220,132,.1)}
+/* REBA 速查 */
+.sk-reba-ref{display:grid;grid-template-columns:1.45fr 1fr;gap:20px;max-width:1280px;margin:26px auto 0;align-items:start}
+.sk-ref-card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.sk-ref-card h4{font-size:14.5px;margin-bottom:10px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.sk-ref-card h4 span{font-size:11px;color:var(--dim2);margin-left:auto}
+.sk-ref-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.sk-ref-item{font-size:11.5px;color:var(--dim);line-height:1.65;background:var(--panel3);border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+.sk-ref-item b{color:var(--text);font-size:12px}
+.sk-ref-item .p{color:var(--blue);font-weight:700}
+.sk-lv{display:flex;flex-direction:column;gap:7px}
+.sk-lv-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--dim);background:var(--panel3);border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+.sk-lv-row i{width:28px;height:10px;border-radius:3px;flex-shrink:0}
+.sk-lv-row b{color:var(--text);width:58px;font-variant-numeric:tabular-nums}
+.sk-lv-row span{margin-left:auto;color:var(--dim2);text-align:right}
+@media(max-width:1100px){.sk-detect-grid{grid-template-columns:1fr}.sk-reba-ref{grid-template-columns:1fr}.sk-todo{grid-template-columns:1fr}}
+@media(max-width:900px){.sk-angles{max-width:100%}.sk-reba-badge{top:auto;bottom:96px}}
+
 .ci-shell{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
 .ci-stage{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:4/3;max-height:560px}
 .ci-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -406,55 +498,8 @@ body.alarming .console{animation:alarmPulse 1.6s ease infinite}
 .steps i.pass{color:var(--grn)}
 @media(max-width:980px){.scenes{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px}.card{flex:0 0 78%;scroll-snap-align:center}.console{grid-template-columns:1fr}.c-side{flex-direction:row;overflow-x:auto;align-items:center}.c-nav{flex-direction:row}.c-nav button{white-space:nowrap}.c-brand{display:none}.c-side .c-ver{display:none}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.camgrid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
 
-/* ============ 肌肉放松工坊（趣味小游戏） ============ */
-.relief-shell{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:stretch;max-width:1080px;margin:0 auto}
-.relief-stage{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:18px;overflow:hidden;min-height:520px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-.relief-stage svg{width:100%;height:auto;display:block}
-.relief-zones{position:absolute;inset:0}
-.rz{position:absolute;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%)}
-.rz::after{content:attr(data-n);position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:var(--panel3);border:1px solid var(--line-2);color:var(--dim);font-size:11px;display:grid;place-items:center}
-.rz:hover{outline:2px solid rgba(255,167,38,.4)}
-.rh-hot{position:absolute;inset:0;border-radius:50%;pointer-events:none}
-.rh-hot i{position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--red);animation:hotPulse .5s ease infinite;box-shadow:0 0 18px rgba(255,77,79,.8),inset 0 0 14px rgba(255,77,79,.6);background:radial-gradient(circle,rgba(255,77,79,.55),rgba(255,77,79,.15) 65%)}
-@keyframes hotPulse{50%{transform:scale(1.12);box-shadow:0 0 30px rgba(255,77,79,1),inset 0 0 18px rgba(255,77,79,.8)}}
-.rh-hot::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(255,77,79,.45);animation:hotRing 1s linear infinite}
-@keyframes hotRing{to{transform:scale(1.3);opacity:0}}
-.rh-hot.late i{animation:hotPulse .16s ease infinite}
-.relief-pop{position:absolute;font-size:20px;font-weight:800;color:var(--grn);pointer-events:none;animation:popUp .8s ease forwards;text-shadow:0 0 10px rgba(61,220,132,.8)}
-@keyframes popUp{to{transform:translateY(-56px);opacity:0}}
-.relief-overlay{position:absolute;inset:0;z-index:6;display:none;place-items:center;background:rgba(3,6,12,.82);backdrop-filter:blur(8px)}
-.relief-overlay.show{display:grid}
-.relief-hud{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px}
-.relief-score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.rh-box{background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
-.rh-box span{display:block;font-size:12.5px;color:var(--dim);letter-spacing:.08em}
-.rh-box b{font-size:24px;font-variant-numeric:tabular-nums;color:var(--text)}
-.rh-box b.combo{color:var(--hl);text-shadow:var(--glow-cyan)}
-.rh-tension span{font-size:13px;color:var(--dim);display:block;margin-bottom:8px;letter-spacing:.06em}
-.rh-bar{height:10px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
-.rh-bar i{display:block;height:100%;width:30%;background:linear-gradient(90deg,var(--grn),var(--yel),var(--red));transition:width .4s ease;border-radius:6px}
-.rh-tip{font-size:14px;line-height:1.8;background:rgba(61,220,132,.06);border:1px dashed rgba(61,220,132,.4);border-radius:12px;padding:12px 14px;color:var(--text);min-height:56px}
-.rh-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:13px}
-.rh-legend span{color:var(--dim)}
-.rh-legend b{color:var(--hl)}
 .relief-note{font-size:13px;color:var(--dim2);line-height:1.8}
-.relief-stage.alarm{animation:redflash .5s ease}
-@media(max-width:900px){.relief-shell{grid-template-columns:1fr}.relief-stage{min-height:0}}
 
-/* ============ 对比 ============ */
-.cmp{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);user-select:none;touch-action:none;aspect-ratio:16/8;min-height:340px}
-.cmp-layer{position:absolute;inset:0}
-.cmp-right{clip-path:inset(0 0 0 var(--p,50%))}
-.cmp-left svg{filter:grayscale(.92) brightness(.82) contrast(1.05)}
-.cmp-tag{position:absolute;top:18px;font-size:14px;background:rgba(8,11,17,.72);padding:7px 16px;border-radius:8px;z-index:3;letter-spacing:.06em}
-.cmp-tag.l{left:18px;color:var(--dim)}
-.cmp-tag.r{right:18px;color:var(--hl)}
-.cmp-tag b{display:block;font-size:16px;color:var(--text)}
-.cmp-tag.r b{color:var(--hl)}
-.cmp-handle{position:absolute;top:0;bottom:0;left:var(--p,50%);width:3px;background:var(--hl);z-index:4;transform:translateX(-50%);box-shadow:0 0 16px rgba(255,167,38,.6)}
-.cmp-handle::after{content:"⇔";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:var(--hl);color:#1a1206;border-radius:50%;display:grid;place-items:center;font-size:19px;font-weight:700;box-shadow:0 0 0 6px rgba(255,167,38,.25)}
-.cmp-note{display:flex;justify-content:space-between;margin-top:16px;font-size:14px;color:var(--dim);gap:12px}
-.cmp-note b{color:var(--hl)}
 
 /* ============ 数据 ============ */
 .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
@@ -613,83 +658,6 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
   </div>
 </section>
 
-<!-- ============ 肌肉放松工坊（趣味小游戏） ============ -->
-<section class="sec" id="relief">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <h2>肌肉放松工坊 · <em>酸痛消消乐</em></h2>
-      <p>点按工人发光的酸痛部位，60 秒挑战你的手速 · 每击碎一处送你一条拉伸小贴士</p>
-    </div>
-    <div class="relief-shell rv">
-      <div class="relief-stage" id="reliefStage">
-        <svg viewBox="0 0 480 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <rect width="480" height="560" fill="var(--sky2)"/>
-          <circle cx="240" cy="300" r="185" fill="rgba(0,229,255,.04)"/>
-          <g stroke="#3A4A63" stroke-width="6"><path d="M60 522 H420"/></g>
-          <text x="240" y="42" fill="#8B93A7" font-size="15" text-anchor="middle" letter-spacing="4">工间放松站</text>
-          <rect x="206" y="392" width="28" height="96" rx="10" fill="#2A3140"/>
-          <rect x="246" y="392" width="28" height="96" rx="10" fill="#2A3140"/>
-          <rect x="200" y="480" width="40" height="14" rx="6" fill="#1A202C"/>
-          <rect x="240" y="480" width="40" height="14" rx="6" fill="#1A202C"/>
-          <path d="M240 150 L300 200 L292 380 Q240 402 188 380 L180 200 Z" fill="#FFA726"/>
-          <path d="M240 158 L252 196 L228 196 Z" fill="#FFD9A0"/>
-          <rect x="200" y="330" width="80" height="10" rx="5" fill="#22303C"/>
-          <rect x="232" y="328" width="16" height="14" rx="3" fill="#FFD54A"/>
-          <rect x="128" y="196" width="30" height="110" rx="15" fill="#FFA726" transform="rotate(14 143 251)"/>
-          <rect x="322" y="196" width="30" height="110" rx="15" fill="#FFA726" transform="rotate(-14 337 251)"/>
-          <circle cx="140" cy="316" r="15" fill="#E8C39A"/>
-          <circle cx="340" cy="316" r="15" fill="#E8C39A"/>
-          <circle cx="240" cy="102" r="40" fill="#E8C39A"/>
-          <path d="M200 92 a40 40 0 0 1 80 0 l-4 -6 l-72 0 z" fill="#3A2A1A"/>
-          <circle cx="224" cy="104" r="5" fill="#1A202C"/>
-          <circle cx="256" cy="104" r="5" fill="#1A202C"/>
-          <path id="reliefMouth" d="M226 122 Q240 128 254 122" fill="none" stroke="#1A202C" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-        <div class="relief-zones" id="reliefZones"></div>
-        <div class="relief-overlay" id="reliefOverlay" hidden>
-          <div class="go-card">
-            <h3 id="reliefTitle">时间到！</h3>
-            <div class="go-stars" id="reliefStars"></div>
-            <p id="reliefMsg"></p>
-            <button class="btn btn-primary" id="reliefAgain">再来一局</button>
-          </div>
-        </div>
-      </div>
-      <div class="relief-hud">
-        <div class="relief-score-row">
-          <div class="rh-box"><span>得分</span><b id="reliefScore">0</b></div>
-          <div class="rh-box"><span>连击</span><b id="reliefCombo">x1</b></div>
-          <div class="rh-box"><span>时间</span><b id="reliefTime">60</b></div>
-          <div class="rh-box"><span>生命</span><b id="reliefLives">♥♥♥</b></div>
-        </div>
-        <div class="rh-tension"><span>工人酸痛指数</span><div class="rh-bar"><i id="reliefTension"></i></div></div>
-        <div class="rh-tip" id="reliefTip">💡 点击发光部位，或在键盘按 1-6</div>
-        <div class="rh-legend" id="reliefLegend"></div>
-        <button class="btn btn-primary" id="reliefStart" style="width:100%">▶ 开始游戏</button>
-        <p class="relief-note">🧘 工间放松小游戏 · 每个部位对应一个真实拉伸动作 · 最佳纪录保存在本机</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 对比 ============ -->
-<section class="sec" id="compare">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <h2>一道题 · <em>谁来盯工地</em></h2>
-      <p>拖动中间滑块对比</p>
-    </div>
-    <div class="cmp rv" id="cmp">
-      <div class="cmp-layer cmp-left"><svg id="cmpLeft" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-      <div class="cmp-layer cmp-right"><svg id="cmpRight" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg></div>
-      <div class="cmp-tag l">人工巡检<b>1 天 3 次 · 靠经验 · 会疲劳</b></div>
-      <div class="cmp-tag r">AI 监督<b>7×24 · 秒级告警 · 不眨眼</b></div>
-      <div class="cmp-handle"></div>
-    </div>
-    <div class="cmp-note"><span>◀ 拖动对比</span><b>从「发现靠运气」到「识别常态化」</b><span>拖动对比 ▶</span></div>
-  </div>
-</section>
-
 <!-- ============ 庆云大学 · 校企实时监测（分屏联动） ============ -->
 <section class="sec alt" id="unilink">
   <div class="wrap">
@@ -750,38 +718,105 @@ footer{background:#07090E;border-top:1px solid var(--line);padding:70px 0 30px}
   </div>
 </section>
 
-<!-- ============ AI 人体骨骼 · 姿态实时识别 ============ -->
+<!-- ============ AI 人体骨骼 · 姿态实时识别 × REBA ============ -->
 <section class="sec" id="skeleton">
   <div class="wrap">
     <div class="sec-head rv">
-      <h2>AI 人体骨骼 · <em>姿态实时识别</em></h2>
-      <p>真实摄像头 + MediaPipe 骨骼跟踪 · 跌倒 / 无动作 / 举手求助 真实算法报警</p>
+      <h2>AI 人体骨骼 · <em>姿态实时识别 × REBA</em></h2>
+      <p>真实摄像头 + MediaPipe 33 点骨骼跟踪 · 跌倒 / 无动作 / 举手求助 真实算法报警 · REBA 快速全身评估逐帧打分</p>
     </div>
     <div class="sk-shell rv">
       <div class="sk-stage" id="skStage">
         <video id="skVideo" autoplay playsinline muted></video>
         <canvas id="skCanvas"></canvas>
-        <div class="rec-tag"><i></i>SKELETON LIVE · <span id="skClock">--:--:--</span> · <span id="skFps">— FPS</span></div>
+        <div class="rec-tag"><i></i>SKELETON LIVE · <span id="skClock">--:--:--</span> · <span id="skFps">— FPS</span> · 关键点 <span id="skPts">0/33</span></div>
+        <div class="sk-reba-badge" id="skRebaBadge"><b id="skRebaScore">--</b><span>REBA 得分</span><i id="skRebaLevel">待检测</i></div>
+        <div class="sk-angles" id="skAngles">
+          <span class="sk-ang">躯干<b id="skAngTrunk">--°</b></span>
+          <span class="sk-ang">颈部<b id="skAngNeck">--°</b></span>
+          <span class="sk-ang">上臂<b id="skAngArm">--°</b></span>
+          <span class="sk-ang">肘部<b id="skAngElbow">--°</b></span>
+          <span class="sk-ang">膝部<b id="skAngKnee">--°</b></span>
+        </div>
         <div class="sk-idle" id="skIdle">静止计时 0.0s</div>
         <div class="sk-status" id="skStatus">待机 · 点「开启摄像头」启动骨骼识别</div>
       </div>
       <div class="sk-side">
-        <div class="panel"><div class="pt"><b>检测项</b><span>全部为真实算法判定</span></div>
-          <div class="row-list">
-            <div class="rl-item"><span class="dot" style="background:var(--red)"></span><span>跌倒 / 躺倒 · 躯干水平持续 0.7s</span></div>
-            <div class="rl-item"><span class="dot" style="background:var(--yel)"></span><span>无动作 · 静止超 12 秒（演示阈值）</span></div>
-            <div class="rl-item"><span class="dot" style="background:var(--hl)"></span><span>举手求助 · 双手过头 2 秒</span></div>
+        <div class="panel sk-reba-card">
+          <div class="pt"><b>🧮 REBA 快速全身评估</b><span>逐帧真实打分 · 1~15 分</span></div>
+          <div class="sk-reba-groups" style="display:flex;flex-direction:column;gap:8px">
+            <div class="sg">
+              <div class="sg-h">🅰 A 组 · 躯干 / 颈部 / 腿部<b id="skTabA">--</b></div>
+              <div class="sg-row"><span>躯干</span><span class="mv" id="skTrunkAng">--°</span><div class="bar"><i id="skTrunkBar"></i></div><span class="sc" id="skTrunkSc">-</span></div>
+              <div class="sg-row"><span>颈部</span><span class="mv" id="skNeckAng">--°</span><div class="bar"><i id="skNeckBar"></i></div><span class="sc" id="skNeckSc">-</span></div>
+              <div class="sg-row"><span>腿部</span><span class="mv" id="skLegAng">--°</span><div class="bar"><i id="skLegBar"></i></div><span class="sc" id="skLegSc">-</span></div>
+              <div class="sg-add"><span class="sg-lab">负荷</span><span class="sg-seg" id="skLoadSeg"><button type="button" class="on" data-v="0">&lt;5kg</button><button type="button" data-v="1">5-10kg</button><button type="button" data-v="2">&gt;10kg</button></span><span class="sg-lab">查表A</span><b id="skTableA">--</b><span class="sg-lab">+负荷</span><b id="skLoadAdd">0</b><span class="sg-lab">→ 得分A</span><b id="skScoreA">--</b></div>
+            </div>
+            <div class="sg">
+              <div class="sg-h">🅱 B 组 · 上臂 / 前臂 / 手腕<b id="skTabB">--</b></div>
+              <div class="sg-row"><span>上臂</span><span class="mv" id="skUAAng">--°</span><div class="bar"><i id="skUABar"></i></div><span class="sc" id="skUASc">-</span></div>
+              <div class="sg-row"><span>前臂</span><span class="mv" id="skLAAng">--°</span><div class="bar"><i id="skLABar"></i></div><span class="sc" id="skLASc">-</span></div>
+              <div class="sg-row"><span>手腕</span><span class="mv" id="skWrAng">--°</span><div class="bar"><i id="skWrBar"></i></div><span class="sc" id="skWrSc">-</span></div>
+              <div class="sg-add"><span class="sg-lab">耦合</span><select class="sg-sel" id="skCoupling"><option value="0">良好</option><option value="1">一般</option><option value="2">差</option><option value="3">不可接受</option></select><span class="sg-lab">查表B</span><b id="skTableB">--</b><span class="sg-lab">+耦合</span><b id="skCoupAdd">0</b><span class="sg-lab">→ 得分B</span><b id="skScoreB">--</b></div>
+            </div>
           </div>
+          <div class="sk-calc"><span class="sg-lab">查表 C</span><b id="skTabC">--</b><span class="sg-lab">活动加成</span><b id="skAct">0</b><span class="sg-lab">= 总分</span><span class="tot" id="skRebaTotal">--</span></div>
+          <div class="sk-risk-bar"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="sk-risk-labels"><span>0-1 可忽略</span><span>2-3 低</span><span>4-7 中</span><span>8-10 高</span><span>11-15 极高</span></div>
+          <div class="sk-rtxt" id="skRiskTxt">等待检测…</div>
+          <div class="sk-sugg" id="skSugg">开启摄像头后，这里会根据当前 REBA 分数给出人因改善建议。</div>
         </div>
-        <div class="panel"><div class="pt"><b>试试这些动作（真触发才打勾）</b></div>
+        <div class="sk-detect-grid">
+          <div class="sk-detect" id="skDetFall"><div class="sd-h"><i></i>跌倒 / 躺倒<b id="skDetFallN">0</b></div><div class="sd-bar"><i id="skDetFallBar" style="background:var(--red)"></i></div><div class="sd-t">躯干水平持续 0.7s · <span id="skDetFallT">未触发</span></div></div>
+          <div class="sk-detect" id="skDetIdle"><div class="sd-h"><i></i>无动作<b id="skDetIdleN">0</b></div><div class="sd-bar"><i id="skDetIdleBar" style="background:var(--yel)"></i></div><div class="sd-t">静止超 12s（演示阈值）· <span id="skDetIdleT">监控中</span></div></div>
+          <div class="sk-detect" id="skDetHands"><div class="sd-h"><i></i>举手求助<b id="skDetHandsN">0</b></div><div class="sd-bar"><i id="skDetHandsBar" style="background:var(--hl)"></i></div><div class="sd-t">双手过头 2s · <span id="skDetHandsT">未触发</span></div></div>
+        </div>
+        <div class="panel sk-angle-panel">
+          <div class="pt"><b>📐 关节角度实时</b><span>REBA 评分阈值对照</span></div>
+          <div class="ar"><span>躯干倾角</span><div class="bar"><i id="skJTrunk"></i></div><span class="v" id="skJVTrunk">--°</span><b id="skJLTrunk">直立 0° = 1 分</b></div>
+          <div class="ar"><span>颈部倾角</span><div class="bar"><i id="skJNeck"></i></div><span class="v" id="skJVNeck">--°</span><b id="skJLNeck">≤20° = 1 分</b></div>
+          <div class="ar"><span>上臂抬角</span><div class="bar"><i id="skJArm"></i></div><span class="v" id="skJVArm">--°</span><b id="skJLArm">≤20° = 1 分</b></div>
+          <div class="ar"><span>肘屈角</span><div class="bar"><i id="skJElbow"></i></div><span class="v" id="skJVElbow">--°</span><b id="skJLElbow">60-100° = 1 分</b></div>
+          <div class="ar"><span>膝屈角</span><div class="bar"><i id="skJKnee"></i></div><span class="v" id="skJVKnee">--°</span><b id="skJLKnee">≤30° 无加成</b></div>
+        </div>
+        <div class="panel">
+          <div class="pt"><b>🎯 动作挑战</b><span>真实算法触发才打勾</span></div>
           <div class="sk-todo" id="skTodo"></div>
         </div>
         <div class="uni-actions">
           <button class="tc-btn" id="skCamBtn">📷 开启摄像头</button>
           <button class="tc-btn" id="skClear">↻ 清空记录</button>
+          <button class="tc-btn" id="skExport">⬇ 导出 REBA 记录</button>
         </div>
         <div class="uni-feed" id="skLog"></div>
-        <p class="relief-note">模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· 演示判定阈值已缩短，现场部署按规章配置</p>
+        <p class="relief-note">模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· REBA 依据 Hignett &amp; McAtamney (2000) 评分表逐帧计算 · 正面摄像头对矢状面角度为近似估计，现场部署可切换侧面机位并按规章配置阈值</p>
+      </div>
+    </div>
+    <div class="sk-reba-ref rv">
+      <div class="sk-ref-card">
+        <h4>📖 REBA 评分标准速查<span>Hignett &amp; McAtamney, Applied Ergonomics 31 (2000)</span></h4>
+        <div class="sk-ref-grid">
+          <div class="sk-ref-item"><b>躯干</b>：直立 1 · 屈/伸 0-20° 2 · 屈 20-60° 3 · 屈 &gt;60° 4 · <span class="p">+1 扭转/侧弯</span></div>
+          <div class="sk-ref-item"><b>颈部</b>：屈 0-20° 1 · 屈 &gt;20° 或后伸 2 · <span class="p">+1 扭转/侧弯</span></div>
+          <div class="sk-ref-item"><b>腿部</b>：双脚支撑/行走/坐姿 1 · 单脚/不稳 2 · <span class="p">+1 膝 30-60° · +2 膝 &gt;60°</span></div>
+          <div class="sk-ref-item"><b>负荷</b>：&lt;5kg 0 · 5-10kg 1 · &gt;10kg 2 · <span class="p">+1 冲击/突加力</span></div>
+          <div class="sk-ref-item"><b>上臂</b>：屈/伸 0-20° 1 · 屈 20-45° 2 · 屈 45-90° 3 · 屈 &gt;90° 4 · <span class="p">+1 外展 · +1 耸肩 · -1 有支撑</span></div>
+          <div class="sk-ref-item"><b>前臂</b>：屈 60-100° 1 · 屈 &lt;60° 或 &gt;100° 2</div>
+          <div class="sk-ref-item"><b>手腕</b>：屈/伸 0-15° 1 · 屈/伸 &gt;15° 2 · <span class="p">+1 侧偏/扭转</span></div>
+          <div class="sk-ref-item"><b>耦合</b>：良好 0 · 一般 1 · 差 2 · 不可接受 3</div>
+          <div class="sk-ref-item"><b>活动加成</b>：<span class="p">+1 静态 &gt;1 分钟</span> · <span class="p">+1 高频重复 &gt;4 次/分</span> · <span class="p">+1 快速大幅变化</span></div>
+          <div class="sk-ref-item"><b>计分链</b>：A 组查表A + 负荷 → 得分A · B 组查表B + 耦合 → 得分B · 查表C → 得分C + 活动 = REBA 总分</div>
+        </div>
+      </div>
+      <div class="sk-ref-card">
+        <h4>🚦 风险等级与行动要求<span>总分 1~15</span></h4>
+        <div class="sk-lv">
+          <div class="sk-lv-row"><i style="background:#64E59A"></i><b>1 分</b><span>可忽略 · 无需措施</span></div>
+          <div class="sk-lv-row"><i style="background:var(--grn)"></i><b>2-3 分</b><span>低风险 · 可能需要改善</span></div>
+          <div class="sk-lv-row"><i style="background:var(--yel)"></i><b>4-7 分</b><span>中风险 · 需要改善</span></div>
+          <div class="sk-lv-row"><i style="background:var(--hl)"></i><b>8-10 分</b><span>高风险 · 尽快改善</span></div>
+          <div class="sk-lv-row"><i style="background:var(--red)"></i><b>11-15 分</b><span>极高风险 · 立即改善</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1414,6 +1449,59 @@ const I18N={
 '启动失败':{en:'Startup failed',ko:'시작 실패'},
 '↻ 清空记录':{en:'↻ Clear Log',ko:'↻ 기록 지우기'},
 '模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· 演示判定阈值已缩短，现场部署按规章配置':{en:'Model: MediaPipe Pose Landmarker (in-browser) · video local · demo thresholds shortened',ko:'모델: MediaPipe Pose(브라우저 추론) · 영상 로컬 · 데모 임계값 단축'},
+'姿态实时识别 × REBA':{en:'Live Pose Recognition × REBA',ko:'자세 실시간 인식 × REBA'},
+'真实摄像头 + MediaPipe 33 点骨骼跟踪 · 跌倒 / 无动作 / 举手求助 真实算法报警 · REBA 快速全身评估逐帧打分':{en:'Real camera + MediaPipe 33-point skeleton · fall / inactivity / hands-up alarms · REBA scored every frame',ko:'실제 카메라 + MediaPipe 33포인트 골격 · 낙상/무동작/구조요청 알람 · REBA 매 프레임 평가'},
+'关键点':{en:'Keypoints',ko:'키포인트'},
+'REBA 得分':{en:'REBA Score',ko:'REBA 점수'},
+'待检测':{en:'Pending',ko:'대기'},
+'🧮 REBA 快速全身评估':{en:'🧮 REBA Rapid Entire Body Assessment',ko:'🧮 REBA 전신 신속평가'},
+'逐帧真实打分 · 1~15 分':{en:'Scored every frame · 1-15',ko:'매 프레임 채점 · 1~15점'},
+'🅰 A 组 · 躯干 / 颈部 / 腿部':{en:'🅰 Group A · Trunk / Neck / Legs',ko:'🅰 A그룹 · 몸통/목/다리'},
+'躯干':{en:'Trunk',ko:'몸통'},'颈部':{en:'Neck',ko:'목'},'腿部':{en:'Legs',ko:'다리'},
+'负荷':{en:'Load',ko:'하중'},'查表A':{en:'Table A',ko:'표A'},'+负荷':{en:'+Load',ko:'+하중'},'→ 得分A':{en:'→ Score A',ko:'→ 점수A'},
+'🅱 B 组 · 上臂 / 前臂 / 手腕':{en:'🅱 Group B · Upper Arm / Forearm / Wrist',ko:'🅱 B그룹 · 상완/전완/손목'},
+'上臂':{en:'Upper arm',ko:'상완'},'前臂':{en:'Forearm',ko:'전완'},'手腕':{en:'Wrist',ko:'손목'},
+'耦合':{en:'Coupling',ko:'파지'},'良好':{en:'Good',ko:'양호'},'一般':{en:'Fair',ko:'보통'},'差':{en:'Poor',ko:'나쁨'},'不可接受':{en:'Unacceptable',ko:'수용불가'},
+'查表B':{en:'Table B',ko:'표B'},'+耦合':{en:'+Coupling',ko:'+파지'},'→ 得分B':{en:'→ Score B',ko:'→ 점수B'},
+'查表 C':{en:'Table C',ko:'표C'},'活动加成':{en:'Activity',ko:'활동점수'},'= 总分':{en:'= Total',ko:'= 총점'},
+'等待检测…':{en:'Waiting for detection…',ko:'검출 대기 중…'},
+'开启摄像头后，这里会根据当前 REBA 分数给出人因改善建议。':{en:'After enabling the camera, ergonomic suggestions appear based on the live REBA score.',ko:'카메라를 켜면 현재 REBA 점수에 따른 개선 제안이 표시됩니다.'},
+'可忽略 · 无需措施':{en:'Negligible · no action needed',ko:'무시 가능 · 조치 불필요'},
+'低风险 · 可能需要改善':{en:'Low · improvement may be needed',ko:'낮음 · 개선 필요할 수 있음'},
+'中风险 · 需要改善':{en:'Medium · improvement needed',ko:'중간 · 개선 필요'},
+'高风险 · 尽快改善':{en:'High · improve soon',ko:'높음 · 조속 개선'},
+'极高风险 · 立即改善':{en:'Very high · improve now',ko:'매우 높음 · 즉시 개선'},
+'跌倒 / 躺倒':{en:'Fall / lying',ko:'낙상/누움'},
+'无动作':{en:'Inactivity',ko:'무동작'},
+'举手求助':{en:'Hands-up SOS',ko:'구조요청'},
+'未触发':{en:'Not triggered',ko:'미발생'},
+'监控中':{en:'Watching',ko:'감시 중'},
+'躯干水平持续 0.7s ·':{en:'Torso horizontal 0.7s ·',ko:'몸통 수평 0.7초 ·'},
+'静止超 12s（演示阈值）·':{en:'Still >12s (demo) ·',ko:'정지 12초 초과(데모) ·'},
+'双手过头 2s ·':{en:'Hands overhead 2s ·',ko:'양손 머리위 2초 ·'},
+'📐 关节角度实时':{en:'📐 Live Joint Angles',ko:'📐 관절각 실시간'},
+'REBA 评分阈值对照':{en:'vs REBA thresholds',ko:'REBA 기준 대조'},
+'躯干倾角':{en:'Trunk angle',ko:'몸통 각도'},'颈部倾角':{en:'Neck angle',ko:'목 각도'},'上臂抬角':{en:'Upper arm angle',ko:'상완 각도'},'肘屈角':{en:'Elbow angle',ko:'팔꿈치 각도'},'膝屈角':{en:'Knee angle',ko:'무릎 각도'},
+'直立 0° = 1 分':{en:'Upright 0° = 1',ko:'직립 0° = 1점'},
+'≤20° = 1 分':{en:'≤20° = 1',ko:'≤20° = 1점'},
+'60-100° = 1 分':{en:'60-100° = 1',ko:'60-100° = 1점'},
+'≤30° 无加成':{en:'≤30° no add',ko:'≤30° 무가산'},
+'🎯 动作挑战':{en:'🎯 Pose Challenges',ko:'🎯 동작 챌린지'},
+'真实算法触发才打勾':{en:'Checked only by real detection',ko:'실제 감지 시에만 체크'},
+'⬇ 导出 REBA 记录':{en:'⬇ Export REBA Log',ko:'⬇ REBA 기록 내보내기'},
+'模型：MediaPipe Pose Landmarker（浏览器本地推理，影像不出本机）· REBA 依据 Hignett & McAtamney (2000) 评分表逐帧计算 · 正面摄像头对矢状面角度为近似估计，现场部署可切换侧面机位并按规章配置阈值':{en:'Model: MediaPipe Pose (in-browser) · REBA per Hignett & McAtamney (2000) scored every frame · frontal camera approximates sagittal angles; side camera recommended on-site',ko:'모델: MediaPipe Pose(브라우저 추론) · REBA는 Hignett & McAtamney(2000) 표로 매 프레임 계산 · 정면 카메라는 시상면 각도 근사 · 현장은 측면 카메라 권장'},
+'📖 REBA 评分标准速查':{en:'📖 REBA Scoring Quick Reference',ko:'📖 REBA 채점 기준'},
+'Hignett & McAtamney, Applied Ergonomics 31 (2000)':{en:'Hignett & McAtamney, Applied Ergonomics 31 (2000)',ko:'Hignett & McAtamney, Applied Ergonomics 31 (2000)'},
+'🚦 风险等级与行动要求':{en:'🚦 Risk Levels & Actions',ko:'🚦 위험 등급과 조치'},
+'总分 1~15':{en:'Total 1-15',ko:'총점 1~15'},
+'1 分':{en:'1',ko:'1점'},
+'2-3 分':{en:'2-3',ko:'2-3점'},
+'4-7 分':{en:'4-7',ko:'4-7점'},
+'8-10 分':{en:'8-10',ko:'8-10점'},
+'11-15 分':{en:'11-15',ko:'11-15점'},
+'弯腰前倾 · 躯干 >20° 持续 8 秒':{en:'Bend forward · trunk >20° for 8s',ko:'허리 숙임 · 몸통 >20° 8초'},
+'深蹲 · 双膝 >60° 持续 3 秒':{en:'Squat · knees >60° for 3s',ko:'스쿼트 · 무릎 >60° 3초'},
+'REBA 高危姿势 · ≥8 分持续 3 秒':{en:'REBA high-risk pose · ≥8 for 3s',ko:'REBA 고위험 자세 · ≥8점 3초'},
 '作业前安全体检 · 4 秒通关':{en:'Pre-work Safety Check · 4-sec Gate',ko:'작업 전 안전검진 · 4초 통과'},
 '摄像头扫身扫脸：反光衣真实图像判定 · 精神状态真实眼睛分析 · 结果语音播报':{en:'Camera checks vest (real image) & eyes (real analysis) · speaks result',ko:'카메라로 반사조끼(실제 영상)·눈(실제 분석) 판정 · 음성 안내'},
 '体检项目':{en:'Check Items',ko:'검진 항목'},
@@ -1449,14 +1537,36 @@ const I18N={
 };
 let lang='zh';
 try{lang=localStorage.getItem('eagleeye_lang')||'zh';}catch(e){}
-const I18N_DONE=new WeakSet();
 const I18N_SKIP=new Set(['SCRIPT','STYLE']);
+const I18N_REV={}; // {lang:{targetStr:zhStr}} 反向映射，支持中/英/韩来回切换
+function revFor(l){
+  if(I18N_REV[l])return I18N_REV[l];
+  const m={};
+  for(const zh in I18N){
+    const v=I18N[zh]&&I18N[zh][l];
+    if(v)m[v]=zh;
+  }
+  I18N_REV[l]=m;
+  return m;
+}
+function trString(s){
+  if(!s)return s;
+  const direct=I18N[s];
+  if(direct&&direct[lang])return direct[lang];
+  const zh0=revFor('en')[s]||revFor('ko')[s];
+  if(zh0){
+    if(lang==='zh')return zh0;
+    const d=I18N[zh0];
+    if(d&&d[lang])return d[lang];
+  }
+  return s;
+}
 function trText(node){
   if(node.nodeType!==3)return;
   const s=node.textContent.trim();
-  if(!s||I18N_DONE.has(node))return;
-  const m=I18N[s];
-  if(m&&m[lang]){node.textContent=node.textContent.replace(s,m[lang]);I18N_DONE.add(node);}
+  if(!s)return;
+  const r=trString(s);
+  if(r!==s)node.textContent=node.textContent.replace(s,r);
 }
 function trNode(root){
   if(!root)return;
@@ -1474,7 +1584,7 @@ function trNode(root){
     if(!e||e.nodeType!==1)return;
     attrs.forEach(a=>{
       const v=e.getAttribute(a);
-      if(v){const m=I18N[v];if(m&&m[lang])e.setAttribute(a,m[lang]);}
+      if(v){const r=trString(v);if(r!==v)e.setAttribute(a,r);}
     });
     Array.from(e.children||[]).forEach(walk);
   };
@@ -2513,185 +2623,7 @@ SCENES.forEach((s,idx)=>{
   setTimeout(()=>run(),600+idx*400);
 });
 
-/* ============================================================
-   肌肉放松工坊 · 酸痛消消乐（趣味小游戏）
-   ============================================================ */
-(function(){
-  const stage=$('#reliefStage');
-  if(!stage)return;
-  const ZONES=[
-    {id:'neck',label:'肩颈',key:'1',cx:240,cy:118,r:46,tip:'肩颈放松：缓慢耸肩画圈 10 次，下巴微收。'},
-    {id:'armL',label:'左肩臂',key:'2',cx:143,cy:250,r:48,tip:'左臂拉伸：左手搭右肩，右臂轻拉肘部 15 秒。'},
-    {id:'armR',label:'右肩臂',key:'3',cx:337,cy:250,r:48,tip:'右臂拉伸：右手搭左肩，左臂轻拉肘部 15 秒。'},
-    {id:'back',label:'腰背',key:'4',cx:240,cy:300,r:58,tip:'腰背放松：双手叉腰，缓慢后仰再前屈，重复 8 次。'},
-    {id:'legL',label:'左腿',key:'5',cx:220,cy:440,r:45,tip:'左腿拉伸：扶墙后抬左脚，左手拉脚踝 15 秒。'},
-    {id:'legR',label:'右腿',key:'6',cx:260,cy:440,r:45,tip:'右腿拉伸：扶墙后抬右脚，右手拉脚踝 15 秒。'}
-  ];
-  const zonesEl=$('#reliefZones');
-  const $id=s=>document.getElementById(s);
-  ZONES.forEach(z=>{
-    const d=document.createElement('div');
-    d.className='rz';
-    d.style.cssText=`left:${z.cx/480*100}%;top:${z.cy/560*100}%;width:${z.r*2/480*100}%;aspect-ratio:1`;
-    d.dataset.z=z.id;d.dataset.n=z.key;
-    d.title=z.label;
-    d.addEventListener('pointerdown',e=>{e.preventDefault();hitZone(z);});
-    zonesEl.appendChild(d);
-  });
-  $id('reliefLegend').innerHTML=ZONES.map(z=>`<span><b>${z.key}</b> ${z.label}</span>`).join('');
-  /* 音效 */
-  let AC=null;
-  function sfx(freq,dur,type){
-    try{
-      AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-      AC.resume();
-      const o=AC.createOscillator(),g=AC.createGain();
-      o.type=type||'sine';o.frequency.value=freq;
-      g.gain.setValueAtTime(0.12,AC.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
-      o.connect(g).connect(AC.destination);
-      o.start();o.stop(AC.currentTime+dur);
-    }catch(e){}
-  }
-  /* 状态 */
-  let running=false,score=0,combo=0,maxCombo=0,timeLeft=60,lives=3,tension=30,popped=0,elapsed=0;
-  let spawnTimer=null,tickTimer=null;
-  let best=parseInt(localStorage.getItem('eagleeye_relief_best')||'0',10);
-  function setMouth(kind){
-    const m=$id('reliefMouth');
-    if(!m)return;
-    m.setAttribute('d',kind==='happy'?'M226 116 Q240 130 254 116':kind==='sad'?'M226 128 Q240 114 254 128':'M226 122 Q240 128 254 122');
-  }
-  function updHud(){
-    $id('reliefScore').textContent=score;
-    const c=$id('reliefCombo');c.textContent='x'+combo;c.className=combo>=5?'combo':'';
-    $id('reliefTime').textContent=timeLeft;
-    $id('reliefLives').textContent='♥'.repeat(Math.max(0,lives))+'♡'.repeat(Math.max(0,3-lives));
-    $id('reliefTension').style.width=tension+'%';
-  }
-  function hitZone(z){
-    if(!running)return;
-    const hot=zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`);
-    if(!hot){if(navigator.vibrate)navigator.vibrate(25);return;}
-    clearTimeout(hot._t);
-    hot.remove();
-    combo++;maxCombo=Math.max(maxCombo,combo);
-    const pts=100+combo*10;
-    score+=pts;popped++;
-    tension=Math.max(0,tension-12);
-    const pop=document.createElement('div');
-    pop.className='relief-pop';
-    pop.style.cssText=`left:${z.cx/480*100}%;top:${z.cy/560*100}%`;
-    pop.textContent='+'+pts;
-    stage.appendChild(pop);
-    setTimeout(()=>pop.remove(),850);
-    $id('reliefTip').textContent='💡 '+z.tip;
-    setMouth('happy');setTimeout(()=>setMouth('neutral'),500);
-    sfx(520+combo*40,.15,'sine');
-    if(navigator.vibrate)navigator.vibrate(15);
-    updHud();
-  }
-  function spawn(){
-    if(!running)return;
-    const free=ZONES.filter(z=>!zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`));
-    if(!free.length)return;
-    const z=free[Math.floor(Math.random()*free.length)];
-    const el=zonesEl.querySelector(`[data-z="${z.id}"]`);
-    const hot=document.createElement('div');
-    hot.className='rh-hot';
-    hot.innerHTML='<i></i>';
-    const life=Math.max(2800,4400-elapsed*26);
-    el.appendChild(hot);
-    const t=setTimeout(()=>{
-      if(!running)return;
-      const cur=zonesEl.querySelector(`[data-z="${z.id}"] .rh-hot`);
-      if(cur===hot){
-        hot.remove();
-        lives--;tension=Math.min(100,tension+18);combo=0;
-        setMouth('sad');setTimeout(()=>setMouth('neutral'),900);
-        stage.classList.remove('alarm');void stage.offsetWidth;stage.classList.add('alarm');
-        sfx(160,.3,'sawtooth');
-        if(navigator.vibrate)navigator.vibrate([80,50,80]);
-        if(lives<=0){updHud();endGame();return;}
-        updHud();
-      }
-    },life);
-    hot._t=t;
-    setTimeout(()=>{if(document.body.contains(hot))hot.classList.add('late');},life*0.6);
-  }
-  function tick(){
-    if(!running)return;
-    elapsed++;
-    timeLeft--;
-    $id('reliefTime').textContent=timeLeft;
-    if(timeLeft<=0){endGame();return;}
-    const interval=Math.max(650,1350-elapsed*14);
-    clearInterval(spawnTimer);
-    spawnTimer=setInterval(spawn,interval);
-    if(elapsed>20&&Math.random()<0.5)spawn();
-  }
-  function endGame(){
-    running=false;
-    clearInterval(spawnTimer);clearInterval(tickTimer);
-    zonesEl.querySelectorAll('.rh-hot').forEach(h=>{clearTimeout(h._t);h.remove();});
-    setMouth('happy');
-    const stars=score>=1200?3:score>=800?2:score>=400?1:0;
-    if(score>best){best=score;try{localStorage.setItem('eagleeye_relief_best',String(best));}catch(e){}}
-    $id('reliefTitle').textContent='时间到！';
-    $id('reliefStars').innerHTML=Array.from({length:3},(_,i)=>i<stars?'⭐':'<span class="off">⭐</span>').join('');
-    const rank=stars===3?'🥇 肌肉放松大师':stars===2?'🥈 放松达人':stars===1?'🥉 新手放松员':'还需要多多拉伸';
-    $id('reliefMsg').innerHTML=`<span>得分 </span><b style="color:var(--hl)">${score}</b><span> · 击碎 </span><b style="color:var(--grn)">${popped}</b><span> 处 · 最大连击 </span><b>${maxCombo}</b><span> · 最佳 </span><b>${best}</b><br><b style="color:var(--grn)">${rank}</b>`;
-    $id('reliefOverlay').classList.add('show');
-    sfx(660,.2,'triangle');
-  }
-  function startGame(){
-    score=0;combo=0;maxCombo=0;timeLeft=60;lives=3;tension=30;popped=0;elapsed=0;running=true;
-    $id('reliefOverlay').classList.remove('show');
-    zonesEl.querySelectorAll('.rh-hot').forEach(h=>{clearTimeout(h._t);h.remove();});
-    $id('reliefTip').textContent='💡 点击发光部位，或在键盘按 1-6';
-    setMouth('neutral');
-    updHud();
-    clearInterval(spawnTimer);clearInterval(tickTimer);
-    spawnTimer=setInterval(spawn,1350);
-    tickTimer=setInterval(tick,1000);
-    $id('reliefStart').textContent='🔄 重新开始';
-    sfx(440,.12,'triangle');
-  }
-  $id('reliefStart').addEventListener('click',startGame);
-  $id('reliefAgain').addEventListener('click',startGame);
-  addEventListener('keydown',e=>{
-    if(!running)return;
-    const z=ZONES.find(x=>x.key===e.key);
-    if(z)hitZone(z);
-  });
-  updHud();
-})();
 
-/* ============================================================
-   对比滑块
-   ============================================================ */
-function cmpScene(boxes){
-  return `<rect width="1200" height="600" fill="var(--sky2)"/><rect y="470" width="1200" height="130" fill="#0E141F"/><g stroke="#3A4A63" stroke-width="8"><path d="M100 470 V250 H1100 V470"/><path d="M100 320 H1100 M100 390 H1100"/></g>${workerSVG(350,340,1.9,{helmet:false})}${workerSVG(600,380,1.6,{})}${workerSVG(800,350,1.7,{})}<g fill="#1A2434"><rect x="900" y="330" width="220" height="140"/><rect x="930" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/><rect x="1020" y="355" width="60" height="40" fill="#FFE9A8" opacity=".5"/></g>${boxes}<text x="600" y="120" font-size="30" fill="#8B93A7" text-anchor="middle" letter-spacing="8">施工现场</text>`;
-}
-$('#cmpLeft').innerHTML=cmpScene('');
-$('#cmpRight').innerHTML=cmpScene(`
-  <rect x="300" y="300" width="110" height="150" fill="none" stroke="#FF4D4F" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1s" repeatCount="indefinite"/></rect>
-  <text x="305" y="288" fill="#FF4D4F" font-size="22">未佩戴安全帽</text>
-  <rect x="550" y="345" width="105" height="130" fill="none" stroke="#4DA6FF" stroke-width="4" stroke-dasharray="12 8"><animate attributeName="stroke-dashoffset" from="0" to="40" dur="1.2s" repeatCount="indefinite"/></rect>
-  <text x="555" y="333" fill="#4DA6FF" font-size="20">人员</text>
-  <rect x="740" y="310" width="120" height="140" fill="none" stroke="#FFA726" stroke-width="5" stroke-dasharray="14 8"><animate attributeName="stroke-dashoffset" from="0" to="44" dur="1.1s" repeatCount="indefinite"/></rect>
-  <text x="745" y="298" fill="#FFA726" font-size="22">未系安全带</text>
-  <text x="600" y="560" font-size="24" fill="#3DDC84" text-anchor="middle" letter-spacing="4">AI 已识别 3 处风险 · 已报警</text>`);
-const cmp=$('#cmp');
-let dragging=false;
-function setCmpP(clientX){
-  const r=cmp.getBoundingClientRect();
-  const p=Math.max(4,Math.min(96,(clientX-r.left)/r.width*100));
-  cmp.style.setProperty('--p',p+'%');
-}
-cmp.addEventListener('pointerdown',e=>{dragging=true;setCmpP(e.clientX);cmp.setPointerCapture(e.pointerId);});
-cmp.addEventListener('pointermove',e=>{if(dragging)setCmpP(e.clientX);});
-cmp.addEventListener('pointerup',()=>dragging=false);
 
 /* ============================================================
    数据卡（真实数据一处配置）
@@ -2937,7 +2869,7 @@ function downloadCSV(name,rows){
 }
 
 /* ============================================================
-   ① AI 人体骨骼 · 姿态实时识别（MediaPipe Pose）
+   ① AI 人体骨骼 · 姿态实时识别 × REBA（MediaPipe Pose）
    ============================================================ */
 (function(){
   const stage=$('#skStage');
@@ -2945,11 +2877,14 @@ function downloadCSV(name,rows){
   const video=$('#skVideo'),canvas=$('#skCanvas'),ctx=canvas.getContext('2d');
   let stream=null,lm=null,running=false,raf=null,lastT=0,fps=0;
   const POSE_LINES=[[11,12],[12,24],[24,26],[26,28],[11,23],[23,25],[25,27],[11,13],[13,15],[12,14],[14,16],[15,17],[15,19],[15,21],[16,18],[16,20],[16,22]];
-  let prevPts=null,idleT=0,handsT=0,fallT=0,lastCentroid=null;
+  let idleT=0,handsT=0,fallT=0,bendT=0,squatT=0,rebaHighT=0,rebaLastLog=0,rebaWarnLog=0;
+  let lastCentroid=null,lastAngVec=null,lastAngT=0,rapidUntil=0;
+  let lastRebaSample=0,rebaLog=[];
+  const counts={fall:0,idle:0,hands:0};
   const done=JSON.parse(localStorage.getItem('eagleeye_sk_todo')||'{}');
-  const TODOS=[['hands','举手求助 · 双手过头 2 秒'],['bend','弯腰动作 · 8 秒'],['fall','躺下 / 跌倒'],['idle','静止不动 12 秒']];
+  const TODOS=[['hands','举手求助 · 双手过头 2 秒'],['bend','弯腰前倾 · 躯干 >20° 持续 8 秒'],['squat','深蹲 · 双膝 >60° 持续 3 秒'],['fall','躺下 / 跌倒'],['idle','静止不动 12 秒'],['reba','REBA 高危姿势 · ≥8 分持续 3 秒']];
   function renderTodo(){
-    $('#skTodo').innerHTML=TODOS.map(t=>`<div class="tl ${done[t[0]]?'done':''}"><i>${done[t[0]]?'✓':''}</i>${t[1]}</div>`).join('');
+    $('#skTodo').innerHTML=TODOS.map(t=>`<div class="tl ${done[t[0]]?'done':''}"><i>${done[t[0]]?'✓':''}</i><span>${t[1]}</span></div>`).join('');
   }
   renderTodo();
   function setStatus(txt,cls){
@@ -2971,11 +2906,189 @@ function downloadCSV(name,rows){
     try{localStorage.setItem('eagleeye_sk_todo',JSON.stringify(done));}catch(e){}
     renderTodo();
   }
+  function flashDet(sel){
+    const el=$(sel);if(!el)return;
+    el.classList.add('act');setTimeout(()=>el.classList.remove('act'),900);
+  }
+  function txt(id,v){const el=$(id);if(el)el.textContent=v;}
+  function setBar(el,pct,over){
+    if(!el)return;
+    el.style.width=clamp(pct,0,100)+'%';
+    el.classList.toggle('over',!!over);
+  }
+  /* ============ REBA 引擎（Hignett & McAtamney 2000） ============ */
+  const REBA_A=[ // [neck-1][trunk-1][legs-1]
+    [[1,2,3,4],[2,3,4,5],[2,4,5,6],[3,5,6,7],[4,6,7,8]],
+    [[1,2,3,4],[3,4,5,6],[4,5,6,7],[5,6,7,8],[6,7,8,9]],
+    [[3,3,5,6],[4,5,6,7],[5,6,7,8],[6,7,8,9],[7,8,9,9]]
+  ];
+  const REBA_B=[ // [lowerArm-1][upperArm-1][wrist-1]
+    [[1,2,2],[1,2,3],[3,4,5],[4,5,5],[6,7,8],[7,8,8]],
+    [[1,2,3],[2,3,4],[4,5,5],[5,6,7],[7,8,8],[8,9,9]]
+  ];
+  const REBA_C=[
+    [1,1,1,2,3,3,4,5,6,7,7,7],
+    [1,2,2,3,4,4,5,6,6,7,7,8],
+    [2,3,3,3,4,5,6,7,7,8,8,8],
+    [3,4,4,4,5,6,7,8,8,9,9,9],
+    [4,4,4,5,6,7,8,8,9,9,9,9],
+    [6,6,6,7,8,8,9,9,10,10,10,10],
+    [7,7,7,8,9,9,9,10,10,11,11,11],
+    [8,8,8,9,10,10,10,10,10,11,11,11],
+    [9,9,9,10,10,10,11,11,11,12,12,12],
+    [10,10,10,11,11,11,11,12,12,12,12,12],
+    [11,11,11,11,11,12,12,12,12,12,12,12],
+    [12,12,12,12,12,12,12,12,12,12,12,12]
+  ];
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function angAt(a,b,c,asp){ // 夹角 ∠abc（0-180）
+    const ab=[a.x-b.x,(a.y-b.y)*asp], cb=[c.x-b.x,(c.y-b.y)*asp];
+    const d=Math.hypot(ab[0],ab[1])*Math.hypot(cb[0],cb[1]);
+    if(d<1e-6)return 180;
+    return Math.acos(clamp((ab[0]*cb[0]+ab[1]*cb[1])/d,-1,1))*180/Math.PI;
+  }
+  function devV(a,b,asp){ // 与竖直线的夹角（不分上下方向，直立=0）0-90
+    return Math.atan2(Math.abs(b.x-a.x),Math.abs(b.y-a.y)*asp)*180/Math.PI;
+  }
+  function armV(a,b,asp){ // 与竖直向下方向的夹角（REBA 上臂屈曲基准：下垂=0，上举过头≈180）
+    return Math.atan2(Math.abs(b.x-a.x),(b.y-a.y)*asp)*180/Math.PI;
+  }
+  function loadSel(){const el=$('#skLoadSeg .on');return el?+el.dataset.v:0;}
+  function coupSel(){const el=$('#skCoupling');return el?+el.value:0;}
+  function calcREBA(p,asp,st){
+    const sh={x:(p[11].x+p[12].x)/2,y:(p[11].y+p[12].y)/2};
+    const hp={x:(p[23].x+p[24].x)/2,y:(p[23].y+p[24].y)/2};
+    /* ---- A 组：躯干 / 颈 / 腿 ---- */
+    const trunkAng=devV(hp,sh,asp);
+    let trunk=trunkAng<1?1:trunkAng<=20?2:trunkAng<=60?3:4;
+    const shAng=Math.atan2(p[12].y-p[11].y,(p[12].x-p[11].x)*asp)*180/Math.PI;
+    const hpAng=Math.atan2(p[24].y-p[23].y,(p[24].x-p[23].x)*asp)*180/Math.PI;
+    const tilt=Math.abs(((shAng-hpAng+540)%360)-180); // 0-180：侧弯/扭转近似
+    const trunkMod=tilt>15?1:0;
+    trunk=clamp(trunk+trunkMod,1,5);
+    const neckAng=devV(sh,p[0],asp);
+    let neck=neckAng<=20?1:2;
+    const neckMod=(neckAng>20&&Math.abs(p[0].x-sh.x)>0.05)?1:0;
+    neck=clamp(neck+neckMod,1,3);
+    const kneeL=180-angAt(p[23],p[25],p[27],asp),kneeR=180-angAt(p[24],p[26],p[28],asp); // 膝屈角：伸直=0
+    const kneeAng=Math.max(kneeL,kneeR);
+    const footLift=Math.abs(p[27].y-p[28].y)>0.05;
+    let legs=footLift?2:1;
+    if(kneeAng>60)legs+=2;else if(kneeAng>30)legs+=1;
+    legs=clamp(legs,1,4);
+    const load=loadSel();
+    const tableA=REBA_A[neck-1][trunk-1][legs-1];
+    const scoreA=tableA+load;
+    /* ---- B 组：上臂 / 前臂 / 腕 ---- */
+    const uaL=armV(p[11],p[13],asp),uaR=armV(p[12],p[14],asp);
+    const uaAng=Math.max(uaL,uaR);
+    let ua=uaAng<=20?1:uaAng<=45?2:uaAng<=90?3:4;
+    const abd=(uaAng>20&&(Math.abs(p[15].x-p[13].x)>0.04||Math.abs(p[16].x-p[14].x)>0.04))?1:0;
+    const raised=(sh.y-p[0].y)<0.10?1:0;
+    ua=clamp(ua+abd+raised,1,6);
+    const elbL=angAt(p[11],p[13],p[15],asp),elbR=angAt(p[12],p[14],p[16],asp);
+    const elbAng=Math.max(elbL,elbR);
+    const la=(elbAng>=60&&elbAng<=100)?1:2;
+    const wrL=angAt(p[13],p[15],p[19],asp),wrR=angAt(p[14],p[16],p[20],asp);
+    const wrAng=Math.max(wrL,wrR);
+    const wr=wrAng>=165?1:2; // 180±15
+    const coup=coupSel();
+    const tableB=REBA_B[la-1][ua-1][wr-1];
+    const scoreB=tableB+coup;
+    /* ---- C + 活动 ---- */
+    const tableC=REBA_C[clamp(scoreA,1,12)-1][clamp(scoreB,1,12)-1];
+    let act=0,actWhy=[];
+    if(st.idleT>60){act++;actWhy.push('静态>1min');}
+    if(st.rapid){act++;actWhy.push('快速大幅动作');}
+    const total=clamp(tableC+act,1,15);
+    let risk,riskCls,riskLabel,riskAction,sugg;
+    if(total<=1){risk=0;riskCls='r1';riskLabel='可忽略';riskAction='无需措施';sugg='当前姿态接近中性位，肌肉骨骼负荷可忽略，保持规范作业姿态。';}
+    else if(total<=3){risk=1;riskCls='r2';riskLabel='低风险';riskAction='可能需要改善';sugg='姿态总体安全，适当轮换作业内容，避免长时间维持同一姿势。';}
+    else if(total<=7){risk=2;riskCls='r3';riskLabel='中风险';riskAction='需要改善';sugg='建议调整作业面高度或站位，减少躯干前倾与手臂抬举，安排工间休息。';}
+    else if(total<=10){risk=3;riskCls='r4';riskLabel='高风险';riskAction='尽快改善';sugg='高风险姿势！尽快回到中立姿态，配合工位/工装改善并加强现场监督。';}
+    else{risk=4;riskCls='r5';riskLabel='极高风险';riskAction='立即改善';sugg='极高风险！立即停止当前动作，启动干预并重新设计作业流程。';}
+    return {trunk,trunkAng,trunkMod,neck,neckAng,neckMod,legs,kneeAng,footLift,load,tableA,scoreA,
+      ua,uaAng,abd,raised,la,elbAng,wr,wrAng,coup,tableB,scoreB,tableC,act,actWhy,total,
+      risk,riskCls,riskLabel,riskAction,sugg};
+  }
+  /* ============ UI 渲染 ============ */
+  function renderREBA(r){
+    const badge=$('#skRebaBadge');
+    badge.className='sk-reba-badge '+(r?r.riskCls:'');
+    txt('#skRebaScore',r?r.total:'--');
+    txt('#skRebaLevel',r?r.riskLabel+' · '+r.riskAction:'待检测');
+    /* A 组 */
+    txt('#skTrunkAng',r?r.trunkAng.toFixed(0)+'°':'--°');
+    txt('#skTrunkSc',r?(r.trunkMod?r.trunk+'＊':r.trunk):'-');
+    setBar($('#skTrunkBar'),r?r.trunkAng/90*100:0,r&&r.trunkAng>20);
+    txt('#skNeckAng',r?r.neckAng.toFixed(0)+'°':'--°');
+    txt('#skNeckSc',r?(r.neckMod?r.neck+'＊':r.neck):'-');
+    setBar($('#skNeckBar'),r?r.neckAng/60*100:0,r&&r.neckAng>20);
+    txt('#skLegAng',r?r.kneeAng.toFixed(0)+'°':'--°');
+    txt('#skLegSc',r?(r.footLift?r.legs+'＊':r.legs):'-');
+    setBar($('#skLegBar'),r?r.kneeAng/120*100:0,r&&r.kneeAng>30);
+    txt('#skLoadAdd',r?'+'+r.load:'0');
+    txt('#skTableA',r?r.tableA:'--');
+    txt('#skScoreA',r?r.scoreA:'--');
+    /* B 组 */
+    txt('#skUAAng',r?r.uaAng.toFixed(0)+'°':'--°');
+    txt('#skUASc',r?((r.abd||r.raised)?r.ua+'＊':r.ua):'-');
+    setBar($('#skUABar'),r?r.uaAng/120*100:0,r&&r.uaAng>45);
+    txt('#skLAAng',r?r.elbAng.toFixed(0)+'°':'--°');
+    txt('#skLASc',r?r.la:'-');
+    setBar($('#skLABar'),r?100-Math.abs(r.elbAng-80)/80*100:0,r&&(r.elbAng<60||r.elbAng>100));
+    txt('#skWrAng',r?r.wrAng.toFixed(0)+'°':'--°');
+    txt('#skWrSc',r?r.wr:'-');
+    setBar($('#skWrBar'),r?Math.max(0,100-(180-r.wrAng)/15*100):0,r&&r.wrAng<165);
+    txt('#skCoupAdd',r?'+'+r.coup:'0');
+    txt('#skTableB',r?r.tableB:'--');
+    txt('#skScoreB',r?r.scoreB:'--');
+    /* C */
+    txt('#skTabC',r?r.tableC:'--');
+    txt('#skAct',r?(r.act?'+'+r.act+' '+r.actWhy.join('/'):'0'):'0');
+    txt('#skRebaTotal',r?r.total+' 分':'--');
+    const rc=['#64E59A','var(--grn)','var(--yel)','var(--hl)','var(--red)'];
+    $$('.sk-risk-bar i').forEach((el,i)=>el.classList.toggle('on',r&&i===r.risk));
+    const rt=$('#skRiskTxt');
+    if(r)rt.innerHTML=`当前总分 <b>${r.total}</b> · <b style="color:${rc[r.risk]}">${r.riskLabel}</b> · ${r.riskAction}`;
+    else rt.textContent='等待检测…';
+    txt('#skSugg',r?'💡 '+r.sugg:'开启摄像头后，这里会根据当前 REBA 分数给出人因改善建议。');
+    /* 角度面板 */
+    txt('#skJVTrunk',r?r.trunkAng.toFixed(0)+'°':'--°');
+    setBar($('#skJTrunk'),r?r.trunkAng/90*100:0,r&&r.trunkAng>20);
+    txt('#skJLTrunk',r?`评分 ${r.trunk} · 直立=1`:'直立 0° = 1 分');
+    txt('#skJVNeck',r?r.neckAng.toFixed(0)+'°':'--°');
+    setBar($('#skJNeck'),r?r.neckAng/60*100:0,r&&r.neckAng>20);
+    txt('#skJLNeck',r?`评分 ${r.neck} · ≤20°=1`:'≤20° = 1 分');
+    txt('#skJVArm',r?r.uaAng.toFixed(0)+'°':'--°');
+    setBar($('#skJArm'),r?r.uaAng/120*100:0,r&&r.uaAng>45);
+    txt('#skJLArm',r?`评分 ${r.ua} · ≤20°=1`:'≤20° = 1 分');
+    txt('#skJVElbow',r?r.elbAng.toFixed(0)+'°':'--°');
+    setBar($('#skJElbow'),r?100-Math.abs(r.elbAng-80)/80*100:0,r&&(r.elbAng<60||r.elbAng>100));
+    txt('#skJLElbow',r?`评分 ${r.la} · 60-100°=1`:'60-100° = 1 分');
+    txt('#skJVKnee',r?r.kneeAng.toFixed(0)+'°':'--°');
+    setBar($('#skJKnee'),r?r.kneeAng/120*100:0,r&&r.kneeAng>30);
+    txt('#skJLKnee',r?`腿评分 ${r.legs}${r.kneeAng>30?' · 屈膝加成':''}`:'≤30° 无加成');
+    /* 舞台角标 */
+    const hot=(id,v,lim)=>{const el=$(id);if(!el)return;el.textContent=v.toFixed(0)+'°';el.parentElement.classList.toggle('hot',v>lim);};
+    if(r){
+      hot('#skAngTrunk',r.trunkAng,20);
+      hot('#skAngNeck',r.neckAng,20);
+      hot('#skAngArm',r.uaAng,45);
+      hot('#skAngElbow',r.elbAng,100);
+      hot('#skAngKnee',r.kneeAng,30);
+    }
+  }
+  function renderAnglesNone(){
+    ['#skAngTrunk','#skAngNeck','#skAngArm','#skAngElbow','#skAngKnee'].forEach(id=>{
+      const el=$(id);if(!el)return;el.textContent='--°';el.parentElement.classList.remove('hot');
+    });
+  }
   function drawSkeleton(pts,state){
     const w=video.videoWidth||640,h=video.videoHeight||480;
     canvas.width=w;canvas.height=h;
     ctx.clearRect(0,0,w,h);
-    const col=state==='fall'?'#FF4D4F':state==='warn'?'#FFD54A':'#3DDC84';
+    const col=state==='fall'?'#FF4D4F':state==='hands'?'#FFA726':state==='reba'?'#FF4D4F':state==='warn'?'#FFD54A':'#3DDC84';
     ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3;
     ctx.shadowColor=col;ctx.shadowBlur=8;
     POSE_LINES.forEach(([a,b])=>{
@@ -3010,6 +3123,7 @@ function downloadCSV(name,rows){
       await video.play();
       await ensureModel();
       running=true;
+      idleT=0;handsT=0;fallT=0;bendT=0;squatT=0;rebaHighT=0;
       $('#skCamBtn').textContent='📷 关闭摄像头';
       setStatus('识别中 · 请站到画面中央','ok');
       log('骨骼识别已启动 · 影像不出本机');
@@ -3032,78 +3146,176 @@ function downloadCSV(name,rows){
   $('#skClear').addEventListener('click',()=>{
     Object.keys(done).forEach(k=>delete done[k]);
     try{localStorage.setItem('eagleeye_sk_todo',JSON.stringify(done));}catch(e){}
+    counts.fall=counts.idle=counts.hands=0;
+    rebaLog=[];
     renderTodo();
     $('#skLog').innerHTML='';
+    txt('#skDetFallN','0');txt('#skDetIdleN','0');txt('#skDetHandsN','0');
     toast('记录已清空');
+  });
+  $('#skExport').addEventListener('click',()=>{
+    if(!rebaLog.length){toast('暂无 REBA 记录 · 先开启摄像头');return;}
+    const rows=[['时间','REBA总分','风险等级','躯干','颈部','腿部','上臂','前臂','手腕','查表A','负荷','得分A','查表B','耦合','得分B','查表C','活动加成']];
+    rebaLog.forEach(e=>rows.push([e.t,e.total,e.level,e.trunk,e.neck,e.legs,e.ua,e.la,e.wr,e.tableA,e.load,e.scoreA,e.tableB,e.coup,e.scoreB,e.tableC,e.act]));
+    downloadCSV('reba-记录-'+Date.now()+'.csv',rows.map(r=>r.join(',')));
+    toast('REBA 记录已导出');
+  });
+  $('#skLoadSeg').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#skLoadSeg button').forEach(x=>x.classList.toggle('on',x===b));
   });
   function loop(){
     if(!running)return;
     raf=requestAnimationFrame(loop);
     const t=performance.now();
-    if(t-lastT>500){fps=Math.round(1000/(t-lastT));lastT=t;$('#skFps').textContent=fps+' FPS';}
+    if(t-lastT>500){fps=Math.round(1000/(t-lastT));lastT=t;txt('#skFps',fps+' FPS');}
     const c=$('#skClock');if(c)c.textContent=nowStr();
     if(video.readyState<2)return;
     const res=lm.detectForVideo(video,performance.now());
     if(!res||!res.landmarks||!res.landmarks.length){
       setStatus('未检测到人员 · 请站到画面中央','warn');
-      prevPts=null;idleT=0;handsT=0;fallT=0;
+      txt('#skPts','0/33');
+      idleT=0;handsT=0;fallT=0;bendT=0;squatT=0;rebaHighT=0;
+      lastCentroid=null;
+      renderREBA(null);renderAnglesNone();
+      setBar($('#skDetFallBar'),0);setBar($('#skDetIdleBar'),0);setBar($('#skDetHandsBar'),0);
       return;
     }
     const p=res.landmarks[0];
-    /* 关键点 */
+    const vis=p.filter(k=>k.visibility>0.4).length;
+    txt('#skPts',vis+'/33');
+    const w=video.videoWidth||640,h=video.videoHeight||480;
+    const asp=w/Math.max(h,1);
     const nose=p[0],ls=p[11],rs=p[12],lw=p[15],rw=p[16],lh=p[23],rh=p[24];
     const shX=(ls.x+rs.x)/2,shY=(ls.y+rs.y)/2;
     const hpX=(lh.x+rh.x)/2,hpY=(lh.y+rh.y)/2;
     const dx=shX-hpX,dy=shY-hpY;
     const lean=Math.abs(dx)/Math.max(Math.abs(dy),0.001);
     const lying=dy<0.03;
-    /* 跌倒：躯干接近水平或肩低于髋 持续0.7s */
+    let state='ok';
+    /* ① 跌倒：躯干水平或肩低于髋 持续 0.7s */
     if((lean>1.5||lying)&&(ls.visibility>0.5&&rs.visibility>0.5&&lh.visibility>0.5&&rh.visibility>0.5)){
-      fallT+=1/fps*0.5+0.05;
+      fallT+=0.15;
       if(fallT>0.7){
+        fallT=0;counts.fall++;
         setStatus('⚠ 跌倒 / 躺倒检测！','danger');
-        drawSkeleton(p,'fall');
+        state='fall';
         mark('fall');
         log('⚠ 跌倒/躺倒告警 · 已推送','#FF4D4F');
         if(navigator.vibrate)navigator.vibrate([150,80,150]);
-        fallT=0;
-      }else drawSkeleton(p,'warn');
-    }else{fallT=Math.max(0,fallT-0.05);}
-    /* 举手求助：双腕高于肩 2 秒 */
+        flashDet('#skDetFall');
+      }
+    }else fallT=Math.max(0,fallT-0.1);
+    /* ② 举手求助：双腕高于肩 2s */
     if(lw.visibility>0.5&&rw.visibility>0.5&&lw.y<shY-0.04&&rw.y<shY-0.04){
       handsT+=0.15;
       if(handsT>2){
+        handsT=0;counts.hands++;
         setStatus('🙌 举手求助！','danger');
+        state='hands';
         mark('hands');
         log('🙌 举手求助检测 · 已上报','#FFA726');
         if(navigator.vibrate)navigator.vibrate([100,60,100]);
-        handsT=0;
+        flashDet('#skDetHands');
       }
     }else handsT=0;
-    /* 弯曲/弯腰：肩低于平时? 简化：肩髋距离缩短 + 髋高于平时 */
-    const hipDrop=hpY>(lh.y+rh.y)/2-0.02;
-    /* 无动作：关键点位移 */
+    /* ③ 无动作：关键点位移 */
     const centroid={x:(nose.x+shX+hpX)/3,y:(nose.y+shY+hpY)/3};
     let moved=1e9;
     if(lastCentroid){
       moved=Math.hypot(centroid.x-lastCentroid.x,centroid.y-lastCentroid.y);
       if(moved<0.006){
         idleT+=0.15;
-        $('#skIdle').textContent='静止计时 '+idleT.toFixed(1)+'s';
         if(idleT>12){
+          idleT=0;counts.idle++;
           setStatus('⚠ 无动作超时！','danger');
           mark('idle');
           log('⚠ 无动作 12 秒 · 请确认安全','#FFD54A');
-          idleT=0;
+          flashDet('#skDetIdle');
         }
-      }else idleT=0;
+      }else idleT=Math.max(0,idleT-0.3);
     }
     lastCentroid=centroid;
-    if(fallT<=0&&handsT<=0&&idleT<11)setStatus('识别中 · 状态正常','ok');
-    drawSkeleton(p,fallT>0.3?'warn':'ok');
+    /* 快速大幅动作（REBA 活动加成） */
+    if(lastAngT&&t-lastAngT>900){
+      const vec=[ls.x,ls.y,rs.x,rs.y,lw.x,lw.y,rw.x,rw.y];
+      let sum=0;
+      for(let i=0;i<vec.length;i++)sum+=Math.abs(vec[i]-lastAngVec[i]);
+      if(sum>0.30)rapidUntil=t+2000;
+      lastAngVec=vec;lastAngT=t;
+    }else if(!lastAngT){
+      lastAngVec=[ls.x,ls.y,rs.x,rs.y,lw.x,lw.y,rw.x,rw.y];lastAngT=t;
+    }
+    const rapid=performance.now()<rapidUntil;
+    /* ④ REBA 逐帧计算 */
+    const r=calcREBA(p,asp,{idleT,rapid});
+    /* ⑤ 弯腰前倾挑战：躯干 >20° 持续 8s */
+    if(r.trunkAng>20&&!lying){
+      bendT+=0.15;
+      if(bendT>8){bendT=0;mark('bend');log('✅ 弯腰前倾 8 秒 · 动作挑战完成','#3DDC84');}
+    }else bendT=Math.max(0,bendT-0.1);
+    /* ⑥ 深蹲挑战：双膝 >60° 且髋降至膝高附近 持续 3s */
+    const hipDrop=hpY>((p[25].y+p[26].y)/2-0.02);
+    if(r.kneeAng>60&&hipDrop){
+      squatT+=0.15;
+      if(squatT>3){squatT=0;mark('squat');log('✅ 深蹲 3 秒 · 动作挑战完成','#3DDC84');}
+    }else squatT=Math.max(0,squatT-0.1);
+    /* ⑦ REBA 高危姿势告警 */
+    if(r.total>=11){
+      rebaHighT+=0.15;
+      if(rebaHighT>1.5&&performance.now()-rebaLastLog>8000){
+        rebaLastLog=performance.now();
+        setStatus('🚨 极高风险姿势 · REBA '+r.total+' 分！','danger');
+        state='reba';
+        mark('reba');
+        log('🚨 REBA '+r.total+' 分 · 极高风险姿势 · 已告警','#FF4D4F');
+        if(navigator.vibrate)navigator.vibrate([120,60,120]);
+        flashDet('#skRebaBadge');
+      }
+    }else if(r.total>=8){
+      rebaHighT+=0.15;
+      if(rebaHighT>3&&performance.now()-rebaWarnLog>10000){
+        rebaWarnLog=performance.now();
+        setStatus('⚠ 高风险姿势 · REBA '+r.total+' 分','warn');
+        if(state==='ok')state='reba';
+        mark('reba');
+        log('⚠ REBA '+r.total+' 分 · 高风险姿势持续','#FFA726');
+      }
+    }else rebaHighT=0;
+    /* REBA 采样（导出 CSV 用，2 秒一条） */
+    if(t-lastRebaSample>2000){
+      lastRebaSample=t;
+      rebaLog.push({t:nowStr(),total:r.total,level:r.riskLabel,trunk:r.trunk,neck:r.neck,legs:r.legs,ua:r.ua,la:r.la,wr:r.wr,tableA:r.tableA,load:r.load,scoreA:r.scoreA,tableB:r.tableB,coup:r.coup,scoreB:r.scoreB,tableC:r.tableC,act:r.act});
+      if(rebaLog.length>600)rebaLog.shift();
+    }
+    /* 状态 */
+    if(state==='ok'){
+      if(fallT>0)setStatus('疑似跌倒 · 持续 '+fallT.toFixed(1)+'s','warn');
+      else if(handsT>0)setStatus('举手动作 · 持续 '+handsT.toFixed(1)+'s','warn');
+      else if(idleT>8)setStatus('静止 '+idleT.toFixed(0)+'s · 即将触发无动作告警','warn');
+      else if(r.total>=8)setStatus('⚠ 高风险姿势 · REBA '+r.total+' 分','warn');
+      else setStatus('识别中 · 状态正常 · REBA '+r.total+' 分','ok');
+    }
+    /* 检测卡 */
+    txt('#skDetFallN',counts.fall);
+    txt('#skDetIdleN',counts.idle);
+    txt('#skDetHandsN',counts.hands);
+    setBar($('#skDetFallBar'),fallT/0.7*100);
+    setBar($('#skDetIdleBar'),idleT/12*100);
+    setBar($('#skDetHandsBar'),handsT/2*100);
+    txt('#skDetFallT',fallT>0?fallT.toFixed(1)+'s / 0.7s':'未触发');
+    txt('#skDetIdleT',idleT>0?idleT.toFixed(1)+'s / 12s':'监控中');
+    txt('#skDetHandsT',handsT>0?handsT.toFixed(1)+'s / 2s':'未触发');
+    const live=(id,on)=>{const el=$(id);if(el)el.classList.toggle('live',on);};
+    live('#skDetFall',fallT>0);
+    live('#skDetIdle',idleT>8);
+    live('#skDetHands',handsT>0);
+    renderREBA(r);
+    drawSkeleton(p,state==='fall'?'fall':state==='hands'?'hands':state==='reba'?'reba':(fallT>0.3||handsT>0||r.total>=8)?'warn':'ok');
   }
   setInterval(()=>{$('#skIdle').textContent='静止计时 '+(idleT>0?idleT.toFixed(1):'0.0')+'s';},500);
 })();
+
 
 /* ============================================================
    ② 作业前安全体检（摄像头 + 面部眼睛分析 + 语音播报）
