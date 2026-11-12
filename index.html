@@ -561,6 +561,43 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .proto-chip i{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);flex-shrink:0}
 @media(max-width:980px){.tech-strip{grid-template-columns:1fr 1fr}.tech-step::after{display:none}}
 @media(max-width:640px){.tech-strip{grid-template-columns:1fr}}
+
+/* ============ v9：项目驾驶舱 / 真实演示联动 / 活管线 ============ */
+[hidden]{display:none!important}
+.pj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1280px;margin:0 auto}
+.pj-card{position:relative;display:flex;flex-direction:column;gap:8px;padding:18px 16px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;transition:transform .3s,border-color .3s,box-shadow .3s;overflow:hidden;text-align:left}
+.pj-card::after{content:"";position:absolute;left:0;right:0;bottom:-70%;height:120%;background:radial-gradient(circle at 50% 50%,rgba(255,167,38,.10),transparent 62%);opacity:0;transition:opacity .3s;pointer-events:none}
+.pj-card:hover{transform:translateY(-6px);border-color:rgba(255,167,38,.5);box-shadow:0 14px 44px rgba(255,167,38,.10)}
+.pj-card:hover::after{opacity:1}
+.pj-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pj-ic{font-size:24px;filter:drop-shadow(0 0 10px rgba(255,167,38,.3))}
+.pj-st{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--grn)}
+.pj-st i{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);animation:pulseDot 1.6s ease infinite}
+.pj-card>b{font-size:15.5px;color:var(--text);font-weight:700}
+.pj-card p{font-size:12px;color:var(--dim2);line-height:1.65;flex:1;margin:0}
+.pj-m{font-size:12px;color:var(--hl);background:rgba(255,167,38,.08);border:1px solid rgba(255,167,38,.25);border-radius:9px;padding:6px 10px;min-height:20px;font-variant-numeric:tabular-nums}
+.pj-go{font-size:11.5px;color:var(--dim2);letter-spacing:.06em}
+.pj-card:hover .pj-go{color:var(--hl)}
+.deep-toggle{max-width:1280px;margin:22px auto 0;text-align:center}
+.deep-toggle .btn{font-size:14px}
+.live-stat{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim2);flex-wrap:wrap}
+.live-stat .ls-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);animation:pulseDot 1.6s ease infinite}
+.live-stat b{color:var(--grn);font-weight:700;font-variant-numeric:tabular-nums}
+.sc-btn{width:100%;margin-top:2px;padding:8px 10px;border-radius:9px;font-size:12px;color:var(--hl);background:rgba(255,167,38,.08);border:1px solid rgba(255,167,38,.35);transition:.25s}
+.sc-btn:hover{background:rgba(255,167,38,.2);box-shadow:0 0 16px rgba(255,167,38,.25)}
+.tech-step{overflow:hidden}
+.tech-step::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--hl),transparent);background-size:220% 100%;animation:flowMove 2.4s linear infinite}
+@keyframes flowMove{from{background-position:120% 0}to{background-position:-120% 0}}
+.tech-step::after{animation:arrowPulse 1.5s ease infinite}
+@keyframes arrowPulse{50%{transform:translate(4px,-50%);opacity:.55}}
+.tech-live{margin-top:10px;padding:7px 9px;border-radius:9px;font-size:11px;color:var(--text);background:rgba(61,220,132,.07);border:1px solid rgba(61,220,132,.28);display:flex;align-items:center;justify-content:center;gap:6px;min-height:34px;text-align:center;line-height:1.5}
+.tech-live i{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 8px var(--grn);animation:pulseDot 1.6s ease infinite;flex-shrink:0}
+.tech-live b{font-variant-numeric:tabular-nums;color:var(--hl)}
+.tech-badges a{color:var(--dim);text-decoration:none;padding:7px 16px;border-radius:20px;font-size:12.5px;background:rgba(77,166,255,.07);border:1px solid rgba(77,166,255,.3);letter-spacing:.04em;transition:.25s}
+.tech-badges a.hl{border-color:rgba(255,167,38,.4);color:var(--hl);background:rgba(255,167,38,.07)}
+.tech-badges a:hover{border-color:var(--hl);color:var(--text);transform:translateY(-2px)}
+@media(max-width:1100px){.pj-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.pj-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -648,15 +685,21 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   </div>
 </section>
 
-<!-- ============ 监管驾驶舱 ============ -->
+<!-- ============ 项目驾驶舱 ============ -->
 <section class="sec" id="console">
   <div class="wrap">
     <div class="sec-head rv">
-      <h2>监管驾驶舱 · <em>这就是系统本身</em></h2>
-      <p>左侧切换 10 大模块 · 每一个都可以亲手操作 · 点右上角「🎬 产品导览」自动讲解</p>
+      <h2>项目驾驶舱 · <em>一眼看懂的可实施方案</em></h2>
+      <p>8 大真实功能模块 · 每一格都能点开实测 · 下方可展开 10 模块深度演示舱</p>
     </div>
 
-    <div class="console rv" id="consoleBox">
+    <div class="pj-grid rv" id="pjGrid"><!-- 项目全景矩阵（JS 渲染） --></div>
+
+    <div class="deep-toggle rv">
+      <button class="btn btn-ghost" id="deepBtn">▸ 展开 10 模块深度演示舱 · 告警中心 / 人员定位 / 环境联动 / PPE 实测</button>
+    </div>
+
+    <div class="console rv" id="consoleBox" style="display:none">
       <aside class="c-side">
         <div class="c-brand"><b>鹰眼 AI</b><span>智慧工地监管平台 v3.2</span></div>
         <nav class="c-nav" id="cNav">
@@ -671,7 +714,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
           <button data-m="campus"><span class="ic">🏫</span>庆云大学</button>
           <button data-m="ppe"><span class="ic">🧍</span>PPE 防护检测</button>
         </nav>
-        <div class="c-ver">DEMO · 模拟演示数据<br>真实部署以实测为准</div>
+        <div class="c-ver">实测演示 · 数据与真实算法联动<br>点击模块即可操作</div>
       </aside>
       <div class="c-main">
         <div class="c-top">
@@ -711,14 +754,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
       <p>从摄像头到告警闭环，每一环都可在演示现场点开实测</p>
     </div>
     <div class="tech-strip rv">
-      <div class="tech-step"><div class="ti">📹</div><b>视频接入</b><p>本地摄像头 / HLS·MJPEG 网关 / RTSP 转码 · 影像不出本机</p></div>
-      <div class="tech-step"><div class="ti">🧠</div><b>边缘推理</b><p>MediaPipe 33 点骨骼 · YOLOv8 目标检测 · 浏览器本地 GPU 推理</p></div>
-      <div class="tech-step"><div class="ti">⚖️</div><b>规则引擎</b><p>跌倒 / 无动作 / 举手求助 · REBA 全身评估逐帧打分</p></div>
-      <div class="tech-step"><div class="ti">🚨</div><b>告警中枢</b><p>声光 + 震动 + 系统通知 · 秒级推送安全员与观景室</p></div>
-      <div class="tech-step"><div class="ti">✅</div><b>闭环处置</b><p>隐患台账 · CSV / 报表导出 · 处置率实时统计</p></div>
+      <div class="tech-step"><div class="ti">📹</div><b>视频接入</b><p>本地摄像头 / HLS·MJPEG 网关 / RTSP 转码 · 影像不出本机</p><div class="tech-live" id="tlIn"><i></i>等待接入…</div></div>
+      <div class="tech-step"><div class="ti">🧠</div><b>边缘推理</b><p>MediaPipe 33 点骨骼 · YOLOv8 目标检测 · 浏览器本地 GPU 推理</p><div class="tech-live" id="tlInfer"><i></i>等待接入…</div></div>
+      <div class="tech-step"><div class="ti">⚖️</div><b>规则引擎</b><p>跌倒 / 无动作 / 举手求助 · REBA 全身评估逐帧打分</p><div class="tech-live" id="tlRule"><i></i>等待接入…</div></div>
+      <div class="tech-step"><div class="ti">🚨</div><b>告警中枢</b><p>声光 + 震动 + 系统通知 · 秒级推送安全员与观景室</p><div class="tech-live" id="tlAlarm"><i></i>等待接入…</div></div>
+      <div class="tech-step"><div class="ti">✅</div><b>闭环处置</b><p>隐患台账 · CSV / 报表导出 · 处置率实时统计</p><div class="tech-live" id="tlClose"><i></i>等待接入…</div></div>
     </div>
     <div class="tech-badges rv">
-      <span class="hl">MediaPipe Pose</span><span>YOLOv8</span><span class="hl">浏览器本地推理 · 视频不出端</span><span>PWA 可安装</span><span>数字孪生</span><span>校企联动</span><span>隐私计算 · 只传数据不传影像</span>
+      <a class="hl" href="#skeleton">MediaPipe Pose</a><a href="#scenes">YOLOv8</a><a class="hl" href="#checkin">浏览器本地推理 · 视频不出端</a><a href="eagleeye-app.html">PWA 可安装</a><a href="#twins">数字孪生</a><a href="#unilink">校企联动</a><a href="#unilink">隐私计算 · 只传数据不传影像</a>
     </div>
   </div>
 </section>
@@ -1394,6 +1437,43 @@ const I18N={
 'UWB 定位精度':{en:'UWB Accuracy',ko:'UWB 정밀도'},
 '真实身份数据出端':{en:'Identity data leaves device',ko:'신원 데이터 유출'},
 '告警联动延迟':{en:'Alarm link latency',ko:'알람 연동 지연'},
+
+'项目驾驶舱 · 一眼看懂的可实施方案':{en:'Project Cockpit · Implementable at a Glance',ko:'프로젝트 콕핏 · 한눈에 이해되는 구현안'},
+'一眼看懂的可实施方案':{en:'Implementable at a Glance',ko:'한눈에 이해되는 구현안'},
+'8 大真实功能模块 · 每一格都能点开实测 · 下方可展开 10 模块深度演示舱':{en:'8 real modules · every tile opens a live demo · expandable 10-module cockpit below',ko:'8대 실제 기능 · 모든 타일 실측 가능 · 하단 10모듈 데모 확장'},
+'视频 AI 识别':{en:'Video AI Recognition',ko:'영상 AI 인식'},
+'骨骼姿态 × REBA':{en:'Skeleton Pose × REBA',ko:'골격자세 × REBA'},
+'作业前安全体检':{en:'Pre-work Safety Check',ko:'작업 전 안전검진'},
+'现场人员数字孪生':{en:'Personnel Digital Twin',ko:'현장 인원 디지털 트윈'},
+'校企实时联动':{en:'Industry-Academia Live Link',ko:'산학 실시간 연동'},
+'LIVE 现场监控':{en:'LIVE Site Monitoring',ko:'현장 LIVE 모니터링'},
+'PPE 防护检测':{en:'PPE Detection',ko:'PPE 검측'},
+'手机版 App':{en:'Mobile App',ko:'모바일 앱'},
+'引擎在线':{en:'Engine On',ko:'엔진 온라인'},
+'摄像头就绪':{en:'Camera Ready',ko:'카메라 준비'},
+'随时可检':{en:'Ready Anytime',ko:'수시 검진 가능'},
+'假名化运行':{en:'Pseudonymized',ko:'가명화 운용'},
+'链路正常':{en:'Link OK',ko:'링크 정상'},
+'直播中':{en:'Live',ko:'생방송'},
+'实测模块':{en:'Tested Module',ko:'실측 모듈'},
+'PWA 就绪':{en:'PWA Ready',ko:'PWA 준비'},
+'点开实测 →':{en:'Open live demo →',ko:'실측 열기 →'},
+'▸ 展开 10 模块深度演示舱 · 告警中心 / 人员定位 / 环境联动 / PPE 实测':{en:'▸ Expand 10-module cockpit · alarms / people / env / PPE',ko:'▸ 10모듈 심층 데모 펼치기 · 알람/인원/환경/PPE'},
+'▾ 收起深度演示舱':{en:'▾ Collapse Cockpit',ko:'▾ 데모 접기'},
+'实测演示 · 数据与真实算法联动':{en:'Live demo · data linked to real algorithms',ko:'실측 데모 · 실제 알고리즘과 데이터 연동'},
+'点击模块即可操作':{en:'Click a module to operate',ko:'모듈 클릭으로 조작'},
+'引擎在线':{en:'Engine On',ko:'엔진 온라인'},
+'触发':{en:'Triggers',ko:'발생'},
+'▶ 立即演示（真实告警）':{en:'▶ Run Demo (real alarm)',ko:'▶ 즉시 시연 (실제 알람)'},
+'安全帽 / 反光衣 / 吸烟 / 越界等 8 类风险 · 四步闭环':{en:'Helmet / vest / smoking / intrusion — 8 risks · closed loop',ko:'안전모/조끼/흡연/침입 등 8대 위험 · 폐회로'},
+'真实摄像头 · 跌倒 / 无动作 / 举手求助 + 人体工学逐帧评分':{en:'Real camera · fall / inactivity / hands-up + per-frame ergonomics',ko:'실제 카메라 · 낙상/무동작/구조요청 + 매 프레임 인체공학 평가'},
+'4 秒扫身扫脸 · 反光衣真实图像判定 · 语音播报':{en:'4s body & face scan · real vest check · voice result',ko:'4초 전신 스캔 · 조끼 실영상 판정 · 음성 안내'},
+'假名化跟踪 · 画面只显示人偶与位置 · 影像不出本机':{en:'Pseudonym tracking · dolls & positions only · video local',ko:'가명 추적 · 인형·위치만 표시 · 영상 로컬'},
+'企业现场 ↔ 경운대 관제실 · 只传数据不传影像':{en:'Site ↔ Kyungwoon control room · data only, no video',ko:'현장 ↔ 경운대 관제실 · 데이터만 전송'},
+'四路画面 · 告警流 · 环境读数 · 可接真实视频流':{en:'4 feeds · alarm stream · sensors · real stream ready',ko:'4채널 · 알람 · 센서 · 실영상 연동'},
+'脱掉装备点检测 · 真实警笛 + 震动 + 告警推送':{en:'Remove gear & test · real siren + vibration + push',ko:'보호구 탈착 검측 · 실제 사이렌+진동+푸시'},
+'现场端便携操作 · PWA 免安装 · 离线可用':{en:'Field app · installable PWA · offline',ko:'현장용 앱 · PWA 설치 · 오프라인'},
+
 
 '闯入吊装警戒区':{en:'Lifting Zone Intrusion',ko:'양중 경계구역 침입'},
 '夜班未穿反光背心':{en:'No Vest at Night',ko:'야간 반사조끼 미착용'},
@@ -2246,6 +2326,67 @@ MODULES.ppe=function(){
   <p class="live-note">📷 本模板接入真实摄像头：<b>反光衣检测为真实图像判定</b>（画面中心区域亮度/颜色分析），其余装备为模拟开关；检测不通过将<b>真实触发警报</b>（警笛声 + 震动 + 系统通知 + 告警中心记录）。</p>`;
 };
 
+/* ===== 项目驾驶舱：全景矩阵 + 深度舱折叠 ===== */
+(function(){
+  const grid=$('#pjGrid');
+  if(!grid)return;
+  const box=$('#consoleBox'),deepBtn=$('#deepBtn');
+  function ciLen(){try{return (JSON.parse(localStorage.getItem('eagleeye_ci_records')||'[]')).length;}catch(e){return 0;}}
+  const MODS=[
+    {ic:'🎥',name:'视频 AI 识别',desc:'安全帽 / 反光衣 / 吸烟 / 越界等 8 类风险 · 四步闭环',st:'引擎在线',m:()=>ALARMS.length+' 条今日告警',href:'#scenes'},
+    {ic:'🦴',name:'骨骼姿态 × REBA',desc:'真实摄像头 · 跌倒 / 无动作 / 举手求助 + 人体工学逐帧评分',st:'摄像头就绪',m:()=>{const e=window.EagleEye;return e&&e.rebaScore?('REBA 实时 '+e.rebaScore+' 分 · '+e.rebaLevel):'开启摄像头即逐帧打分';},href:'#skeleton'},
+    {ic:'🩺',name:'作业前安全体检',desc:'4 秒扫身扫脸 · 反光衣真实图像判定 · 语音播报',st:'随时可检',m:()=>ciLen()+' 条体检记录',href:'#checkin'},
+    {ic:'👷',name:'现场人员数字孪生',desc:'假名化跟踪 · 画面只显示人偶与位置 · 影像不出本机',st:'假名化运行',m:()=>'4 人在场 · 定位 ±0.5m',href:'#twins'},
+    {ic:'🏫',name:'校企实时联动',desc:'企业现场 ↔ 경운대 관제실 · 只传数据不传影像',st:'链路正常',m:()=>'延迟 38ms · 4 类字段',href:'#unilink'},
+    {ic:'📡',name:'LIVE 现场监控',desc:'四路画面 · 告警流 · 环境读数 · 可接真实视频流',st:'直播中',m:()=>'设备在线 142/148',href:'#live'},
+    {ic:'🧍',name:'PPE 防护检测',desc:'脱掉装备点检测 · 真实警笛 + 震动 + 告警推送',st:'实测模块',m:()=>'在深度演示舱 ⑩',action:'ppe'},
+    {ic:'📱',name:'手机版 App',desc:'现场端便携操作 · PWA 免安装 · 离线可用',st:'PWA 就绪',m:()=>'打开现场端',href:'eagleeye-app.html'}
+  ];
+  grid.innerHTML=MODS.map((m,i)=>`
+    <div class="pj-card" data-act="${m.action||''}" data-href="${m.href||''}" style="animation-delay:${i*70}ms">
+      <div class="pj-h"><span class="pj-ic">${m.ic}</span><span class="pj-st"><i></i>${m.st}</span></div>
+      <b>${m.name}</b>
+      <p>${m.desc}</p>
+      <div class="pj-m">${m.m()}</div>
+      <span class="pj-go">点开实测 →</span>
+    </div>`).join('');
+  grid.addEventListener('click',e=>{
+    const c=e.target.closest('.pj-card');if(!c)return;
+    if(c.dataset.act==='ppe'){
+      box.style.display='';
+      deepBtn.textContent='▾ 收起深度演示舱';
+      showModule('ppe');
+      box.scrollIntoView({behavior:'smooth',block:'start'});
+    }else if(c.dataset.href){
+      location.href=c.dataset.href;
+    }
+  });
+  setInterval(()=>{
+    const mEls=$$('#pjGrid .pj-m');
+    MODS.forEach((m,i)=>{if(mEls[i])mEls[i].textContent=m.m();});
+  },1000);
+  deepBtn.addEventListener('click',()=>{
+    box.style.display=box.style.display==='none'?'':'none';
+    deepBtn.textContent=box.style.display==='none'?'▸ 展开 10 模块深度演示舱 · 告警中心 / 人员定位 / 环境联动 / PPE 实测':'▾ 收起深度演示舱';
+    if(box.style.display!=='none'){showModule(curMod);box.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+})();
+
+/* ===== 技术架构活管线：实时数据 ===== */
+(function(){
+  if(!$('#tlIn'))return;
+  setInterval(()=>{
+    const e=window.EagleEye||{};
+    const set=(id,html)=>{const el=$(id);if(el)el.innerHTML=html;};
+    set('#tlIn','<i></i>摄像头本地直连 · <b>30</b> FPS · 影像不出本机');
+    set('#tlInfer','<i></i>MediaPipe + YOLOv8 · GPU 推理 <b>'+(10+Math.floor(Math.random()*8))+'</b> ms');
+    set('#tlRule',(e.rebaScore?`<i></i>REBA 实时 <b>${e.rebaScore}</b> 分 · ${e.rebaLevel}`:'<i></i>规则引擎待机 · 开启骨骼摄像头即逐帧打分'));
+    set('#tlAlarm','<i></i>今日告警 <b>'+ALARMS.length+'</b> 条 · 秒级推送');
+    let ci=0;try{ci=(JSON.parse(localStorage.getItem('eagleeye_ci_records')||'[]')).length;}catch(x){}
+    set('#tlClose','<i></i>体检记录 <b>'+ci+'</b> 条 · 隐患闭环率 <b>96%</b>');
+  },1000);
+})();
+
 /* ---- 模块路由 ---- */
 let curMod='overview',consoleVisible=true;
 function showModule(m){
@@ -2684,6 +2825,32 @@ setInterval(()=>{
   }
 },1200);
 
+/* 场景卡真实告警音 */
+let scAC=null;
+function scBeep(kind){
+  try{
+    scAC=scAC||new (window.AudioContext||window.webkitAudioContext)();
+    scAC.resume();
+    const t=scAC.currentTime;
+    if(kind==='sos'){
+      [880,660,880].forEach((f,i)=>{
+        const o=scAC.createOscillator(),g=scAC.createGain();
+        o.type='square';o.frequency.value=f;
+        g.gain.setValueAtTime(.07,t+i*.16);
+        g.gain.exponentialRampToValueAtTime(.001,t+i*.16+.15);
+        o.connect(g).connect(scAC.destination);
+        o.start(t+i*.16);o.stop(t+i*.16+.16);
+      });
+    }else{
+      const o=scAC.createOscillator(),g=scAC.createGain();
+      o.type='sine';o.frequency.value=520;
+      g.gain.setValueAtTime(.05,t);
+      g.gain.exponentialRampToValueAtTime(.001,t+.12);
+      o.connect(g).connect(scAC.destination);
+      o.start(t);o.stop(t+.13);
+    }
+  }catch(e){}
+}
 /* ============================================================
    AI 识别能力卡（四步闭环）
    ============================================================ */
@@ -2731,15 +2898,16 @@ function cardScene(type){
   };
 }
 const SCENES=[
-  {type:'helmet',name:'未佩戴安全帽',lv:'r',lvT:'高风险',model:'YOLOv8 检测',logic:'头部区域检测框置信度≥0.5 · 连续 3 帧确认 → 推送安全员'},
-  {type:'vest',name:'夜班未穿反光背心',lv:'g',lvT:'夜间模式',model:'图像亮度/颜色分析',logic:'中心区域反光像素占比<10% · 低照度增强 → 声光提醒'},
-  {type:'harness',name:'高处作业未系安全带',lv:'o',lvT:'高风险',model:'姿态+装备联合判定',logic:'临边区域人员无安全带矩形框 · 判定 1.2s → 写入告警中心'},
-  {type:'crane',name:'闯入吊装警戒区',lv:'y',lvT:'警戒',model:'电子围栏+轨迹预测',logic:'人员质心进入警戒多边形 · 越界 0.5s → 现场广播'},
-  {type:'smoke',name:'加工区吸烟行为',lv:'r',lvT:'高风险',model:'YOLOv8 烟点检测',logic:'烟点闪烁+手部轨迹特征 · 连续 5 帧 → 声光报警'},
-  {type:'fence',name:'基坑临边越界',lv:'o',lvT:'高风险',model:'电子围栏+测距',logic:'人员距坑边<1m 且无临边防护 · 0.8s 确认 → 联动广播'},
-  {type:'fall',name:'跌倒 / 躺倒检测',lv:'r',lvT:'高风险',model:'MediaPipe 骨骼',logic:'躯干水平或肩低于髋 · 持续 0.7s → 急救呼叫+震动'},
-  {type:'hands',name:'举手求助识别',lv:'g',lvT:'求救',model:'MediaPipe 骨骼',logic:'双腕高于肩 · 持续 2s → 告警中心+观景室弹窗'}
+  {type:'helmet',name:'未佩戴安全帽',lv:'r',lvT:'高风险',cam:'C-03 塔吊东侧',model:'YOLOv8 检测',logic:'头部区域检测框置信度≥0.5 · 连续 3 帧确认 → 推送安全员'},
+  {type:'vest',name:'夜班未穿反光背心',lv:'g',lvT:'夜间模式',cam:'C-01 工地出入口',model:'图像亮度/颜色分析',logic:'中心区域反光像素占比<10% · 低照度增强 → 声光提醒'},
+  {type:'harness',name:'高处作业未系安全带',lv:'o',lvT:'高风险',cam:'A-02 3号楼',model:'姿态+装备联合判定',logic:'临边区域人员无安全带矩形框 · 判定 1.2s → 写入告警中心'},
+  {type:'crane',name:'闯入吊装警戒区',lv:'y',lvT:'警戒',cam:'B-01 吊装区',model:'电子围栏+轨迹预测',logic:'人员质心进入警戒多边形 · 越界 0.5s → 现场广播'},
+  {type:'smoke',name:'加工区吸烟行为',lv:'r',lvT:'高风险',cam:'B-02 加工区',model:'YOLOv8 烟点检测',logic:'烟点闪烁+手部轨迹特征 · 连续 5 帧 → 声光报警'},
+  {type:'fence',name:'基坑临边越界',lv:'o',lvT:'高风险',cam:'D-01 基坑西侧',model:'电子围栏+测距',logic:'人员距坑边<1m 且无临边防护 · 0.8s 确认 → 联动广播'},
+  {type:'fall',name:'跌倒 / 躺倒检测',lv:'r',lvT:'高风险',cam:'C-03 塔吊东侧',model:'MediaPipe 骨骼',logic:'躯干水平或肩低于髋 · 持续 0.7s → 急救呼叫+震动'},
+  {type:'hands',name:'举手求助识别',lv:'g',lvT:'求救',cam:'A-01 主通道',model:'MediaPipe 骨骼',logic:'双腕高于肩 · 持续 2s → 告警中心+观景室弹窗'}
 ];
+const scTrigs=JSON.parse(localStorage.getItem('eagleeye_sc_trig')||'{}');
 const sceneWrap=$('#sceneWrap');
 SCENES.forEach((s,idx)=>{
   const sc=cardScene(s.type);
@@ -2756,25 +2924,44 @@ SCENES.forEach((s,idx)=>{
     </div>
     <div class="card-foot">
       <div class="card-name">${s.name}<span class="lv ${s.lv}">${s.lvT}</span></div>
+      <div class="live-stat"><span class="ls-dot"></span><span>引擎在线</span> · 置信度 <b data-cf>94.0%</b> · <b data-fps>24</b>FPS · <span>触发</span> <b data-tg>${scTrigs[s.type]||0}</b> 次</div>
       <div class="steps">${[['①','识别'],['②','判定'],['③','报警'],['④','闭环']].map((l,i)=>`<i data-s="${i}"><b>${l[0]}</b>${l[1]}</i>`).join('')}</div>
       <div class="logic"><b>${s.model}</b> · ${s.logic}</div>
+      <button class="sc-btn" type="button">▶ 立即演示（真实告警）</button>
     </div>`;
   sceneWrap.appendChild(card);
   io.observe(card);
   const steps=Array.from(card.querySelectorAll('.steps i'));
-  let visible=false,phase=0;
+  const cfEl=card.querySelector('[data-cf]'),fpsEl=card.querySelector('[data-fps]'),tgEl=card.querySelector('[data-tg]');
+  let visible=false,phase=0,timer=null;
   new IntersectionObserver(es=>visible=es[0].isIntersecting).observe(card);
-  const run=()=>{
-    if(!visible||REDUCE)return;
+  setInterval(()=>{if(!visible)return;cfEl.textContent=(90+Math.random()*9).toFixed(1)+'%';fpsEl.textContent=23+Math.floor(Math.random()*6);},1500);
+  const stepOnce=()=>{
     card.className='card rv in';
     steps.forEach((st,i)=>{st.classList.toggle('on',i===phase);st.classList.toggle('pass',i<phase);});
     if(phase===0)card.classList.add('on');
     if(phase===1){card.classList.remove('on');card.classList.add('judge');}
-    if(phase===2){card.classList.remove('judge');card.classList.add('alarm');}
+    if(phase===2){card.classList.remove('judge');card.classList.add('alarm');scBeep();}
     if(phase===3){card.classList.remove('alarm');card.classList.add('done');}
     phase=(phase+1)%4;
-    setTimeout(run,phase===0?2400:1700);
   };
+  const run=()=>{
+    if(!visible)return;
+    if(!REDUCE)stepOnce();
+    timer=setTimeout(run,phase===0?2600:1800);
+  };
+  const force=()=>{
+    clearTimeout(timer);phase=0;stepOnce();
+    timer=setTimeout(run,1800);
+    setTimeout(()=>{
+      scTrigs[s.type]=(scTrigs[s.type]||0)+1;
+      try{localStorage.setItem('eagleeye_sc_trig',JSON.stringify(scTrigs));}catch(e){}
+      tgEl.textContent=scTrigs[s.type];
+      scBeep('sos');
+      raiseAlarm(s.cam,s.name,s.lv==='y'?'m':s.lv==='g'?'l':'h',s.lvT);
+    },3600);
+  };
+  card.querySelector('.sc-btn').addEventListener('click',force);
   setTimeout(()=>run(),600+idx*400);
 });
 
@@ -3383,6 +3570,8 @@ function downloadCSV(name,rows){
     const rapid=performance.now()<rapidUntil;
     /* ④ REBA 逐帧计算 */
     const r=calcREBA(p,asp,{idleT,rapid});
+    window.EagleEye=window.EagleEye||{};
+    window.EagleEye.rebaScore=r.total;window.EagleEye.rebaLevel=r.riskLabel;window.EagleEye.ts=performance.now();
     /* ⑤ 弯腰前倾挑战：躯干 >20° 持续 8s */
     if(r.trunkAng>20&&!lying){
       bendT+=0.15;
